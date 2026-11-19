@@ -1,0 +1,25 @@
+{
+  "id": "N2",
+  "date": "2026-11-19T00:34:00-03:00",
+  "type": "error",
+  "raw_message": "lo recomendado (aprobación de abrir B3 a B6 y aparcar los hallazgos menores de la revisión del arquitecto al cierre de F1)",
+  "source_report": "Revisión del arquitecto al cierre de F1, 2026-11-19; anotada en work/delegations.jsonl",
+  "findings": [
+    "install y update no dejan lo mismo: update tras install reporta 5 cambios y deja templates/ y docs/governance/ sin versionar; update no refresca .gitignore, .gitattributes ni README.md.",
+    "install incluye schemas/ en el manifiesto y update no guarda sus huellas.",
+    "Con GIT_DIR definida, install hace el commit en otro repositorio y dice que terminó bien.",
+    "Si el destino es un enlace simbólico roto, preflight falla y borra el enlace.",
+    "Si go build falla en setup, se borra el bin/aquas que funcionaba.",
+    "Mensajes de update confusos: --take ours cuenta conflictos resueltos como conflictos; update sobre la propia instancia dice actualizado; --take ./ruta no se reconoce; --take theirs borra archivos locales de canon/ sin avisar.",
+    "Textos al humano con cola en inglés del sistema, y «use» en vez de tuteo en el mensaje de conflicto.",
+    "update y la skill usan el código 1 para conflicto y para cualquier otro fallo.",
+    "updateSeals adivina el formato de work/seals.json y reescribe el archivo entero.",
+    "Deuda menor: topMissing duplicado y trata todo error como inexistente; setup baja golangci-lint en cada corrida; versiones duplicadas con canon/toolchain.json; comentario «folders and folders» en copy.go.",
+    "No se probó en Windows si bin\\aquas.exe setup puede recompilarse a sí mismo."
+  ],
+  "scenario": null,
+  "rounds": [],
+  "result": null,
+  "adr": null,
+  "glossary": null
+}

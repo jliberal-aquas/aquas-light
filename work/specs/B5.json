@@ -1,0 +1,34 @@
+{
+  "id": "B5",
+  "parent": "S3",
+  "name": "install acepta un destino dentro del paquete",
+  "what": "`aquas install` acepta una ruta destino dentro de la raíz del paquete, por ejemplo una ruta relativa corrida desde `tools/`, y la copia se repite dentro de sí misma hasta un error de ruta demasiado larga. También toma `--help` como ruta. Se corrige en el preflight: rechaza con código 1, sin crear nada, un destino que es la raíz del paquete o está dentro de ella, y rechaza un argumento que empieza con `-` con un mensaje de uso.",
+  "files": [
+    "tools/internal/install/preflight.go",
+    "tools/cmd/aquas/main.go",
+    "tools/internal/install/preflight_test.go"
+  ],
+  "repro": {
+    "name": "TestPreflightRejectsDestInsidePackage",
+    "red": "`aquas install mi-api` desde `<paquete>/tools` falla con `file name too long` tras copiar recursivamente (revisión del arquitecto, experimento L)."
+  },
+  "functional_test": "El humano corre `go run ./cmd/aquas install mi-api` desde `tools/` y ve un mensaje corto que dice que el destino no puede estar dentro del paquete; no aparece la carpeta `mi-api`.",
+  "technical_test": {
+    "name": "TestPreflightRejectsDestInsidePackage",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Destino relativo `mi-api` con el directorio actual en `<paquete>/tools`.",
+      "expect": "Código 1; mensaje de menos de 300 caracteres que nombra la raíz del paquete; `<paquete>/tools/mi-api` no existe."
+    },
+    {
+      "case": "Destino igual a la raíz del paquete.",
+      "expect": "Código 1; nada cambia."
+    },
+    {
+      "case": "`aquas install --help`.",
+      "expect": "Código distinto de 0 con un mensaje de uso; no se crea la carpeta `--help`."
+    }
+  ]
+}

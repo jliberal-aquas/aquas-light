@@ -1,0 +1,16 @@
+{
+  "id": "B6",
+  "parent": "S8",
+  "name": "La skill usa una variable de shell entre llamadas",
+  "what": "`skill/SKILL.md` guarda la carpeta temporal en `$tmp` en el paso 3 y la usa en los pasos 4, 5 y 6. La herramienta de comandos de Claude no conserva variables entre llamadas. Se corrige el texto: el agente anota la ruta literal que imprimió `mktemp -d` y la escribe en cada comando siguiente, sin `$tmp`.",
+  "files": [
+    "skill/SKILL.md"
+  ],
+  "repro": {
+    "name": "lectura de skill/SKILL.md",
+    "red": "Los pasos 4, 5 y 6 usan `\"$tmp/tools\"` y `rm -rf \"$tmp\"` (revisión del arquitecto)."
+  },
+  "functional_test": "El humano lee `skill/SKILL.md` y no encuentra `$tmp` en ningún comando después del paso 3.",
+  "technical_test": "Prueba técnica: no aplica (sin código)",
+  "destructive_cases": []
+}

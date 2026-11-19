@@ -1,0 +1,30 @@
+{
+  "id": "B3",
+  "parent": "S7",
+  "name": "update escribe a través de enlaces simbólicos",
+  "what": "`aquas update` sigue enlaces simbólicos al leer y escribir en la instancia. Un archivo o carpeta de la instancia que es enlace (por ejemplo `canon/method.md` o `templates/`) hace que update escriba fuera de la instancia. Se corrige: antes de escribir nada, update revisa cada componente de la ruta destino con `Lstat`; si alguno es enlace simbólico, se detiene con código distinto de 0, nombra la ruta y no cambia ningún archivo.",
+  "files": [
+    "tools/internal/update/update.go",
+    "tools/internal/update/update_test.go"
+  ],
+  "repro": {
+    "name": "TestUpdateRefusesSymlinks",
+    "red": "Con `canon/method.md` enlazado a un archivo externo, update reemplaza el archivo externo y sale con código 0 (revisión del arquitecto, experimento D)."
+  },
+  "functional_test": "El humano reemplaza `canon/method.md` por un enlace a otro archivo, corre la actualización y ve un error que nombra `canon/method.md`; el archivo apuntado sigue igual.",
+  "technical_test": {
+    "name": "TestUpdateRefusesSymlinks",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "`canon/method.md` es enlace a un archivo fuera de la instancia.",
+      "expect": "Código distinto de 0; la salida nombra `canon/method.md`; el archivo externo queda idéntico byte a byte; ningún archivo de la instancia cambia."
+    },
+    {
+      "case": "`templates` es enlace a una carpeta fuera de la instancia.",
+      "expect": "Código distinto de 0; la carpeta externa queda sin archivos nuevos."
+    }
+  ],
+  "platforms_note": "En Windows crear enlaces puede requerir permisos; la prueba se salta allí solo si `os.Symlink` falla, y lo dice con t.Skip."
+}

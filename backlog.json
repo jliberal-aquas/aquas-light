@@ -4,8 +4,8 @@
     "I": 2,
     "F": 10,
     "S": 47,
-    "B": 3,
-    "N": 2,
+    "B": 7,
+    "N": 3,
     "C": 10
   },
   "capabilities": [
@@ -171,6 +171,47 @@
       "priority": 0,
       "spec": "work/specs/B2.json",
       "spec_sha256": "b96f506278a5a03fcd9444d5493d6020b6b8f417fbd14a0d17ea6ec7d1f6ad07"
+    },
+    {
+      "id": "B3",
+      "type": "bug",
+      "parent": "S7",
+      "state": "in_progress",
+      "priority": 0,
+      "spec": "work/specs/B3.json"
+    },
+    {
+      "id": "B4",
+      "type": "bug",
+      "parent": "S7",
+      "state": "ready",
+      "priority": 0,
+      "spec": "work/specs/B4.json"
+    },
+    {
+      "id": "B5",
+      "type": "bug",
+      "parent": "S3",
+      "state": "ready",
+      "priority": 0,
+      "spec": "work/specs/B5.json"
+    },
+    {
+      "id": "B6",
+      "type": "bug",
+      "parent": "S8",
+      "state": "ready",
+      "priority": 0,
+      "spec": "work/specs/B6.json"
+    },
+    {
+      "id": "N2",
+      "type": "need",
+      "parent": "F1",
+      "state": "to_refine",
+      "priority": 10,
+      "spec": null,
+      "source": "work/requests/N2.json"
     },
     {
       "id": "F2",

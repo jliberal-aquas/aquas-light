@@ -1,0 +1,14 @@
+{
+  "slice": "B3",
+  "step": "red",
+  "done": [
+    "plan"
+  ],
+  "next": "Implementador: prueba roja, código y verde.",
+  "files": [
+    "tools/internal/update/update.go",
+    "tools/internal/update/update_test.go"
+  ],
+  "blockers": [],
+  "updated_at": "2026-11-19T00:40:00-03:00"
+}

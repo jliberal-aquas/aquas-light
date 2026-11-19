@@ -1,0 +1,30 @@
+{
+  "id": "B4",
+  "parent": "S7",
+  "name": "update deja la instancia a medias y dice que no actualizó nada",
+  "what": "Si `aquas update` falla durante la escritura, algunos archivos ya quedaron escritos y el mensaje dice «no se actualizó nada». Se corrige en dos partes: (1) update valida todo lo que puede fallar antes de escribir el primer archivo (conflictos, lectura de `work/seals.json`, destinos que son carpeta donde va un archivo); (2) si aun así falla una escritura, el mensaje dice que la actualización quedó incompleta y que el humano debe volver a correrla, con código distinto de 0.",
+  "files": [
+    "tools/internal/update/update.go",
+    "tools/cmd/aquas/main.go",
+    "tools/internal/update/update_test.go"
+  ],
+  "repro": {
+    "name": "TestUpdateValidatesBeforeWriting",
+    "red": "Con `templates/README.md` como carpeta en la instancia, update escribe `tools/cmd/aquas/main.go` y `docs/governance/` y luego dice «no se actualizó nada» (revisión del arquitecto, experimento E)."
+  },
+  "functional_test": "El humano crea una carpeta `templates/README.md` en su instancia, corre la actualización y ve un error que la nombra; `git status` no muestra cambios.",
+  "technical_test": {
+    "name": "TestUpdateValidatesBeforeWriting",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "`templates/README.md` es una carpeta en la instancia y el paquete trae ese archivo.",
+      "expect": "Código distinto de 0; la salida nombra la ruta; ningún archivo de la instancia cambia, en diez corridas seguidas."
+    },
+    {
+      "case": "`work/seals.json` existe con JSON inválido.",
+      "expect": "Código distinto de 0 antes de escribir; ningún archivo cambia."
+    }
+  ]
+}
