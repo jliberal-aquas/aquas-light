@@ -2,6 +2,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -114,11 +115,21 @@ func runUpdate(args []string, stdout, stderr io.Writer) int {
 	}
 	res, err := update.Update(root, instance, version, takes)
 	if err != nil {
-		_, _ = fmt.Fprintf(stderr, "aquas: no se actualizó nada: %v\n", err)
+		_, _ = fmt.Fprint(stderr, updateFailure(err))
 		return 1
 	}
 	_, _ = fmt.Fprintf(stdout, "Aquas Light actualizado en %s: %d archivos cambiados y %d archivos en conflicto.\n", instance, len(res.Changed), len(res.Conflicts))
 	return 0
+}
+
+// updateFailure words an update error: a PartialError means the instance was
+// left half updated; any other error happened before writing.
+func updateFailure(err error) string {
+	var pe *update.PartialError
+	if errors.As(err, &pe) {
+		return fmt.Sprintf("aquas: la actualización quedó incompleta: %v\nAlgunos archivos ya se actualizaron y otros no. Corrige la causa y vuelve a correr `aquas update` hasta que termine.\n", err)
+	}
+	return fmt.Sprintf("aquas: no se actualizó nada: %v\n", err)
 }
 
 func runHost(stdout, stderr io.Writer) int {

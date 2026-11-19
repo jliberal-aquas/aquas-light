@@ -1,0 +1,31 @@
+=== RUN   TestIntegrationInstall
+--- PASS: TestIntegrationInstall (1.31s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	2.318s
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/hashing	1.010s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/host	1.020s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/install	1.014s [no tests to run]
+=== RUN   TestUpdateRefusesSymlinks
+=== RUN   TestUpdateRefusesSymlinks/archivo_del_canon_enlazado
+=== RUN   TestUpdateRefusesSymlinks/carpeta_tope_enlazada
+=== RUN   TestUpdateRefusesSymlinks/work/seals.json_enlazado
+=== RUN   TestUpdateRefusesSymlinks/subcarpeta_de_tools_enlazada
+--- PASS: TestUpdateRefusesSymlinks (0.08s)
+    --- PASS: TestUpdateRefusesSymlinks/archivo_del_canon_enlazado (0.02s)
+    --- PASS: TestUpdateRefusesSymlinks/carpeta_tope_enlazada (0.02s)
+    --- PASS: TestUpdateRefusesSymlinks/work/seals.json_enlazado (0.02s)
+    --- PASS: TestUpdateRefusesSymlinks/subcarpeta_de_tools_enlazada (0.02s)
+=== RUN   TestUpdateValidatesBeforeWriting
+=== RUN   TestUpdateValidatesBeforeWriting/carpeta_en_lugar_de_templates/README.md
+=== RUN   TestUpdateValidatesBeforeWriting/work/seals.json_inválido
+--- PASS: TestUpdateValidatesBeforeWriting (0.05s)
+    --- PASS: TestUpdateValidatesBeforeWriting/carpeta_en_lugar_de_templates/README.md (0.03s)
+    --- PASS: TestUpdateValidatesBeforeWriting/work/seals.json_inválido (0.02s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/update	1.140s

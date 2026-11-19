@@ -85,8 +85,8 @@ func (t Takes) resolve(rel string) string {
 }
 
 // Update replaces the instance with what pkgRoot carries. It runs from the
-// new package, like install. Nothing is written until every conflict is
-// resolved.
+// new package, like install. Everything that can fail is validated first and
+// nothing is written until then; a failure while writing is a *PartialError.
 func Update(pkgRoot, instance, version string, takes Takes) (Result, error) {
 	var res Result
 	if err := takes.Validate(); err != nil {
@@ -159,7 +159,8 @@ func Update(pkgRoot, instance, version string, takes Takes) (Result, error) {
 		return res, &ConflictError{Paths: unresolved}
 	}
 
-	// Step 2: mirror.
+	// Step 2: plan the mirror, still writing nothing.
+	var ops []op
 	newFiles := map[string]string{}
 	for rel, abs := range pkgFiles {
 		if rel == manifestRel {
@@ -183,19 +184,13 @@ func Update(pkgRoot, instance, version string, takes Takes) (Result, error) {
 		if info, err := os.Stat(abs); err == nil {
 			perm = info.Mode().Perm()
 		}
-		if err := writeFile(dst, data, perm); err != nil {
-			return res, err
-		}
-		res.Changed = append(res.Changed, rel)
+		ops = append(ops, op{rel: rel, dst: dst, data: data, perm: perm})
 	}
 	for rel, abs := range instFiles {
 		if _, ok := pkgFiles[rel]; ok || rel == manifestRel || resolution[rel] == Ours {
 			continue
 		}
-		if err := os.Remove(abs); err != nil {
-			return res, err
-		}
-		res.Changed = append(res.Changed, rel)
+		ops = append(ops, op{rel: rel, dst: abs, remove: true})
 	}
 
 	out, err := json.MarshalIndent(install.Manifest{SchemaVersion: 1, Algorithm: "sha256-lf", Version: strings.TrimPrefix(version, "v"), Files: newFiles}, "", "  ")
@@ -204,19 +199,94 @@ func Update(pkgRoot, instance, version string, takes Takes) (Result, error) {
 	}
 	out = append(out, '\n')
 	if !bytes.Equal(out, raw) {
-		if err := writeFile(filepath.Join(instance, filepath.FromSlash(manifestRel)), out, 0o644); err != nil {
-			return res, err
-		}
-		res.Changed = append(res.Changed, manifestRel)
+		ops = append(ops, op{rel: manifestRel, dst: filepath.Join(instance, filepath.FromSlash(manifestRel)), data: out, perm: 0o644})
 	}
 
-	if changed, err := updateSeals(pkgRoot, instance); err != nil {
+	sealsData, err := planSeals(pkgRoot, instance)
+	if err != nil {
 		return res, err
-	} else if changed {
-		res.Changed = append(res.Changed, sealsRel)
+	}
+	if sealsData != nil {
+		ops = append(ops, op{rel: sealsRel, dst: filepath.Join(instance, filepath.FromSlash(sealsRel)), data: sealsData, perm: 0o644})
+	}
+
+	for _, o := range ops {
+		if err := o.check(instance); err != nil {
+			return res, err
+		}
+	}
+
+	// Step 3: write. From here on a failure leaves the instance half updated.
+	sort.Slice(ops, func(i, j int) bool { return ops[i].rel < ops[j].rel })
+	for _, o := range ops {
+		var werr error
+		if o.remove {
+			werr = os.Remove(o.dst)
+		} else {
+			werr = writeFile(o.dst, o.data, o.perm)
+		}
+		if werr != nil {
+			sort.Strings(res.Changed)
+			return res, &PartialError{Path: o.rel, Err: werr}
+		}
+		res.Changed = append(res.Changed, o.rel)
 	}
 	sort.Strings(res.Changed)
 	return res, nil
+}
+
+// PartialError reports a failure while writing: some files were already
+// updated and the instance is left incomplete. Running update again finishes it.
+type PartialError struct {
+	Path string
+	Err  error
+}
+
+func (e *PartialError) Error() string {
+	return fmt.Sprintf("falló la escritura de %s: %v", e.Path, e.Err)
+}
+
+func (e *PartialError) Unwrap() error { return e.Err }
+
+// op is one planned change: write data to dst, or remove dst.
+type op struct {
+	rel    string
+	dst    string
+	data   []byte
+	perm   fs.FileMode
+	remove bool
+}
+
+// check fails, without changing anything, when the change cannot be made
+// because of what already exists at the destination.
+func (o op) check(instance string) error {
+	parts := strings.Split(o.rel, "/")
+	cur := instance
+	for i, part := range parts {
+		cur = filepath.Join(cur, part)
+		info, err := os.Lstat(cur)
+		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				return nil
+			}
+			return fmt.Errorf("no se pudo revisar %s: %w", strings.Join(parts[:i+1], "/"), err)
+		}
+		last := i == len(parts)-1
+		switch {
+		case last && !info.Mode().IsRegular():
+			return fmt.Errorf("%s existe en la instancia pero no es un archivo: muévelo o bórralo y vuelve a intentar", o.rel)
+		case !last && !info.IsDir():
+			return fmt.Errorf("%s existe en la instancia pero no es una carpeta: %s no se puede escribir; muévelo o bórralo y vuelve a intentar", strings.Join(parts[:i+1], "/"), o.rel)
+		}
+	}
+	if o.remove {
+		return nil
+	}
+	f, err := os.OpenFile(o.dst, os.O_WRONLY, 0)
+	if err != nil {
+		return fmt.Errorf("%s no se puede escribir: %w", o.rel, err)
+	}
+	return f.Close()
 }
 
 // symlinkError names the symlink found inside the instance.
@@ -320,7 +390,7 @@ func walk(root, top string, out map[string]string) error {
 	})
 }
 
-func writeFile(dst string, data []byte, perm fs.FileMode) error {
+var writeFile = func(dst string, data []byte, perm fs.FileMode) error {
 	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
 		return err
 	}
@@ -353,24 +423,26 @@ func readJSONObject(p string) (map[string]any, error) {
 	return doc, nil
 }
 
-// updateSeals replaces only the docs/governance/ entries of the instance's
-// work/seals.json with the package's. It never creates the file.
-func updateSeals(pkgRoot, instance string) (bool, error) {
+// planSeals computes the new content of the instance's work/seals.json: only
+// the docs/governance/ entries are replaced with the package's. It returns nil
+// when there is nothing to write and never creates the file. It validates the
+// instance file whenever it exists.
+func planSeals(pkgRoot, instance string) ([]byte, error) {
 	dst := filepath.Join(instance, filepath.FromSlash(sealsRel))
 	if _, err := os.Stat(dst); err != nil {
-		return false, nil
-	}
-	src := filepath.Join(pkgRoot, filepath.FromSlash(sealsRel))
-	if _, err := os.Stat(src); err != nil {
-		return false, nil
-	}
-	pkgDoc, err := readJSONObject(src)
-	if err != nil {
-		return false, err
+		return nil, nil
 	}
 	instDoc, err := readJSONObject(dst)
 	if err != nil {
-		return false, err
+		return nil, fmt.Errorf("%s: %w", sealsRel, err)
+	}
+	src := filepath.Join(pkgRoot, filepath.FromSlash(sealsRel))
+	if _, err := os.Stat(src); err != nil {
+		return nil, nil
+	}
+	pkgDoc, err := readJSONObject(src)
+	if err != nil {
+		return nil, fmt.Errorf("%s del paquete: %w", sealsRel, err)
 	}
 	pm, im := sealsMap(pkgDoc), sealsMap(instDoc)
 	before := map[string]any{}
@@ -388,11 +460,11 @@ func updateSeals(pkgRoot, instance string) (bool, error) {
 		}
 	}
 	if reflect.DeepEqual(before, im) {
-		return false, nil
+		return nil, nil
 	}
 	out, err := json.MarshalIndent(instDoc, "", "  ")
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-	return true, os.WriteFile(dst, append(out, '\n'), 0o644)
+	return append(out, '\n'), nil
 }

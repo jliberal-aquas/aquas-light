@@ -185,15 +185,16 @@
       "id": "B4",
       "type": "bug",
       "parent": "S7",
-      "state": "in_progress",
+      "state": "done",
       "priority": 0,
-      "spec": "work/specs/B4.json"
+      "spec": "work/specs/B4.json",
+      "spec_sha256": "0ce95b15f9215f450bdc8c1c87ca04ec12b27fb31928bb05fc2bb9cde505bfbd"
     },
     {
       "id": "B5",
       "type": "bug",
       "parent": "S3",
-      "state": "ready",
+      "state": "in_progress",
       "priority": 0,
       "spec": "work/specs/B5.json"
     },

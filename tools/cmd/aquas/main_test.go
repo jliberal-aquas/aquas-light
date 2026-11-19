@@ -2,10 +2,14 @@ package main
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/jliberal-aquas/aquas-light/tools/internal/update"
 )
 
 func noPanic(t *testing.T, s string) {
@@ -144,5 +148,21 @@ func TestSetupSubcommandOutsideRepo(t *testing.T) {
 	}
 	if !strings.Contains(usage(), "setup") {
 		t.Errorf("usage no menciona setup")
+	}
+}
+
+func TestUpdateFailureMessages(t *testing.T) {
+	partial := updateFailure(fmt.Errorf("envuelto: %w", &update.PartialError{Path: "canon/a.md", Err: errors.New("disco lleno")}))
+	for _, want := range []string{"incompleta", "vuelve a correr", "canon/a.md"} {
+		if !strings.Contains(partial, want) {
+			t.Errorf("el mensaje parcial no contiene %q: %q", want, partial)
+		}
+	}
+	if strings.Contains(partial, "no se actualizó nada") {
+		t.Errorf("el mensaje parcial no debe decir que no se actualizó nada: %q", partial)
+	}
+	plain := updateFailure(errors.New("conflicto"))
+	if !strings.Contains(plain, "no se actualizó nada") || strings.Contains(plain, "incompleta") {
+		t.Errorf("mensaje de validación inesperado: %q", plain)
 	}
 }

@@ -409,3 +409,80 @@ func TestUpdateRefusesSymlinks(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateValidatesBeforeWriting(t *testing.T) {
+	cases := []struct {
+		name    string
+		rel     string // path the error must name
+		runs    int
+		prepare func(t *testing.T, v2, inst string)
+	}{
+		{name: "carpeta en lugar de templates/README.md", rel: "templates/README.md", runs: 10,
+			prepare: func(t *testing.T, v2, inst string) {
+				write(t, v2, "tools/extra.go", "package main // nuevo\n")
+				write(t, v2, "docs/governance/g.md", "gobernanza\n")
+				if err := os.RemoveAll(filepath.Join(inst, "templates", "README.md")); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.MkdirAll(filepath.Join(inst, "templates", "README.md"), 0o755); err != nil {
+					t.Fatal(err)
+				}
+			}},
+		{name: "work/seals.json inválido", rel: "work/seals.json", runs: 1,
+			prepare: func(t *testing.T, v2, inst string) {
+				write(t, inst, "work/seals.json", "{no es json")
+				write(t, v2, "work/seals.json", `{"docs/governance/g.md":"x"}`)
+				write(t, v2, "docs/governance/g.md", "gobernanza\n")
+			}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			v1, v2 := newPackage(t, "v1"), newPackage(t, "v2")
+			inst := newInstance(t, v1)
+			c.prepare(t, v2, inst)
+			before := treeSnapshot(t, inst)
+			for i := 0; i < c.runs; i++ {
+				res, err := Update(v2, inst, "0.2.0", Takes{})
+				if err == nil {
+					t.Fatalf("corrida %d: se esperaba un error", i)
+				}
+				var pe *PartialError
+				if errors.As(err, &pe) {
+					t.Errorf("corrida %d: el error debía ser de validación, no PartialError: %v", i, err)
+				}
+				if !strings.Contains(err.Error(), c.rel) {
+					t.Errorf("corrida %d: el error no nombra %s: %v", i, c.rel, err)
+				}
+				if len(res.Changed) != 0 {
+					t.Errorf("corrida %d: no debía cambiar nada: %v", i, res.Changed)
+				}
+				if after := treeSnapshot(t, inst); !equalSnap(before, after) {
+					t.Errorf("corrida %d: la instancia cambió: antes %v, después %v", i, before, after)
+				}
+			}
+		})
+	}
+}
+
+func TestUpdateWriteFailureIsPartialError(t *testing.T) {
+	v1, v2 := newPackage(t, "v1"), newPackage(t, "v2")
+	inst := newInstance(t, v1)
+	orig := writeFile
+	t.Cleanup(func() { writeFile = orig })
+	calls := 0
+	writeFile = func(dst string, data []byte, perm os.FileMode) error {
+		calls++
+		if calls == 2 {
+			return errors.New("disco lleno")
+		}
+		return orig(dst, data, perm)
+	}
+	_, err := Update(v2, inst, "0.2.0", Takes{})
+	var pe *PartialError
+	if !errors.As(err, &pe) {
+		t.Fatalf("se esperaba PartialError, llegó %v", err)
+	}
+	if !strings.Contains(err.Error(), "disco lleno") {
+		t.Errorf("el error pierde la causa: %v", err)
+	}
+}

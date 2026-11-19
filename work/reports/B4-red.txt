@@ -1,0 +1,60 @@
+=== RUN   TestUpdateValidatesBeforeWriting
+=== RUN   TestUpdateValidatesBeforeWriting/carpeta_en_lugar_de_templates/README.md
+    update_test.go:425: remove /tmp/TestUpdateValidatesBeforeWritingcarpeta_en_lugar_de_templatesREADME.md1436000387/003/inst/templates/README.md: no such file or directory
+=== RUN   TestUpdateValidatesBeforeWriting/work/seals.json_inválido
+    update_test.go:457: corrida 0: no debía cambiar nada: [canon/method.md canon/other.md tools/main.go templates/README.md docs/governance/g.md canon/manifest.json]
+    update_test.go:460: corrida 0: la instancia cambió: antes map[.:dir README.md:# Hola
+         archive:dir archive/.gitkeep: canon:dir canon/manifest.json:{
+          "schema_version": 1,
+          "algorithm": "sha256-lf",
+          "version": "0.1.0",
+          "files": {
+            "canon/method.md": "577fe4ba0c0ddfe3702a1e2208085685a181fe095b245797d9a301566554b08e",
+            "canon/other.md": "9518e8c091f3ceabec9d00147e4cf037ec813260631561880fdc4b9e18e5c140",
+            "tools/go.mod": "fc4a3fdfa1b8230e721b7eaada825923cc3b4219dee283230bcec3f6be74c274",
+            "tools/main.go": "afceaef2191e61ea7b7afb45653f40a6c435c9e6611ca6374c94c51c8343a861"
+          }
+        }
+         canon/method.md:metodo v1
+         canon/other.md:otro v1
+         docs:dir docs/.gitkeep: product:dir product/.gitkeep: tools:dir tools/go.mod:module x
+         tools/main.go:package main // v1
+         work:dir work/.gitkeep: work/seals.json:{no es json], después map[.:dir README.md:# Hola
+         archive:dir archive/.gitkeep: canon:dir canon/manifest.json:{
+          "schema_version": 1,
+          "algorithm": "sha256-lf",
+          "version": "0.2.0",
+          "files": {
+            "canon/method.md": "a979f83924282c8f6a49ca46cb536341ad18bd4888a6808a0fc130bcdc45ab48",
+            "canon/other.md": "7ad4e8d4e042075f1ae10167aee403c809c410d9b1aebdda56ed06bbedb680a2",
+            "tools/go.mod": "fc4a3fdfa1b8230e721b7eaada825923cc3b4219dee283230bcec3f6be74c274",
+            "tools/main.go": "cbaf7d587e985269dbe9ad2d7b22a10bdcebd8bb78e2fac824d54df6444aa958"
+          }
+        }
+         canon/method.md:metodo v2
+         canon/other.md:otro v2
+         docs:dir docs/.gitkeep: docs/governance:dir docs/governance/g.md:gobernanza
+         product:dir product/.gitkeep: templates:dir templates/README.md:# Hola
+         tools:dir tools/go.mod:module x
+         tools/main.go:package main // v2
+         work:dir work/.gitkeep: work/seals.json:{no es json]
+--- FAIL: TestUpdateValidatesBeforeWriting (0.02s)
+    --- FAIL: TestUpdateValidatesBeforeWriting/carpeta_en_lugar_de_templates/README.md (0.01s)
+    --- FAIL: TestUpdateValidatesBeforeWriting/work/seals.json_inválido (0.01s)
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/update	0.022s
+FAIL
+
+=== segunda corrida (sin la fase de validación; caso carpeta) ===
+--- FAIL: TestUpdateValidatesBeforeWriting (0.03s)
+    --- FAIL: TestUpdateValidatesBeforeWriting/carpeta_en_lugar_de_templates/README.md (0.03s)
+        update_test.go:451: corrida 0: el error debía ser de validación, no PartialError: falló la escritura de templates/README.md: open /tmp/TestUpdateValidatesBeforeWritingcarpeta_en_lugar_de_templatesREADME.md1488092409/003/inst/templates/README.md: is a directory
+        update_test.go:457: corrida 0: no debía cambiar nada: [canon/manifest.json canon/method.md canon/other.md docs/governance/g.md]
+        update_test.go:460: corrida 0: la instancia cambió: antes map[.:dir README.md:# Hola
+             archive:dir archive/.gitkeep: canon:dir canon/manifest.json:{
+              "schema_version": 1,
+              "algorithm": "sha256-lf",
+              "version": "0.1.0",
+              "files": {
+                "canon/method.md": "577fe4ba0c0ddfe3702a1e2208085685a181fe095b245797d9a301566554b08e",
+                "canon/other.md": "9518e8c091f3ceabec9d00147e4cf037ec813260631561880fdc4b9e18e5c140",

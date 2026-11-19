@@ -32,3 +32,5 @@
 {"date": "2026-11-19", "item": "B3", "role": "implementer", "model": "sonnet", "task": "Arreglar B3 con TDD: update rechaza enlaces simbólicos", "tokens": 74834, "tool_uses": 4, "duration_s": 49}
 {"date": "2026-11-19", "item": "B3", "role": "tester", "model": "haiku", "task": "Verde, rojo por mutación y casos destructivos de B3", "tokens": 81864, "tool_uses": 10, "duration_s": 77}
 {"date": "2026-11-19", "item": "B3", "role": "implementer", "model": "sonnet", "task": "Corrección B3: reforzar la prueba con instantánea completa y dos subcasos (continuación del mismo agente)", "tokens": null, "tool_uses": null, "duration_s": null}
+{"date": "2026-11-19", "item": "B4", "role": "implementer", "model": "sonnet", "task": "Arreglar B4 con TDD: validar antes de escribir y PartialError", "tokens": 89717, "tool_uses": 9, "duration_s": 111}
+{"date": "2026-11-19", "item": "B4", "role": "tester", "model": "haiku", "task": "Verde, rojo por mutación y casos destructivos de B4", "tokens": 84910, "tool_uses": 16, "duration_s": 118}

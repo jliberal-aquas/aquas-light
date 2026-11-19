@@ -1,0 +1,49 @@
+{
+  "item": "B4",
+  "conclusion": "Las tres pruebas de B4 y la suite completa pasan con -race. Las tres mutaciones temporales hacen fallar al menos una prueba, cada una la que corresponde. Los dos casos destructivos del spec tienen cobertura en las pruebas, pero no verifican el código de salida distinto de 0 ni la salida del CLI. git diff --stat no cambió.",
+  "findings": [
+    {
+      "what": "Ninguna prueba afirma que el CLI devuelva código distinto de 0 cuando update falla, que es un requisito de ambos casos destructivos y de B4 (2).",
+      "where": "tools/cmd/aquas/main.go:118-121; tools/cmd/aquas/main_test.go:154-168",
+      "why": "TestUpdateFailureMessages solo revisa el texto de updateFailure. runUpdate devuelve 1 en ese camino, pero ninguna prueba lo verifica; una regresión que devuelva 0 pasaría en verde.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El caso destructivo 1 pide diez corridas, sin cambios en la instancia y un mensaje que nombra la ruta. TestUpdateValidatesBeforeWriting lo cubre con runs: 10, res.Changed vacío, snapshot del árbol igual y el error que contiene templates/README.md. La salida impresa por el CLI no se prueba, solo el error interno.",
+      "where": "tools/internal/update/update_test.go:413-465",
+      "why": "El texto que ve el humano sale de updateFailure y no se revisa para este caso; la prueba solo cubre el error que devuelve Update.",
+      "certainty": "inferred",
+      "severity": "minor"
+    },
+    {
+      "what": "El caso funcional del spec (git status sin cambios tras el fallo) no tiene prueba automatizada; el snapshot del árbol de la instancia la aproxima.",
+      "where": "work/specs/B4.json:15; tools/internal/update/update_test.go:317",
+      "why": "treeSnapshot compara el contenido de la instancia, no el estado de git. Es una cobertura equivalente y no un defecto, pero no es la misma verificación.",
+      "certainty": "inferred",
+      "severity": "minor"
+    },
+    {
+      "what": "Caso destructivo 2 (seals.json inválido): la prueba lo cubre con runs: 1 y verifica error, nombre de ruta y tree sin cambios. Con la mutación (b) la prueba falla, así que el error lo detecta planSeals y no op.check.",
+      "where": "tools/internal/update/update_test.go:413-465; tools/internal/update/update.go:430-435",
+      "why": "El spec no pide diez corridas para este caso, así que la cobertura cumple. Se anota para que quede claro que esta cobertura depende de planSeals.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {"file": "tools/internal/update/update.go", "line": 262, "quote": "func (o op) check(instance string) error {"},
+    {"file": "tools/internal/update/update.go", "line": 430, "quote": "func planSeals(pkgRoot, instance string) ([]byte, error) {"},
+    {"file": "tools/cmd/aquas/main.go", "line": 127, "quote": "func updateFailure(err error) string {"},
+    {"file": "tools/cmd/aquas/main.go", "line": 120, "quote": "_, _ = fmt.Fprint(stderr, updateFailure(err))"},
+    {"file": "tools/internal/update/update_test.go", "line": 444, "quote": "for i := 0; i < c.runs; i++ {"},
+    {"file": "tools/cmd/aquas/main_test.go", "line": 165, "quote": "if !strings.Contains(plain, \"no se actualizó nada\") || strings.Contains(plain, \"incompleta\") {"}
+  ],
+  "output": "Base (go test -race -count=1, tools/): las tres pruebas PASS (TestUpdateFailureMessages, TestUpdateValidatesBeforeWriting con subcasos templates/README.md y work/seals.json inválido, TestUpdateWriteFailureIsPartialError). Suite completa ok en los cinco paquetes con cmd/aquas, internal/update y el resto. Mutacion (a) op.check devuelve nil: FALLA TestUpdateValidatesBeforeWriting/carpeta_en_lugar_de_templates/README.md; pasan el subcaso seals.json y TestUpdateWriteFailureIsPartialError y TestUpdateFailureMessages. Mutacion (b) planSeals devuelve nil,nil al inicio: FALLA TestUpdateValidatesBeforeWriting/work/seals.json_inválido; pasan el subcaso carpeta y las demas. Mutacion (c) updateFailure siempre dice no se actualizó nada: FALLA TestUpdateFailureMessages; pasan las dos de update. Cada archivo se restauro desde /tmp/b4bak con cp y cmp: update.go y main.go identicos a su respaldo tras cada mutacion. Suite completa de nuevo tras restaurar: ok. git diff --stat igual al inicio (6 archivos, 221 insertions, 37 deletions), comparado con cmp contra /tmp/b4_diffstat_inicio.txt.",
+  "pending": [
+    "Automatizar la comprobacion de codigo de salida distinto de 0 para ambos casos destructivos (el CLI devuelve 1 en tools/cmd/aquas/main.go:121, sin prueba).",
+    "Automatizar el caso funcional (git status sin cambios); hoy solo lo cubre el snapshot del arbol."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}
