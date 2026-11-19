@@ -3,3 +3,5 @@
 {"date": "2026-11-18", "item": "S1", "role": "implementer", "model": "sonnet", "task": "Construir S1 con TDD", "tokens": 69147, "tool_uses": 4, "duration_s": 57}
 {"date": "2026-11-18", "item": "S1", "role": "tester", "model": "haiku", "task": "Verde, rojo sin código y casos destructivos", "tokens": 75496, "tool_uses": 11, "duration_s": 58}
 {"date": "2026-11-18", "item": "S2", "role": "implementer", "model": "sonnet", "task": "Escribir el canon v1", "tokens": 95214, "tool_uses": 6, "duration_s": 80}
+{"date": "2026-11-18", "item": "S3", "role": "implementer", "model": "sonnet", "task": "Construir S3 con TDD: preflight de install", "tokens": 73664, "tool_uses": 4, "duration_s": 70}
+{"date": "2026-11-18", "item": "S3", "role": "tester", "model": "haiku", "task": "Verde, rojo sin código y casos destructivos de S3", "tokens": 94838, "tool_uses": 12, "duration_s": 115}

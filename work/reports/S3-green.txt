@@ -1,0 +1,2 @@
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	1.012s
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/install	1.015s

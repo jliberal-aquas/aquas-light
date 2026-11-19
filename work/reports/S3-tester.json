@@ -1,0 +1,61 @@
+{
+  "item": "S3",
+  "conclusion": "S3 pasa. El test técnico TestPreflightRejectsNonEmptyFolder falla por aserción («se esperaba un error por carpeta no vacía») cuando Preflight se reemplaza por un stub que no comprueba nada, y pasa con el código real. Los cinco destructive_cases se comportan como la spec exige con el binario real construido desde el código del slice. El caso 5 se verificó con un go falso en PATH que imprime go1.10, y además con un test temporal que inyecta Deps.GoVersion; ambos dan el mismo mensaje. preflight.go quedó restaurado y es idéntico al original (sha256 890d46ba8818545c004275a30cb513264c40b832ad566df17204a8f87757a79c). El verde final da código 0 con -race. No toqué backlog.json, work/memory.json ni canon/, y no hice commit.",
+  "findings": [
+    {
+      "what": "El error cuando falta Go mezcla el texto en español con el mensaje en inglés de exec de Go.",
+      "where": "tools/internal/install/preflight.go:49 (y el %v que lo incluye)",
+      "why": "La spec pide un mensaje en español; al faltar el ejecutable, la salida contiene «exec: \"go\": executable file not found in $PATH».",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "backlog.json y work/memory.json ya estaban modificados en el árbol antes de mi corrida; no los toqué.",
+      "where": "backlog.json y work/memory.json",
+      "why": "git status muestra « M backlog.json » y « ?? work/memory.json »; los mtime (22:58:51 y 23:00:23) son anteriores al inicio de mi corrida. El encargo prohíbe tocarlos, así que el orquestador debe saber que hay cambios ajenos.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El esquema de informe que describe canon/delegation.md no está como archivo en el repo; no pude validar el informe contra él.",
+      "where": "canon/delegation.md (referencia a schemas/report.schema.json)",
+      "why": "find sobre el repo no encontró report.schema.json. El informe sigue los campos que describe canon/delegation.md.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "tools/internal/install/preflight.go",
+      "line": "49",
+      "quote": "return fmt.Errorf(\"no se encontró Go (se requiere %s o superior): %v\", minGoText, err)"
+    },
+    {
+      "file": "tools/internal/install/preflight.go",
+      "line": "89",
+      "quote": "return fmt.Errorf(\"la carpeta %s no está vacía (contiene %q); elige una carpeta vacía o una ruta nueva\", dest, list[0].Name())"
+    },
+    {
+      "file": "tools/internal/install/preflight_test.go",
+      "line": "61",
+      "quote": "t.Fatal(\"se esperaba un error por carpeta no vacía\")"
+    },
+    {
+      "file": "tools/cmd/aquas/main.go",
+      "line": "36-39",
+      "quote": "if err := install.Preflight(args[0], install.DefaultDeps()); err != nil { ... return 1"
+    },
+    {
+      "file": "backlog.json",
+      "line": "-",
+      "quote": "git status --short: \" M backlog.json\" y \"?? work/memory.json\" (ya presentes antes de la corrida)"
+    }
+  ],
+  "output": "$ cd tools && go test -count=1 -race ./...\nok github.com/jliberal-aquas/aquas-light/tools/cmd/aquas 1.016s\nok github.com/jliberal-aquas/aquas-light/tools/internal/install 1.016s\nEXIT=0\n\n$ mutacion: Preflight reemplazado por stub que devuelve nil; go vet compila (EXIT=0)\n$ go test -count=1 ./internal/install/ -run TestPreflightRejectsNonEmptyFolder -v\n    preflight_test.go:61: se esperaba un error por carpeta no vacía (subtests a, README.md, .gitkeep, .git)\n--- FAIL: TestPreflightRejectsNonEmptyFolder (0.00s)\nTEST_EXIT=1\n\n$ restaurado: cmp OK; sha256 preflight.go = 890d46ba8818545c004275a30cb513264c40b832ad566df17204a8f87757a79c\n\nCASO 1 (.gitkeep, 0 bytes): exit=1\n  la carpeta .../c1 no está vacía (contiene \".gitkeep\"); elige una carpeta vacía o una ruta nueva\n  stdout vacío; ls -la antes y después idénticos\nCASO 2 (.git vacío): exit=1; contiene \".git\"; ls de raíz y de .git idénticos; entradas en .git: 0\nCASO 3 (a/ vacía): exit=1; contiene \"a\"; ls antes y después idénticos\nCASO 4a (PATH sin git ni go, ruta nueva): exit=1\n  no se encontró `git` en el PATH; instálalo antes de continuar\n  ruta destino y ancestro no creados\nCASO 4b (PATH sin git ni go, carpeta vacía existente): exit=1; mismo mensaje; entradas tras la corrida: 0; la carpeta sigue existiendo\nCASO 5 (go falso que imprime go1.10, ruta nueva): exit=1\n  la versión de Go encontrada es go1.10 y la mínima soportada es 1.24\n  ruta no creada\nTest temporal zz_tester_test.go (Deps.GoVersion=go1.10): PASS; borrado; el paquete queda con preflight.go y preflight_test.go\n\n$ go test -count=1 -race ./...  EXIT=0",
+  "pending": [
+    "La prueba funcional con README.md no se corrió como caso aparte con el binario; el subtest README.md del test técnico cubre el mismo rechazo con la carpeta sin cambios.",
+    "No se validó el informe contra schemas/report.schema.json porque el archivo no existe en el repo."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

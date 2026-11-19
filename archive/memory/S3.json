@@ -1,0 +1,18 @@
+{
+  "slice": "S3",
+  "step": "commit",
+  "done": [
+    "plan",
+    "red",
+    "green",
+    "tester"
+  ],
+  "next": "Commit de S3; luego S4.",
+  "files": [
+    "tools/internal/install/preflight.go",
+    "tools/internal/install/preflight_test.go",
+    "tools/cmd/aquas/main.go"
+  ],
+  "blockers": [],
+  "updated_at": "2026-11-18T23:02:41-03:00"
+}

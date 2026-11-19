@@ -1,0 +1,22 @@
+--- FAIL: TestPreflightRejectsNonEmptyFolder (0.00s)
+    --- FAIL: TestPreflightRejectsNonEmptyFolder/a (0.00s)
+        preflight_test.go:61: se esperaba un error por carpeta no vacía
+    --- FAIL: TestPreflightRejectsNonEmptyFolder/README.md (0.00s)
+        preflight_test.go:61: se esperaba un error por carpeta no vacía
+    --- FAIL: TestPreflightRejectsNonEmptyFolder/.gitkeep (0.00s)
+        preflight_test.go:61: se esperaba un error por carpeta no vacía
+    --- FAIL: TestPreflightRejectsNonEmptyFolder/.git (0.00s)
+        preflight_test.go:61: se esperaba un error por carpeta no vacía
+--- FAIL: TestPreflightCreatesMissingAndAcceptsEmpty (0.00s)
+    preflight_test.go:79: open /tmp/TestPreflightCreatesMissingAndAcceptsEmpty1949896925/001/nuevo/dest: no such file or directory
+--- FAIL: TestPreflightMissingGit (0.00s)
+    preflight_test.go:95: error = <nil>
+--- FAIL: TestPreflightGoVersion (0.00s)
+    preflight_test.go:121: go1.10: error = <nil>
+    preflight_test.go:121: go1.9.2: error = <nil>
+    preflight_test.go:121: devel go1.30-abc: error = <nil>
+    preflight_test.go:121: basura: error = <nil>
+    preflight_test.go:130: go ausente: <nil>
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/install	0.003s
+FAIL

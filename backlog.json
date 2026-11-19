@@ -104,9 +104,10 @@
       "id": "S3",
       "type": "slice",
       "parent": "F1",
-      "state": "ready",
+      "state": "done",
       "priority": 3,
-      "spec": "work/specs/S3.json"
+      "spec": "work/specs/S3.json",
+      "spec_sha256": "0f52035bb0e4f28be2e566e031bf691f3cfe1c6184c4994942e53f167ac83546"
     },
     {
       "id": "S4",
