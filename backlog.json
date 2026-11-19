@@ -158,9 +158,10 @@
       "id": "S8",
       "type": "slice",
       "parent": "F1",
-      "state": "ready",
+      "state": "done",
       "priority": 9,
-      "spec": "work/specs/S8.json"
+      "spec": "work/specs/S8.json",
+      "spec_sha256": "a75dcab4b2ba3277c0e19e3147286c36c3380055c6f01ecea6e6b0207b7563c6"
     },
     {
       "id": "F2",

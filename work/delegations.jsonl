@@ -16,3 +16,5 @@
 {"date": "2026-11-18", "item": "S7", "role": "tester", "model": "haiku", "task": "Verde, rojo sin código y casos destructivos de S7", "tokens": 100741, "tool_uses": 14, "duration_s": 145}
 {"date": "2026-11-18", "item": "S39", "role": "implementer", "model": "sonnet", "task": "Construir S39 con TDD: aquas setup para clones", "tokens": 83235, "tool_uses": 9, "duration_s": 78}
 {"date": "2026-11-18", "item": "S39", "role": "tester", "model": "haiku", "task": "Verde, rojo sin código y casos destructivos de S39", "tokens": 87183, "tool_uses": 17, "duration_s": 155}
+{"date": "2026-11-18", "item": "S8", "role": "implementer", "model": "sonnet", "task": "Escribir skill/SKILL.md apuntando a v0.1.0", "tokens": 67683, "tool_uses": 2, "duration_s": 20}
+{"date": "2026-11-18", "item": "S8", "role": "implementer", "model": "sonnet", "task": "Corrección S8: redacción de conflictos en SKILL.md (continuación del mismo agente)", "tokens": null, "tool_uses": null, "duration_s": null}
