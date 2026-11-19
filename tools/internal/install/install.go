@@ -63,7 +63,7 @@ func Run(root, dest string, opts Options) (err error) {
 	existed := statErr == nil
 	top := topMissing(abs)
 
-	if err := Preflight(dest, opts.Deps); err != nil {
+	if err := PreflightIn(root, dest, opts.Deps); err != nil {
 		return err
 	}
 	defer func() {

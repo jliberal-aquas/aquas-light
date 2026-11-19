@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -60,10 +61,70 @@ func checkGo(deps Deps) error {
 	return nil
 }
 
+// resolvePath returns p as an absolute, clean path with symlinks resolved in
+// its longest existing prefix (the rest may not exist yet).
+func resolvePath(p string) (string, error) {
+	abs, err := filepath.Abs(p)
+	if err != nil {
+		return "", err
+	}
+	var rest []string
+	cur := abs
+	for {
+		if r, e := filepath.EvalSymlinks(cur); e == nil {
+			for i := len(rest) - 1; i >= 0; i-- {
+				r = filepath.Join(r, rest[i])
+			}
+			return r, nil
+		}
+		parent := filepath.Dir(cur)
+		if parent == cur {
+			return abs, nil
+		}
+		rest = append(rest, filepath.Base(cur))
+		cur = parent
+	}
+}
+
+// checkOutsidePackage rejects a dest equal to root or inside it.
+func checkOutsidePackage(root, dest string) error {
+	r, err := resolvePath(root)
+	if err != nil {
+		return fmt.Errorf("ruta inválida %s: %v", root, err)
+	}
+	d, err := resolvePath(dest)
+	if err != nil {
+		return fmt.Errorf("ruta inválida %s: %v", dest, err)
+	}
+	cr, cd := r, d
+	if runtime.GOOS == "windows" {
+		cr, cd = strings.ToLower(r), strings.ToLower(d)
+	}
+	rel, err := filepath.Rel(cr, cd)
+	if err != nil {
+		return nil
+	}
+	if rel == "." || (rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator))) {
+		return fmt.Errorf("el destino no puede ser la raíz del paquete ni estar dentro de ella (%s): elige una carpeta fuera de ese paquete", root)
+	}
+	return nil
+}
+
 // Preflight checks the preconditions of an install into dest. It creates dest
 // when missing and requires it to be empty when it already exists. It never
 // modifies a folder that already existed, and removes what it created on failure.
-func Preflight(dest string, deps Deps) (err error) {
+func Preflight(dest string, deps Deps) error {
+	return PreflightIn("", dest, deps)
+}
+
+// PreflightIn is Preflight plus the package root: when root is not empty, a
+// dest equal to root or inside it is rejected before anything is created.
+func PreflightIn(root, dest string, deps Deps) (err error) {
+	if root != "" {
+		if e := checkOutsidePackage(root, dest); e != nil {
+			return e
+		}
+	}
 	var problems []error
 	if e := deps.LookGit(); e != nil {
 		problems = append(problems, errors.New("no se encontró `git` en el PATH; instálalo antes de continuar"))

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -135,5 +136,57 @@ func TestPreflightGoVersion(t *testing.T) {
 		if err := Preflight(filepath.Join(root, "ok"+v), deps); err != nil {
 			t.Errorf("%s debe aceptarse: %v", v, err)
 		}
+	}
+}
+
+func TestPreflightRejectsDestInsidePackage(t *testing.T) {
+	root := t.TempDir()
+	for _, d := range []string{"canon", "tools"} {
+		if err := os.MkdirAll(filepath.Join(root, d), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := os.WriteFile(filepath.Join(root, "tools", "go.mod"), []byte("module x\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	t.Chdir(filepath.Join(root, "tools"))
+
+	check := func(name, dest string, mustNotExist string) {
+		t.Helper()
+		err := PreflightIn(root, dest, okDeps())
+		if err == nil {
+			t.Errorf("%s: se esperaba un error", name)
+		} else {
+			if len(err.Error()) >= 300 {
+				t.Errorf("%s: mensaje de %d caracteres", name, len(err.Error()))
+			}
+			if !strings.Contains(err.Error(), root) {
+				t.Errorf("%s: el mensaje no nombra la raíz %s: %q", name, root, err)
+			}
+		}
+		if mustNotExist != "" {
+			if _, e := os.Stat(mustNotExist); e == nil {
+				t.Errorf("%s: %s no debía crearse", name, mustNotExist)
+			}
+		}
+	}
+	check("relative inside tools", "mi-api", filepath.Join(root, "tools", "mi-api"))
+	check("dest equals root", root, "")
+	check("dest nested deep", filepath.Join(root, "a", "b"), filepath.Join(root, "a"))
+	check("dest with dotdot", filepath.Join("..", "..", filepath.Base(root), "x"), filepath.Join(root, "x"))
+	if runtime.GOOS == "windows" {
+		check("case-insensitive", strings.ToUpper(filepath.Join(root, "zz")), "")
+	}
+
+	// A sibling outside the package is still accepted.
+	outside := filepath.Join(t.TempDir(), "ok")
+	if err := PreflightIn(root, outside, okDeps()); err != nil {
+		t.Errorf("destino fuera del paquete rechazado: %v", err)
+	}
+	// A sibling with the same name prefix is outside too.
+	prefixed := root + "-copia"
+	t.Cleanup(func() { _ = os.RemoveAll(prefixed) })
+	if err := PreflightIn(root, prefixed, okDeps()); err != nil {
+		t.Errorf("destino hermano con prefijo igual rechazado: %v", err)
 	}
 }

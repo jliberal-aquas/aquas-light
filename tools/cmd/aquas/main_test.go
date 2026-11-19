@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
@@ -164,5 +165,33 @@ func TestUpdateFailureMessages(t *testing.T) {
 	plain := updateFailure(errors.New("conflicto"))
 	if !strings.Contains(plain, "no se actualizó nada") || strings.Contains(plain, "incompleta") {
 		t.Errorf("mensaje de validación inesperado: %q", plain)
+	}
+}
+
+func TestInstallRejectsFlagAsPath(t *testing.T) {
+	root := t.TempDir()
+	for _, d := range []string{"canon", "tools"} {
+		if err := os.MkdirAll(filepath.Join(root, d), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := os.WriteFile(filepath.Join(root, "tools", "go.mod"), []byte("module x\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	t.Chdir(filepath.Join(root, "tools"))
+	for _, sub := range []string{"install", "update", "setup"} {
+		var out, errb bytes.Buffer
+		code := run([]string{sub, "--help"}, &out, &errb)
+		if code == 0 {
+			t.Errorf("%s --help: código 0", sub)
+		}
+		if !strings.Contains(errb.String(), "Uso") {
+			t.Errorf("%s --help: sin mensaje de uso: %q", sub, errb.String())
+		}
+		for _, p := range []string{filepath.Join(root, "tools", "--help"), filepath.Join(root, "--help")} {
+			if _, err := os.Stat(p); err == nil {
+				t.Errorf("%s --help: se creó %s", sub, p)
+			}
+		}
 	}
 }

@@ -1,0 +1,19 @@
+=== RUN   TestIntegrationInstall
+--- PASS: TestIntegrationInstall (1.29s)
+=== RUN   TestInstallRejectsFlagAsPath
+--- PASS: TestInstallRejectsFlagAsPath (0.00s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	2.307s
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/hashing	1.013s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/host	1.019s [no tests to run]
+=== RUN   TestPreflightRejectsDestInsidePackage
+--- PASS: TestPreflightRejectsDestInsidePackage (0.00s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/install	1.019s
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/update	1.011s [no tests to run]

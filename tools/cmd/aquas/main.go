@@ -21,6 +21,15 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return 2
 	}
 	switch args[0] {
+	case "install", "setup":
+		for _, a := range args[1:] {
+			if strings.HasPrefix(a, "-") {
+				_, _ = fmt.Fprintf(stderr, "aquas: opción desconocida %q; este subcomando no acepta opciones\n\n%s", a, usage())
+				return 2
+			}
+		}
+	}
+	switch args[0] {
 	case "version":
 		_, _ = fmt.Fprintf(stdout, "%s\n", version)
 		return 0

@@ -1,0 +1,58 @@
+{
+  "item": "B5",
+  "conclusion": "Las dos pruebas dirigidas pasan y la suite completa pasa con -race. Ambas mutaciones dan rojo en la prueba esperada y los archivos quedaron restaurados (cmp OK). Hay huecos de aserción: el código de salida 1 no se verifica en ningún caso y el caso raíz igual no comprueba que nada cambie.",
+  "findings": [
+    {
+      "what": "Ninguna prueba exige código de salida exactamente 1 para destino dentro de la raíz o destino igual a la raíz.",
+      "where": "tools/internal/install/preflight_test.go:156-166; tools/cmd/aquas/main_test.go:185-186",
+      "why": "PreflightIn sólo verifica err != nil. TestInstallRejectsFlagAsPath comprueba code == 0 para --help pero no code == 1. El spec B5 pide código 1 en los tres destructive_cases.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El caso destino igual a la raíz no verifica que nada cambie.",
+      "where": "tools/internal/install/preflight_test.go:174",
+      "why": "check(\"dest equals root\", root, \"\") pasa mustNotExist vacío, así que no se comprueba que el contenido de la raíz quede igual. El spec pide nada cambia.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El límite de 300 caracteres y el mensaje de la CLI para install mi-api no están cubiertos a nivel de CLI.",
+      "where": "tools/internal/install/preflight_test.go:160-161",
+      "why": "La longitud se mide sobre el error de PreflightIn. main.go antepone un prefijo ('aquas: no se puede instalar ...') que no se mide. Con una raíz larga el mensaje mostrado podría superar 300.",
+      "certainty": "inferred",
+      "severity": "minor"
+    },
+    {
+      "what": "Con la mutación A la prueba roja no reproduce la copia recursiva de la red original; falla rápido en las aserciones.",
+      "where": "tools/internal/install/preflight_test.go:156-157",
+      "why": "La prueba llama sólo a PreflightIn y no a la copia, así que el 'file name too long' del experimento L no aparece. La red sí se detecta, pero por otra vía.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "Con la mutación B el rechazo de --help sigue activo por checkOutsidePackage; la prueba roja se debe sólo a la falta del texto 'Uso'.",
+      "where": "tools/cmd/aquas/main_test.go:188-195; tools/cmd/aquas/main.go:26",
+      "why": "La carpeta --help no se crea aunque se quite el rechazo de '-', porque el preflight la trata como dentro del paquete. Eso es defensa en profundidad y no es un fallo.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {"file": "tools/internal/install/preflight.go", "line": 90, "quote": "func checkOutsidePackage(root, dest string) error {"},
+    {"file": "tools/internal/install/preflight_test.go", "line": 173, "quote": "check(\"relative inside tools\", \"mi-api\", filepath.Join(root, \"tools\", \"mi-api\"))"},
+    {"file": "tools/internal/install/preflight_test.go", "line": 174, "quote": "check(\"dest equals root\", root, \"\")"},
+    {"file": "tools/internal/install/preflight_test.go", "line": 160, "quote": "if len(err.Error()) >= 300 {"},
+    {"file": "tools/cmd/aquas/main.go", "line": 26, "quote": "if strings.HasPrefix(a, \"-\") {"},
+    {"file": "tools/cmd/aquas/main_test.go", "line": 188, "quote": "if !strings.Contains(errb.String(), \"Uso\") {"},
+    {"file": "tools/cmd/aquas/main_test.go", "line": 185, "quote": "if code == 0 {"}
+  ],
+  "output": "Baseline: go test -race -count=1 -run 'TestPreflightRejectsDestInsidePackage|TestInstallRejectsFlagAsPath' -v ./... -> PASS (ambas). go test -race -count=1 ./... -> ok en cmd/aquas, hashing, host, install, update. Mutacion A (return nil al inicio de checkOutsidePackage): TestPreflightRejectsDestInsidePackage ROJO en relative inside tools, dest nested deep, dest with dotdot (y los mensajes de 'no debia crearse'); TestInstallRejectsFlagAsPath verde. Mutacion B (if false && en main.go:26, install/setup): TestInstallRejectsFlagAsPath ROJO en install --help y setup --help ('sin mensaje de uso'); TestPreflightRejectsDestInsidePackage verde. Ambos archivos restaurados desde /tmp/b5bak y verificados con cmp. git diff --stat identico al inicio (7 archivos, 164 insertions, 7 deletions). tools/mi-api y tools/--help no existen. Sin procesos residuales.",
+  "pending": [
+    "Correr en la CLI real `go run ./cmd/aquas install mi-api` desde tools/ para confirmar código de salida 1, longitud del mensaje completo y que no aparece la carpeta mi-api (functional_test del spec). No se ejecutó: sólo se usaron pruebas escritas.",
+    "Agregar aserción de código 1 y de contenido sin cambios para el caso raíz igual (decisión del dueño del spec, no del tester).",
+    "Verificación humana del functional_test."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

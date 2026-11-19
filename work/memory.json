@@ -1,15 +1,13 @@
 {
-  "slice": "B5",
+  "slice": "B6",
   "step": "red",
   "done": [
     "plan"
   ],
   "next": "Implementador: prueba roja, código y verde.",
   "files": [
-    "tools/internal/install/preflight.go",
-    "tools/cmd/aquas/main.go",
-    "tools/internal/install/preflight_test.go"
+    "skill/SKILL.md"
   ],
   "blockers": [],
-  "updated_at": "2026-11-19T00:59:00-03:00"
+  "updated_at": "2026-11-19T01:06:00-03:00"
 }
