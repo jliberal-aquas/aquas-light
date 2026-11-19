@@ -1,0 +1,158 @@
+{
+  "initiative": "I1",
+  "items": [
+    {
+      "id": "F1",
+      "type": "feature",
+      "parent": "I1",
+      "state": "done",
+      "priority": 1,
+      "capability": "C1",
+      "spec": "work/specs/F1.json",
+      "closed_at": "2026-11-19T01:15:00-03:00",
+      "evidence": {
+        "integration_test": "TestIntegrationInstall en tools/cmd/aquas/integration_test.go; CI verde en ubuntu, macos y windows (corrida 44447914168 y siguientes, última 44453912158 sobre d2d9d83).",
+        "tester": "work/reports/F1-tester.json: seis mutaciones detectadas.",
+        "audit": "Auditor (fable) 2026-11-19: cerrable con condiciones; 9 candidatos en work/retro.json. Condiciones cumplidas: B2 abierto y cerrado, página C1 corregida, revisión del arquitecto hecha.",
+        "architect_review": "Arquitecto (fable) 2026-11-19: publicable con condiciones; los cuatro hallazgos major se cerraron como B3, B4, B5 y B6; los menores quedan en N2 (work/requests/N2.json).",
+        "wiki": "docs/governance/C1-install-and-update.md",
+        "pending": "La prueba funcional de S8 (la skill clona v0.1.0) queda pendiente hasta que el humano cree la etiqueta v0.1.0."
+      }
+    },
+    {
+      "id": "S1",
+      "type": "slice",
+      "parent": "F1",
+      "state": "done",
+      "priority": 1,
+      "spec": "work/specs/S1.json",
+      "spec_sha256": "9ae5151a946cb49bf73e8fb8620546c1da6930166994c02f6d781884b9ce2060"
+    },
+    {
+      "id": "S2",
+      "type": "slice",
+      "parent": "F1",
+      "state": "done",
+      "priority": 2,
+      "spec": "work/specs/S2.json",
+      "spec_sha256": "eb4d942ee9440805ff876d4ce4dbe4c447af5f93ea036a5d8b593690dd0dfcd5"
+    },
+    {
+      "id": "B1",
+      "type": "bug",
+      "parent": "S1",
+      "state": "done",
+      "priority": 0,
+      "spec": "work/specs/B1.json",
+      "spec_sha256": "726ddb87849acb31b48cce6b1970cced6798918f4cff1118fa736c69a46026a1"
+    },
+    {
+      "id": "S3",
+      "type": "slice",
+      "parent": "F1",
+      "state": "done",
+      "priority": 3,
+      "spec": "work/specs/S3.json",
+      "spec_sha256": "0f52035bb0e4f28be2e566e031bf691f3cfe1c6184c4994942e53f167ac83546"
+    },
+    {
+      "id": "S4",
+      "type": "slice",
+      "parent": "F1",
+      "state": "done",
+      "priority": 4,
+      "spec": "work/specs/S4.json",
+      "spec_sha256": "d2bc7cf41ecf8d5a2a40035b7a7623f758000854f34939128c93411569c3b7d3"
+    },
+    {
+      "id": "S5",
+      "type": "slice",
+      "parent": "F1",
+      "state": "done",
+      "priority": 5,
+      "spec": "work/specs/S5.json",
+      "spec_sha256": "1bdd0033271b7cf4a1768df727e77ae3c568bb038a0e311ec2c525cfaddc2428"
+    },
+    {
+      "id": "S6",
+      "type": "slice",
+      "parent": "F1",
+      "state": "done",
+      "priority": 6,
+      "spec": "work/specs/S6.json",
+      "spec_sha256": "0f2e75e2af85769a9198f38c77e5cfc30a9eb99ef38e0ee95c0239f645977bdf"
+    },
+    {
+      "id": "S7",
+      "type": "slice",
+      "parent": "F1",
+      "state": "done",
+      "priority": 7,
+      "spec": "work/specs/S7.json",
+      "spec_sha256": "3f3bdb3a33a37b5c3930dbdd765e88070a08b27134ecfaaddc84727113da979e"
+    },
+    {
+      "id": "S39",
+      "type": "slice",
+      "parent": "F1",
+      "state": "done",
+      "priority": 8,
+      "spec": "work/specs/S39.json",
+      "spec_sha256": "60a29cc0190110f4149cbf26e56135145f8e42fe88c0b6e70f904fac749cd32c"
+    },
+    {
+      "id": "S8",
+      "type": "slice",
+      "parent": "F1",
+      "state": "done",
+      "priority": 9,
+      "spec": "work/specs/S8.json",
+      "spec_sha256": "a75dcab4b2ba3277c0e19e3147286c36c3380055c6f01ecea6e6b0207b7563c6"
+    },
+    {
+      "id": "B2",
+      "type": "bug",
+      "parent": "S7",
+      "state": "done",
+      "priority": 0,
+      "spec": "work/specs/B2.json",
+      "spec_sha256": "b96f506278a5a03fcd9444d5493d6020b6b8f417fbd14a0d17ea6ec7d1f6ad07"
+    },
+    {
+      "id": "B3",
+      "type": "bug",
+      "parent": "S7",
+      "state": "done",
+      "priority": 0,
+      "spec": "work/specs/B3.json",
+      "spec_sha256": "73d0cd4a3b1cefd1fde7d7a40944708f39e83555f4abe39e0726d5f76757fa0f"
+    },
+    {
+      "id": "B4",
+      "type": "bug",
+      "parent": "S7",
+      "state": "done",
+      "priority": 0,
+      "spec": "work/specs/B4.json",
+      "spec_sha256": "0ce95b15f9215f450bdc8c1c87ca04ec12b27fb31928bb05fc2bb9cde505bfbd"
+    },
+    {
+      "id": "B5",
+      "type": "bug",
+      "parent": "S3",
+      "state": "done",
+      "priority": 0,
+      "spec": "work/specs/B5.json",
+      "spec_sha256": "de72f4d1013d2501629935ca8ba1118e7e25b6f22f3c5276b9b055155ba2b0f5"
+    },
+    {
+      "id": "B6",
+      "type": "bug",
+      "parent": "S8",
+      "state": "done",
+      "priority": 0,
+      "spec": "work/specs/B6.json",
+      "spec_sha256": "c4c562c6e55089e42942b3576b592c43e0df388658ea5fb55489a51afb0270de"
+    }
+  ]
+}
