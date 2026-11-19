@@ -1,0 +1,4 @@
+=== RUN   TestIntegrationInstall
+--- PASS: TestIntegrationInstall (1.06s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	2.068s

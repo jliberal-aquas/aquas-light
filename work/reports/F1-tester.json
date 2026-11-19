@@ -1,0 +1,37 @@
+{
+  "item": "F1",
+  "conclusion": "TestIntegrationInstall ampliada esta verde con -race y detecta las seis mutaciones (a-f): commit subject, preflight de carpeta no vacia, sobrescritura de archivo editado, update que no reemplaza archivos no editados, core.hooksPath alterado y hash de manifiesto erroneo. Todas revertidas con git checkout; suite completa verde (5 paquetes ok) y sin cambios de produccion. Pendientes: correr en macOS y Windows, y confirmar la causa del borrado observado bajo mutacion (b) en rollback.go.",
+  "findings": [
+    {
+      "what": "La prueba solo corre en el SO del host; la parte 'en Linux, macOS y Windows' del acceptance no se verifico aqui.",
+      "where": "tools/cmd/aquas/integration_test.go (TestIntegrationInstall, uso de runtime.GOOS); work/specs/F1.json campo platforms",
+      "why": "Toda la ejecucion fue en linux. Los caminos de .exe y zip de itFakeLint y itExe no se ejercitaron en Windows.",
+      "certainty": "verificado",
+      "severity": "major"
+    },
+    {
+      "what": "Al desactivar el rechazo de carpeta no vacia, install en esa carpeta borro notes.txt en el rollback.",
+      "where": "tools/internal/install/install.go lineas 66-72 y rollback; observado con la mutacion (b)",
+      "why": "Con el preflight saltado, la carpeta del usuario quedo vacia tras el rollback. Solo observado bajo mutacion; no se leyo rollback.go para confirmar la causa.",
+      "certainty": "hipotesis",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {"file": "tools/cmd/aquas/integration_test.go", "line": 131, "quote": "t.Errorf(\"subject = %q, want %q\", got, subject)"},
+    {"file": "tools/internal/install/git.go", "line": 35, "quote": "subject := \"Install Aquas Light v\" + version"},
+    {"file": "tools/internal/install/preflight.go", "line": 88, "quote": "if len(list) > 0 {"},
+    {"file": "tools/internal/update/update.go", "line": 133, "quote": "if want, ok := old.Files[rel]; ok && hashing.Sum(data) == want {"},
+    {"file": "tools/cmd/aquas/integration_test.go", "line": 341, "quote": "unedited canon/config.json was not replaced by the new package"},
+    {"file": "tools/cmd/aquas/integration_test.go", "line": 371, "quote": "core.hooksPath = %q, want .githooks"},
+    {"file": "tools/internal/install/setup.go", "line": 37, "quote": "config\", \"--local\", \"core.hooksPath\", \".githooks\""},
+    {"file": "tools/internal/install/copy.go", "line": 85, "quote": "files[filepath.ToSlash(rel)] = hashing.Sum(data)"}
+  ],
+  "output": "Baseline: go test -race -count=1 -run TestIntegrationInstall -v ./cmd/aquas/ -> PASS, exit 0. (a) git.go:35 subject 'Installed Aquas Light v' -> FAIL: integration_test.go:131 subject mismatch. (b) preflight.go:88 'if false && len(list) > 0' -> FAIL: :184 code 0 stderr vacio; :187 carpeta cambiada; :196 carpeta cambiada tras Run. (c) update.go:133 'if _, ok := old.Files[rel]; ok || true' -> FAIL: :206 code 0 stderr vacio; :209 archivo editado sobrescrito. (d) update.go, antes de escribir dst: 'if resolution[rel] == \"\" { continue }' -> FAIL: integration_test.go:341 unedited canon/config.json was not replaced by the new package. (e) setup.go:37 core.hooksPath '.githooks' -> '.hooks' -> FAIL: integration_test.go:371 core.hooksPath = \".hooks\", want .githooks. (f) copy.go:85 hashing.Sum(data) -> hash de data+'\\n' -> FAIL: integration_test.go:218 manifest hash mismatch en varios archivos. Revertido con git checkout en los seis casos; git status de produccion limpio. Suite completa go test -race -count=1 ./... -> exit 0, 5 paquetes ok. git status final: ' M work/delegations.jsonl' (preexistente, no tocado), '?? tools/cmd/aquas/integration_test.go', '?? work/reports/F1-integration-green.txt' (preexistentes), '?? work/reports/F1-tester.json' (este informe).",
+  "pending": [
+    "Ejecutar TestIntegrationInstall en macOS y Windows (CI o host) para cerrar la parte de plataformas.",
+    "Confirmar la causa del borrado de notes.txt bajo mutacion (b) leyendo tools/internal/install/rollback.go."
+  ],
+  "certainty": "alta para las mutaciones a-f y la suite verde; media para la causa del borrado observado en (b)",
+  "result": "pass"
+}
