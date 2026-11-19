@@ -1,0 +1,21 @@
+{
+  "id": "F6",
+  "parent": "I1",
+  "name": "Documentar y sellar",
+  "capability": "C6",
+  "acceptance": "Cada función de código tiene su sección narrada en la referencia, y cambiar un archivo deja vencidos todos los documentos que lo cubren por la cadena hasta la capacidad; el commit se bloquea hasta resellarlos con un cambio o una razón escrita.",
+  "integration_test": "TestIntegrationSeals: sella páginas, crea un bug sobre un slice, cambia un archivo y comprueba qué documentos quedan vencidos y qué resellos se aceptan.",
+  "slices": [
+    "S28",
+    "S29",
+    "S30",
+    "S31",
+    "S32",
+    "S33"
+  ],
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ]
+}

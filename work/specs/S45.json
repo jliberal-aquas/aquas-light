@@ -1,0 +1,15 @@
+{
+  "id": "S45",
+  "destructive_cases": [],
+  "parent": "F9",
+  "name": "Registrar un bug",
+  "what": "`aquas bug add <slice> <test>` crea un bug con el siguiente ID `B` cuyo padre es un slice `done`, y exige que la prueba que reproduce la falla exista y falle.",
+  "files": [
+    "tools/internal/work/bug.go"
+  ],
+  "functional_test": "El humano reporta una falla y la ve en el backlog con su prueba roja.",
+  "technical_test": {
+    "name": "TestBugAddRequiresFailingRepro",
+    "red_before_code": true
+  }
+}

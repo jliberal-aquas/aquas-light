@@ -1,0 +1,15 @@
+{
+  "id": "S42",
+  "destructive_cases": [],
+  "parent": "F3",
+  "name": "La instalación compila",
+  "what": "`aquas install` y `aquas update` corren `aquas compile` antes del verificador, así la instancia nace con `.claude/` y `CLAUDE.md`.",
+  "files": [
+    "tools/internal/install/install.go"
+  ],
+  "functional_test": "El humano instala y abre Claude Code: la sesión ya tiene agentes, ganchos y el modelo del orquestador.",
+  "technical_test": {
+    "name": "TestInstallCompilesCanon",
+    "red_before_code": true
+  }
+}

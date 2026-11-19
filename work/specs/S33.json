@@ -1,0 +1,13 @@
+{
+  "id": "S33",
+  "parent": "F6",
+  "name": "Skill document y recorrido del gobierno",
+  "what": "Escribe la skill `document` con la plantilla de seis capas y la página `docs/governance/README.md` con el recorrido completo de una necesidad.",
+  "files": [
+    "canon/skills/document/SKILL.md",
+    "docs/governance/README.md"
+  ],
+  "functional_test": "El humano lee el recorrido y puede contar cómo empieza y cómo termina una necesidad.",
+  "technical_test": "no aplica (sin código)",
+  "destructive_cases": []
+}

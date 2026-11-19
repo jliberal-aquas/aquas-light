@@ -1,0 +1,15 @@
+{
+  "id": "S39",
+  "destructive_cases": [],
+  "parent": "F1",
+  "name": "Preparar un clon",
+  "what": "`go run ./tools/cmd/aquas setup` prepara un clon en otra máquina: compila `bin/aquas`, baja `golangci-lint`, activa `core.hooksPath` y escribe `work/host.json`, sin crear commits.",
+  "files": [
+    "tools/internal/install/setup.go"
+  ],
+  "functional_test": "El humano clona el repo en otra máquina, corre el comando y la sesión siguiente tiene todos los ganchos activos.",
+  "technical_test": {
+    "name": "TestSetupPreparesClone",
+    "red_before_code": true
+  }
+}

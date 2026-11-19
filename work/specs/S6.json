@@ -1,0 +1,36 @@
+{
+  "id": "S6",
+  "parent": "F1",
+  "name": "Detectar el host",
+  "what": "Detecta sistema, arquitectura, herramienta de shell, estilo de rutas, fin de línea y versiones, y escribe `work/host.json` con las reglas de `canon/hosts.json` para ese sistema. Define el esquema del host.",
+  "files": [
+    "tools/internal/host/detect.go"
+  ],
+  "functional_test": "El humano abre `work/host.json` en Windows y lee `os: windows`, `shell_tool: git-bash` y las reglas de rutas.",
+  "technical_test": {
+    "name": "TestDetectHostWritesHints",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Sistema inyectado `windows`.",
+      "expect": "`work/host.json` trae `os: windows` y `shell_tool: git-bash`; es JSON válido y sus reglas son las de `canon/hosts.json` para Windows."
+    },
+    {
+      "case": "Sistema inyectado `plan9`, que no está en `canon/hosts.json`.",
+      "expect": "Código distinto de 0; el mensaje nombra `plan9`; un `work/host.json` previo queda byte a byte igual."
+    },
+    {
+      "case": "`work/host.json` previo con texto que no es JSON.",
+      "expect": "Se reemplaza por un JSON válido y completo; código 0."
+    },
+    {
+      "case": "Diez ejecuciones concurrentes de la detección sobre el mismo repo.",
+      "expect": "Al terminar, `work/host.json` es JSON válido y completo; ninguna ejecución termina en pánico."
+    },
+    {
+      "case": "`canon/hosts.json` con JSON roto.",
+      "expect": "Código distinto de 0; el mensaje nombra `canon/hosts.json`; no se escribe un `work/host.json` parcial."
+    }
+  ]
+}

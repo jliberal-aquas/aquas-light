@@ -1,0 +1,27 @@
+{
+  "id": "I1",
+  "name": "Aquas Light v1",
+  "goal": "Un paquete portable que instala en una carpeta vacía el gobierno de Aquas para Claude Code en Linux, macOS y Windows, con controles deterministas y documentación narrada y sellada.",
+  "source": "work/requests/N1.json",
+  "features": [
+    "F1",
+    "F2",
+    "F5",
+    "F3",
+    "F4",
+    "F9",
+    "F6",
+    "F7",
+    "F8"
+  ],
+  "adr": [
+    "0001-self-contained-pack.md",
+    "0002-json-for-machines-markdown-for-humans.md",
+    "0003-closed-slices-are-immutable.md",
+    "0004-go-for-governance-tools.md",
+    "0005-governance-and-product-are-separate.md",
+    "0006-governance-code-is-read-only-in-instances.md",
+    "0007-docs-are-sealed-to-what-they-describe.md",
+    "0008-linux-macos-and-windows.md"
+  ]
+}

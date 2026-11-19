@@ -1,0 +1,39 @@
+{
+  "id": "S5",
+  "parent": "F1",
+  "name": "git, binarios y commit de instalación",
+  "what": "Arma `install.go`, que encadena los pasos: `git init`, compila `bin/aquas` (`aquas.exe` en Windows), baja `golangci-lint` fijado verificando su checksum, escribe `work/host.json` y hace el commit de instalación. Si un paso falla, borra todo lo creado, incluidos los archivos de solo lectura de `.git`, y la carpeta queda vacía. Los ganchos y `.claude/` los agregan S40 y S42.",
+  "files": [
+    "tools/internal/install/install.go",
+    "tools/internal/install/git.go",
+    "tools/internal/install/lintdownload.go",
+    "tools/internal/install/rollback.go"
+  ],
+  "functional_test": "El humano corre `git log` y ve un único commit `Install Aquas Light vX.Y.Z`.",
+  "technical_test": {
+    "name": "TestInstallRollsBackOnFailure",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Servidor `httptest` que responde 500 a la descarga de `golangci-lint`.",
+      "expect": "Código distinto de 0; la carpeta destino queda con 0 entradas, sin `.git`."
+    },
+    {
+      "case": "Servidor `httptest` que entrega un archivo cuyo SHA-256 no coincide con el fijado.",
+      "expect": "Código distinto de 0; el mensaje nombra la huella esperada y la recibida; el binario bajado no queda en disco; la carpeta destino queda con 0 entradas."
+    },
+    {
+      "case": "Fallo inyectado justo después de `git init`, con archivos de solo lectura dentro de `.git/objects`.",
+      "expect": "La carpeta destino queda con 0 entradas en Linux, macOS y Windows."
+    },
+    {
+      "case": "Configuración global de git sin `user.name` ni `user.email` (`GIT_CONFIG_GLOBAL` apuntando a un archivo vacío).",
+      "expect": "Una de dos y nada intermedio: hay exactamente un commit, o el código es distinto de 0, el mensaje nombra `user.name` y la carpeta queda con 0 entradas."
+    },
+    {
+      "case": "Configuración global de git con `core.hooksPath` apuntando a otra carpeta.",
+      "expect": "Tras instalar, `git config --local core.hooksPath` devuelve `.githooks`; `git rev-list --count HEAD` devuelve 1; el asunto del commit cumple `^Install Aquas Light v\\d+\\.\\d+\\.\\d+$`."
+    }
+  ]
+}

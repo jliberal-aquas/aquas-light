@@ -1,0 +1,37 @@
+{
+  "id": "S34",
+  "parent": "F7",
+  "name": "Leer la sesión",
+  "what": "`aquas cost` lee la transcripción de la sesión y las de `subagents/`, y suma llamadas, tokens, cachés, duración y herramientas por turno, agente y modelo. Antes de escribir código, guarda una transcripción real como fixture.",
+  "files": [
+    "tools/internal/cost/transcript.go",
+    "tools/internal/cost/testdata/"
+  ],
+  "functional_test": "El humano compara la línea del turno con lo que vio en la sesión.",
+  "technical_test": {
+    "name": "TestCostSumsTurnByAgent",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Transcripción cuya última línea es JSON truncado.",
+      "expect": "Se ignora esa línea y se suma el resto; código 0."
+    },
+    {
+      "case": "Un mismo mensaje del asistente repartido en tres líneas con el mismo identificador de mensaje y el mismo `usage`.",
+      "expect": "Sus tokens se cuentan una sola vez."
+    },
+    {
+      "case": "Transcripción con dos turnos del humano.",
+      "expect": "La línea del turno suma solo lo ocurrido desde el último mensaje del humano; la línea de la sesión suma ambos."
+    },
+    {
+      "case": "Transcripción que referencia un subagente cuyo archivo no existe en `subagents/`.",
+      "expect": "Suma lo disponible, marca el subagente como faltante y sale con código 0; sin pánico."
+    },
+    {
+      "case": "Transcripción con líneas de un `type` desconocido.",
+      "expect": "Se ignoran; los totales son iguales a los del mismo fixture sin esas líneas."
+    }
+  ]
+}

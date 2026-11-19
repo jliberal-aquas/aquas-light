@@ -1,0 +1,36 @@
+{
+  "id": "S20",
+  "parent": "F3",
+  "name": "Detectar ediciones a mano",
+  "what": "El verificador compila en memoria y compara con `.claude/` y `CLAUDE.md`; cualquier diferencia rechaza el commit. Ignora `.claude/settings.local.json`, que escribe Claude Code.",
+  "files": [
+    "tools/internal/verify/compiled.go"
+  ],
+  "functional_test": "El humano edita `.claude/agents/tester.md` a mano y el commit se rechaza.",
+  "technical_test": {
+    "name": "TestVerifyDetectsHandEdits",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Agregar un espacio al final de una línea de `.claude/agents/tester.md`.",
+      "expect": "Rechazo que nombra el archivo."
+    },
+    {
+      "case": "Crear `.claude/agents/intruso.md`, que ningún rol genera.",
+      "expect": "Rechazo que nombra `intruso.md`."
+    },
+    {
+      "case": "Borrar `.claude/settings.json`.",
+      "expect": "Rechazo que nombra el archivo faltante."
+    },
+    {
+      "case": "Editar `canon/roles.json` sin recompilar.",
+      "expect": "Rechazo que nombra el archivo desfasado y dice correr `aquas compile`."
+    },
+    {
+      "case": "Crear `.claude/settings.local.json`, que escribe Claude Code y no se sube al repo.",
+      "expect": "No hay rechazo por ese archivo."
+    }
+  ]
+}

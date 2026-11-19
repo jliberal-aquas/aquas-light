@@ -1,0 +1,32 @@
+{
+  "id": "S12",
+  "parent": "F2",
+  "name": "La instalación exige verde",
+  "what": "`aquas install` corre `aquas verify` antes del commit de instalación y deshace todo si no da verde.",
+  "files": [
+    "tools/internal/install/install.go"
+  ],
+  "functional_test": "El humano ve que la instalación termina con la salida verde del verificador.",
+  "technical_test": {
+    "name": "TestInstallRunsVerify",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Plantilla de `backlog.json` con un campo sobrante inyectado.",
+      "expect": "`aquas install` sale con código distinto de 0; la salida incluye el mensaje del verificador; la carpeta destino queda con 0 entradas."
+    },
+    {
+      "case": "Verificador inyectado que anota si existe `HEAD` en el momento en que lo llaman.",
+      "expect": "Anota que `HEAD` no existe: el verificador corre antes del commit de instalación."
+    },
+    {
+      "case": "Verificador inyectado que falla por error de ejecución (código 2, sin lista de violaciones).",
+      "expect": "La instalación se deshace igual: código distinto de 0 y carpeta con 0 entradas."
+    },
+    {
+      "case": "Instalación correcta y después `aquas verify` sobre el repo instalado.",
+      "expect": "Código 0 y `git rev-list --count HEAD` devuelve 1."
+    }
+  ]
+}

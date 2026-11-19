@@ -1,0 +1,15 @@
+{
+  "id": "S41",
+  "destructive_cases": [],
+  "parent": "F5",
+  "name": "Detectar commits que saltaron los ganchos",
+  "what": "`aquas verify --since-last` corre las reglas del commit sobre cada commit posterior a `work/verified_head` y lista los que no las cumplen. El gancho de inicio de sesión lo llama y le muestra el resultado al humano.",
+  "files": [
+    "tools/internal/verify/since.go"
+  ],
+  "functional_test": "El humano hace un commit con `--no-verify` y la sesión siguiente se lo informa con el motivo.",
+  "technical_test": {
+    "name": "TestVerifySinceLastFindsBypassedCommit",
+    "red_before_code": true
+  }
+}

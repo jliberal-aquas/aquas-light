@@ -1,0 +1,36 @@
+{
+  "id": "S16",
+  "parent": "F3",
+  "name": "Agentes desde roles.json",
+  "what": "Genera un archivo por rol en `.claude/agents/` con su modelo y sus instrucciones, y la tabla legible `canon/roles.md`.",
+  "files": [
+    "tools/internal/compile/agents.go"
+  ],
+  "functional_test": "El humano cambia el modelo del tester en `roles.json`, compila y lo ve en `.claude/agents/tester.md`.",
+  "technical_test": {
+    "name": "TestCompileAgents",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "`roles.json` con un rol llamado `../x` y otro llamado `a/b`.",
+      "expect": "Error que nombra el rol; no se escribe ningún archivo fuera de `.claude/agents/`."
+    },
+    {
+      "case": "Quitar un rol de `roles.json` y compilar.",
+      "expect": "El archivo de ese rol desaparece de `.claude/agents/`; no quedan huérfanos."
+    },
+    {
+      "case": "Compilar dos veces sin cambios y comparar.",
+      "expect": "Salida idéntica byte a byte; ningún archivo contiene `\\r`, tampoco en Windows."
+    },
+    {
+      "case": "`roles.json` con dos roles del mismo nombre y otro rol con `model` vacío.",
+      "expect": "Error que nombra el rol; `.claude/agents/` queda idéntico al estado previo."
+    },
+    {
+      "case": "Rol cuyas instrucciones contienen una línea `---`, dos puntos y comillas dobles.",
+      "expect": "El archivo generado tiene un solo bloque de cabecera al inicio y su `name` y `model` son iguales a los de `roles.json`."
+    }
+  ]
+}

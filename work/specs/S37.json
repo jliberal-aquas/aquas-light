@@ -1,0 +1,33 @@
+{
+  "id": "S37",
+  "parent": "F8",
+  "name": "Defectos y candidatos",
+  "what": "Define `work/defects.md`, el esquema de `work/retro.json` y la línea «Hay N candidatos para retrospectiva» en el cierre de feature.",
+  "files": [
+    "tools/internal/retro/retro.go",
+    "tools/internal/work/feature.go"
+  ],
+  "functional_test": "El humano cierra una feature y lee cuántos candidatos hay.",
+  "technical_test": {
+    "name": "TestRetroCountSinceLastRetrospective",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "`work/retro.json` con tres candidatos anteriores a la última retrospectiva y dos posteriores.",
+      "expect": "La línea dice «Hay 2 candidatos para retrospectiva»."
+    },
+    {
+      "case": "`work/retro.json` con cuatro candidatos y ninguna retrospectiva registrada.",
+      "expect": "La línea dice «Hay 4 candidatos para retrospectiva»."
+    },
+    {
+      "case": "`work/retro.json` no existe.",
+      "expect": "La línea dice «Hay 0 candidatos para retrospectiva»; código 0."
+    },
+    {
+      "case": "Candidato con un campo sobrante y otro sin un campo obligatorio.",
+      "expect": "Dos rechazos de esquema, cada uno nombra su campo."
+    }
+  ]
+}

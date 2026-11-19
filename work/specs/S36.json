@@ -1,0 +1,32 @@
+{
+  "id": "S36",
+  "parent": "F7",
+  "name": "Líneas al cerrar el turno",
+  "what": "El gancho `Stop` imprime el turno y la sesión cuando aprueba, y agrega la línea a `work/cost.jsonl`.",
+  "files": [
+    "tools/internal/hooks/stop.go"
+  ],
+  "functional_test": "El humano ve dos líneas de gasto al final de cada turno aprobado.",
+  "technical_test": {
+    "name": "TestStopAppendsCost",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Turno que incumple un punto y queda bloqueado.",
+      "expect": "No se imprime gasto y `work/cost.jsonl` no gana ninguna línea."
+    },
+    {
+      "case": "El mismo turno pasa dos veces por el gancho: primero bloqueado y luego aprobado con `stop_hook_active: true`.",
+      "expect": "`work/cost.jsonl` gana exactamente una línea para ese turno."
+    },
+    {
+      "case": "Turno aprobado cuyo `transcript_path` no existe.",
+      "expect": "El gancho no bloquea el turno; avisa en stderr en español; `work/cost.jsonl` no gana una línea parcial ni inválida."
+    },
+    {
+      "case": "Tercer turno aprobado de una sesión.",
+      "expect": "Se imprimen exactamente dos líneas de gasto; la de la sesión es igual a la suma de las tres líneas de esa sesión en `work/cost.jsonl`."
+    }
+  ]
+}

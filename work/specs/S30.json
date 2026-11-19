@@ -1,0 +1,36 @@
+{
+  "id": "S30",
+  "parent": "F6",
+  "name": "Sellar",
+  "what": "Define el esquema de los sellos. `aquas seal <doc>` guarda en `work/seals.json` la huella del documento y de lo que cubre, con finales de línea normalizados y rutas con `/`. El verificador compara `work/seals.json` con el último commit y aplica las reglas del resello a cada entrada cambiada, aunque se haya editado a mano.",
+  "files": [
+    "tools/internal/seal/seal.go"
+  ],
+  "functional_test": "El humano sella una página y ve su registro en `work/seals.json`.",
+  "technical_test": {
+    "name": "TestSealIsStableAcrossLineEndings",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Sellar el mismo documento como `docs/governance/x.md`, como `./docs/../docs/governance/x.md` y, en Windows, como `docs\\governance\\x.md`.",
+      "expect": "`work/seals.json` tiene una sola entrada, con la clave `docs/governance/x.md`."
+    },
+    {
+      "case": "Sellar un documento que cubre un archivo que no existe.",
+      "expect": "Código distinto de 0; `work/seals.json` queda idéntico byte a byte."
+    },
+    {
+      "case": "Sellar con un `work/seals.json` previo corrupto.",
+      "expect": "Código distinto de 0; el archivo corrupto no se sobrescribe."
+    },
+    {
+      "case": "Cambiar un tabulador por espacios en un archivo cubierto y volver a calcular.",
+      "expect": "La huella cambia: solo se normalizan los finales de línea."
+    },
+    {
+      "case": "Sellar A y luego B en un repo; B y luego A en otro repo igual.",
+      "expect": "Los dos `work/seals.json` son idénticos byte a byte."
+    }
+  ]
+}

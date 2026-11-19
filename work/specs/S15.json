@@ -1,0 +1,36 @@
+{
+  "id": "S15",
+  "parent": "F5",
+  "name": "tools/ bloqueado en una instancia",
+  "what": "Lee el rol del repo de `canon/config.json` en el último commit, no del índice. En una instancia, rechaza todo commit que toque `tools/`, salvo uno que sube la versión del manifiesto y cuyos archivos de `tools/` coinciden con las huellas nuevas del manifiesto. Cambiar el rol solo se acepta en ese mismo tipo de commit.",
+  "files": [
+    "tools/internal/githooks/toolslock.go"
+  ],
+  "functional_test": "El humano edita `tools/` en una instancia y el commit se rechaza.",
+  "technical_test": {
+    "name": "TestToolsLockedInInstance",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Instancia; commit que toca `tools/x.go` junto con un archivo válido de `product/`.",
+      "expect": "Rechazo que nombra `tools/x.go`; no entra ninguno de los dos archivos."
+    },
+    {
+      "case": "Instancia; commit que solo borra `tools/a.go`, y otro que lo mueve a `product/a.go`.",
+      "expect": "Dos rechazos: borrar y renombrar también tocan `tools/`."
+    },
+    {
+      "case": "Instancia; el mismo commit cambia `role` a otro valor en `canon/config.json` y edita `tools/x.go`.",
+      "expect": "Rechazo: el rol se lee del último commit, no del cambio que viene en el índice."
+    },
+    {
+      "case": "Instancia; commit hecho a mano con `git commit` copiando literalmente el mensaje que usa el commit de `aquas update`, tocando `tools/x.go`.",
+      "expect": "Rechazo: la excepción no se obtiene copiando el mensaje."
+    },
+    {
+      "case": "Instancia; commit que agrega al índice la ruta `Tools/x.go` con mayúscula inicial.",
+      "expect": "Rechazo en Linux, macOS y Windows."
+    }
+  ]
+}

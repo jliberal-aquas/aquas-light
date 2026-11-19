@@ -1,0 +1,36 @@
+{
+  "id": "S21",
+  "parent": "F4",
+  "name": "Guardar el mensaje crudo",
+  "what": "El gancho `UserPromptSubmit` agrega el campo `prompt` a `work/turns.jsonl` con fecha e ID de turno antes de que el modelo lo lea.",
+  "files": [
+    "tools/internal/hooks/userprompt.go"
+  ],
+  "functional_test": "El humano escribe un mensaje y lo encuentra idéntico en `work/turns.jsonl`.",
+  "technical_test": {
+    "name": "TestHookUserPromptAppendsRaw",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Entrada cuyo `prompt` trae saltos de línea, comillas dobles, `\\`, un emoji y el carácter U+2028.",
+      "expect": "`work/turns.jsonl` gana una sola línea; al decodificarla, `prompt` es idéntico byte a byte al recibido."
+    },
+    {
+      "case": "Entrada con un `prompt` de 1 MB.",
+      "expect": "Se guarda completo; código 0."
+    },
+    {
+      "case": "Entrada con JSON truncado y otra sin el campo `prompt`.",
+      "expect": "No se agrega ninguna línea y el archivo queda igual; código distinto de 0 con mensaje en español; sin pánico."
+    },
+    {
+      "case": "Veinte procesos del gancho al mismo tiempo, cada uno con un `prompt` distinto.",
+      "expect": "El archivo gana veinte líneas, cada una JSON válido y con su `prompt` entero."
+    },
+    {
+      "case": "`work/turns.jsonl` previo cuya última línea no termina en salto de línea.",
+      "expect": "La línea nueva se puede decodificar sola; no queda pegada a la anterior."
+    }
+  ]
+}

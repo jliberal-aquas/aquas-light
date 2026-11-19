@@ -1,0 +1,36 @@
+{
+  "id": "S25",
+  "parent": "F4",
+  "name": "Ocho puntos del fin de turno",
+  "what": "El gancho `Stop` comprueba los ocho puntos acordados y bloquea con el motivo. Con `stop_hook_active` verdadero no vuelve a bloquear, agrega el caso a `work/gate-bypass.jsonl` y el siguiente turno se lo muestra al humano.",
+  "files": [
+    "tools/internal/hooks/stop.go"
+  ],
+  "functional_test": "El humano ve una respuesta sin «Refinar:» detenida y corregida antes de llegarle.",
+  "technical_test": {
+    "name": "TestHookStopChecksEightPoints",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Tabla de ocho fixtures; cada uno incumple un solo punto y cumple los otros siete.",
+      "expect": "Cada fixture bloquea y su motivo nombra ese punto y ninguno de los otros siete."
+    },
+    {
+      "case": "Fixture que incumple tres puntos a la vez.",
+      "expect": "Un solo bloqueo cuyo motivo lista los tres puntos."
+    },
+    {
+      "case": "Fixture que incumple un punto con `stop_hook_active: true`.",
+      "expect": "No bloquea: código 0 y ninguna decisión `block` en stdout."
+    },
+    {
+      "case": "Fixture que cumple los ocho puntos.",
+      "expect": "Código 0 y ninguna decisión `block` en stdout."
+    },
+    {
+      "case": "stdin con JSON truncado y otra entrada cuyo `transcript_path` no existe.",
+      "expect": "Mensaje en español en stderr; sin pánico; stdout no contiene JSON a medias."
+    }
+  ]
+}

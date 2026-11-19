@@ -1,0 +1,38 @@
+{
+  "id": "S4",
+  "parent": "F1",
+  "name": "Copia de archivos y manifiesto",
+  "what": "Copia `canon/`, `schemas/`, `tools/` y las plantillas; crea `backlog.json`, `work/`, `archive/`, `product/`, `docs/`, `README.md`, `.gitignore` y `.gitattributes` con LF. Escribe `canon/manifest.json` con la huella SHA-256 de cada archivo copiado, calculada con finales de línea normalizados.",
+  "files": [
+    "tools/internal/install/copy.go",
+    "tools/internal/hashing/hash.go",
+    "templates/"
+  ],
+  "functional_test": "El humano abre `canon/manifest.json` y ve una huella por cada archivo del canon.",
+  "technical_test": {
+    "name": "TestManifestHashIgnoresCRLF",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Calcular la huella del mismo texto guardado con LF, con CRLF y con finales mezclados.",
+      "expect": "Las tres huellas son idénticas."
+    },
+    {
+      "case": "Calcular la huella de dos textos que solo difieren en un espacio al final de una línea.",
+      "expect": "Las huellas son distintas: la normalización solo toca finales de línea."
+    },
+    {
+      "case": "Copiar una plantilla binaria que contiene los bytes `0x0D 0x0A`.",
+      "expect": "El archivo copiado es idéntico byte a byte al original."
+    },
+    {
+      "case": "Instalar en dos carpetas temporales distintas y comparar `canon/manifest.json`.",
+      "expect": "Los dos manifiestos son idénticos byte a byte; todas las rutas usan `/`, son relativas y están ordenadas; ninguna contiene `\\` ni el nombre de la carpeta temporal."
+    },
+    {
+      "case": "Recorrer `canon/` después de copiar y cruzarlo con el manifiesto.",
+      "expect": "Cada archivo de `canon/` salvo `manifest.json` tiene exactamente una entrada; ninguna entrada apunta a un archivo que no existe; `manifest.json` no se lista a sí mismo."
+    }
+  ]
+}

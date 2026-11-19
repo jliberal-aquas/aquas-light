@@ -1,0 +1,517 @@
+{
+  "schema_version": 1,
+  "next_ids": {
+    "I": 2,
+    "F": 10,
+    "S": 47,
+    "B": 1,
+    "N": 2,
+    "C": 10
+  },
+  "capabilities": [
+    {
+      "id": "C1",
+      "name": "Instalar y actualizar",
+      "page": "docs/governance/C1-install-and-update.md"
+    },
+    {
+      "id": "C2",
+      "name": "Verificar",
+      "page": "docs/governance/C2-verify.md"
+    },
+    {
+      "id": "C3",
+      "name": "Compilar el canon",
+      "page": "docs/governance/C3-compile-canon.md"
+    },
+    {
+      "id": "C4",
+      "name": "Controlar el turno",
+      "page": "docs/governance/C4-turn-control.md"
+    },
+    {
+      "id": "C5",
+      "name": "Controlar el commit",
+      "page": "docs/governance/C5-commit-control.md"
+    },
+    {
+      "id": "C6",
+      "name": "Documentar y sellar",
+      "page": "docs/governance/C6-document-and-seal.md"
+    },
+    {
+      "id": "C7",
+      "name": "Ver el gasto",
+      "page": "docs/governance/C7-cost.md"
+    },
+    {
+      "id": "C8",
+      "name": "Retrospectiva",
+      "page": "docs/governance/C8-retrospective.md"
+    },
+    {
+      "id": "C9",
+      "name": "Trabajar un slice",
+      "page": "docs/governance/C9-work-a-slice.md"
+    }
+  ],
+  "items": [
+    {
+      "id": "I1",
+      "type": "initiative",
+      "parent": null,
+      "state": "proposed",
+      "priority": 1,
+      "spec": "work/specs/I1.json"
+    },
+    {
+      "id": "F1",
+      "type": "feature",
+      "parent": "I1",
+      "state": "proposed",
+      "priority": 1,
+      "capability": "C1",
+      "spec": "work/specs/F1.json"
+    },
+    {
+      "id": "S1",
+      "type": "slice",
+      "parent": "F1",
+      "state": "proposed",
+      "priority": 1,
+      "spec": "work/specs/S1.json"
+    },
+    {
+      "id": "S2",
+      "type": "slice",
+      "parent": "F1",
+      "state": "proposed",
+      "priority": 2,
+      "spec": "work/specs/S2.json"
+    },
+    {
+      "id": "S3",
+      "type": "slice",
+      "parent": "F1",
+      "state": "proposed",
+      "priority": 3,
+      "spec": "work/specs/S3.json"
+    },
+    {
+      "id": "S4",
+      "type": "slice",
+      "parent": "F1",
+      "state": "proposed",
+      "priority": 4,
+      "spec": "work/specs/S4.json"
+    },
+    {
+      "id": "S5",
+      "type": "slice",
+      "parent": "F1",
+      "state": "proposed",
+      "priority": 5,
+      "spec": "work/specs/S5.json"
+    },
+    {
+      "id": "S6",
+      "type": "slice",
+      "parent": "F1",
+      "state": "proposed",
+      "priority": 6,
+      "spec": "work/specs/S6.json"
+    },
+    {
+      "id": "S7",
+      "type": "slice",
+      "parent": "F1",
+      "state": "proposed",
+      "priority": 7,
+      "spec": "work/specs/S7.json"
+    },
+    {
+      "id": "S39",
+      "type": "slice",
+      "parent": "F1",
+      "state": "proposed",
+      "priority": 8,
+      "spec": "work/specs/S39.json"
+    },
+    {
+      "id": "S8",
+      "type": "slice",
+      "parent": "F1",
+      "state": "proposed",
+      "priority": 9,
+      "spec": "work/specs/S8.json"
+    },
+    {
+      "id": "F2",
+      "type": "feature",
+      "parent": "I1",
+      "state": "proposed",
+      "priority": 2,
+      "capability": "C2",
+      "spec": "work/specs/F2.json"
+    },
+    {
+      "id": "S9",
+      "type": "slice",
+      "parent": "F2",
+      "state": "proposed",
+      "priority": 1,
+      "spec": "work/specs/S9.json"
+    },
+    {
+      "id": "S10",
+      "type": "slice",
+      "parent": "F2",
+      "state": "proposed",
+      "priority": 2,
+      "spec": "work/specs/S10.json"
+    },
+    {
+      "id": "S11",
+      "type": "slice",
+      "parent": "F2",
+      "state": "proposed",
+      "priority": 3,
+      "spec": "work/specs/S11.json"
+    },
+    {
+      "id": "S12",
+      "type": "slice",
+      "parent": "F2",
+      "state": "proposed",
+      "priority": 4,
+      "spec": "work/specs/S12.json"
+    },
+    {
+      "id": "F5",
+      "type": "feature",
+      "parent": "I1",
+      "state": "proposed",
+      "priority": 3,
+      "capability": "C5",
+      "spec": "work/specs/F5.json"
+    },
+    {
+      "id": "S13",
+      "type": "slice",
+      "parent": "F5",
+      "state": "proposed",
+      "priority": 1,
+      "spec": "work/specs/S13.json"
+    },
+    {
+      "id": "S40",
+      "type": "slice",
+      "parent": "F5",
+      "state": "proposed",
+      "priority": 2,
+      "spec": "work/specs/S40.json"
+    },
+    {
+      "id": "S14",
+      "type": "slice",
+      "parent": "F5",
+      "state": "proposed",
+      "priority": 3,
+      "spec": "work/specs/S14.json"
+    },
+    {
+      "id": "S15",
+      "type": "slice",
+      "parent": "F5",
+      "state": "proposed",
+      "priority": 4,
+      "spec": "work/specs/S15.json"
+    },
+    {
+      "id": "S41",
+      "type": "slice",
+      "parent": "F5",
+      "state": "proposed",
+      "priority": 5,
+      "spec": "work/specs/S41.json"
+    },
+    {
+      "id": "F3",
+      "type": "feature",
+      "parent": "I1",
+      "state": "proposed",
+      "priority": 4,
+      "capability": "C3",
+      "spec": "work/specs/F3.json"
+    },
+    {
+      "id": "S16",
+      "type": "slice",
+      "parent": "F3",
+      "state": "proposed",
+      "priority": 1,
+      "spec": "work/specs/S16.json"
+    },
+    {
+      "id": "S17",
+      "type": "slice",
+      "parent": "F3",
+      "state": "proposed",
+      "priority": 2,
+      "spec": "work/specs/S17.json"
+    },
+    {
+      "id": "S18",
+      "type": "slice",
+      "parent": "F3",
+      "state": "proposed",
+      "priority": 3,
+      "spec": "work/specs/S18.json"
+    },
+    {
+      "id": "S19",
+      "type": "slice",
+      "parent": "F3",
+      "state": "proposed",
+      "priority": 4,
+      "spec": "work/specs/S19.json"
+    },
+    {
+      "id": "S20",
+      "type": "slice",
+      "parent": "F3",
+      "state": "proposed",
+      "priority": 5,
+      "spec": "work/specs/S20.json"
+    },
+    {
+      "id": "S42",
+      "type": "slice",
+      "parent": "F3",
+      "state": "proposed",
+      "priority": 6,
+      "spec": "work/specs/S42.json"
+    },
+    {
+      "id": "F4",
+      "type": "feature",
+      "parent": "I1",
+      "state": "proposed",
+      "priority": 5,
+      "capability": "C4",
+      "spec": "work/specs/F4.json"
+    },
+    {
+      "id": "S21",
+      "type": "slice",
+      "parent": "F4",
+      "state": "proposed",
+      "priority": 1,
+      "spec": "work/specs/S21.json"
+    },
+    {
+      "id": "S22",
+      "type": "slice",
+      "parent": "F4",
+      "state": "proposed",
+      "priority": 2,
+      "spec": "work/specs/S22.json"
+    },
+    {
+      "id": "S23",
+      "type": "slice",
+      "parent": "F4",
+      "state": "proposed",
+      "priority": 3,
+      "spec": "work/specs/S23.json"
+    },
+    {
+      "id": "S24",
+      "type": "slice",
+      "parent": "F4",
+      "state": "proposed",
+      "priority": 4,
+      "spec": "work/specs/S24.json"
+    },
+    {
+      "id": "S25",
+      "type": "slice",
+      "parent": "F4",
+      "state": "proposed",
+      "priority": 5,
+      "spec": "work/specs/S25.json"
+    },
+    {
+      "id": "F9",
+      "type": "feature",
+      "parent": "I1",
+      "state": "proposed",
+      "priority": 6,
+      "capability": "C9",
+      "spec": "work/specs/F9.json"
+    },
+    {
+      "id": "S43",
+      "type": "slice",
+      "parent": "F9",
+      "state": "proposed",
+      "priority": 1,
+      "spec": "work/specs/S43.json"
+    },
+    {
+      "id": "S44",
+      "type": "slice",
+      "parent": "F9",
+      "state": "proposed",
+      "priority": 2,
+      "spec": "work/specs/S44.json"
+    },
+    {
+      "id": "S45",
+      "type": "slice",
+      "parent": "F9",
+      "state": "proposed",
+      "priority": 3,
+      "spec": "work/specs/S45.json"
+    },
+    {
+      "id": "S26",
+      "type": "slice",
+      "parent": "F9",
+      "state": "proposed",
+      "priority": 4,
+      "spec": "work/specs/S26.json"
+    },
+    {
+      "id": "S46",
+      "type": "slice",
+      "parent": "F9",
+      "state": "proposed",
+      "priority": 5,
+      "spec": "work/specs/S46.json"
+    },
+    {
+      "id": "S27",
+      "type": "slice",
+      "parent": "F9",
+      "state": "proposed",
+      "priority": 6,
+      "spec": "work/specs/S27.json"
+    },
+    {
+      "id": "F6",
+      "type": "feature",
+      "parent": "I1",
+      "state": "proposed",
+      "priority": 7,
+      "capability": "C6",
+      "spec": "work/specs/F6.json"
+    },
+    {
+      "id": "S28",
+      "type": "slice",
+      "parent": "F6",
+      "state": "proposed",
+      "priority": 1,
+      "spec": "work/specs/S28.json"
+    },
+    {
+      "id": "S29",
+      "type": "slice",
+      "parent": "F6",
+      "state": "proposed",
+      "priority": 2,
+      "spec": "work/specs/S29.json"
+    },
+    {
+      "id": "S30",
+      "type": "slice",
+      "parent": "F6",
+      "state": "proposed",
+      "priority": 3,
+      "spec": "work/specs/S30.json"
+    },
+    {
+      "id": "S31",
+      "type": "slice",
+      "parent": "F6",
+      "state": "proposed",
+      "priority": 4,
+      "spec": "work/specs/S31.json"
+    },
+    {
+      "id": "S32",
+      "type": "slice",
+      "parent": "F6",
+      "state": "proposed",
+      "priority": 5,
+      "spec": "work/specs/S32.json"
+    },
+    {
+      "id": "S33",
+      "type": "slice",
+      "parent": "F6",
+      "state": "proposed",
+      "priority": 6,
+      "spec": "work/specs/S33.json"
+    },
+    {
+      "id": "F7",
+      "type": "feature",
+      "parent": "I1",
+      "state": "proposed",
+      "priority": 8,
+      "capability": "C7",
+      "spec": "work/specs/F7.json"
+    },
+    {
+      "id": "S34",
+      "type": "slice",
+      "parent": "F7",
+      "state": "proposed",
+      "priority": 1,
+      "spec": "work/specs/S34.json"
+    },
+    {
+      "id": "S35",
+      "type": "slice",
+      "parent": "F7",
+      "state": "proposed",
+      "priority": 2,
+      "spec": "work/specs/S35.json"
+    },
+    {
+      "id": "S36",
+      "type": "slice",
+      "parent": "F7",
+      "state": "proposed",
+      "priority": 3,
+      "spec": "work/specs/S36.json"
+    },
+    {
+      "id": "F8",
+      "type": "feature",
+      "parent": "I1",
+      "state": "proposed",
+      "priority": 9,
+      "capability": "C8",
+      "spec": "work/specs/F8.json"
+    },
+    {
+      "id": "S37",
+      "type": "slice",
+      "parent": "F8",
+      "state": "proposed",
+      "priority": 1,
+      "spec": "work/specs/S37.json"
+    },
+    {
+      "id": "S38",
+      "type": "slice",
+      "parent": "F8",
+      "state": "proposed",
+      "priority": 2,
+      "spec": "work/specs/S38.json"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "S2",
+  "parent": "F1",
+  "name": "Canon v1",
+  "what": "Escribe el canon con las decisiones del refinamiento N1: constitución, método, comunicación, delegación, `roles.json` con el rol `architect`, `config.json`, `hosts.json` y `toolchain.json` del gobierno. Quita `work/inbox.json` y `work/checklist.json` del método.",
+  "files": [
+    "canon/constitution.md",
+    "canon/method.md",
+    "canon/communication.md",
+    "canon/delegation.md",
+    "canon/roles.json",
+    "canon/config.json",
+    "canon/hosts.json",
+    "canon/toolchain.json"
+  ],
+  "functional_test": "El humano lee `canon/method.md` y encuentra las respuestas de las cinco rondas sin contradicción con `GLOSSARY.md`.",
+  "technical_test": "no aplica (sin código)",
+  "destructive_cases": []
+}

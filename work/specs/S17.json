@@ -1,0 +1,37 @@
+{
+  "id": "S17",
+  "parent": "F3",
+  "name": "settings.json",
+  "what": "Genera `.claude/settings.json` con el modelo del orquestador, el registro de todos los ganchos y la negación de leer secretos. Cada gancho llama a `.githooks/claude-hook`, que sale con código 2 y pide correr `setup` si `bin/aquas` no existe.",
+  "files": [
+    "tools/internal/compile/settings.go",
+    ".githooks/claude-hook"
+  ],
+  "functional_test": "El humano abre una sesión nueva y el modelo es el del orquestador.",
+  "technical_test": {
+    "name": "TestCompileSettings",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "`.claude/settings.json` previo con una clave agregada a mano.",
+      "expect": "Tras compilar, la clave ajena ya no está."
+    },
+    {
+      "case": "`.claude/settings.local.json` previo con contenido propio.",
+      "expect": "Queda idéntico byte a byte: la compilación no lo toca ni lo borra."
+    },
+    {
+      "case": "Compilar dos veces seguidas y contar los ganchos registrados.",
+      "expect": "`SessionStart`, `SubagentStart`, `UserPromptSubmit`, `PreToolUse`, `SubagentStop` y `Stop` aparecen exactamente una vez cada uno; las dos salidas son idénticas byte a byte."
+    },
+    {
+      "case": "Compilar en los tres sistemas y revisar los comandos de los ganchos.",
+      "expect": "Ningún comando contiene `\\`, letra de unidad ni la ruta absoluta de la carpeta temporal; el archivo es idéntico en los tres sistemas."
+    },
+    {
+      "case": "`canon/config.json` sin modelo del orquestador.",
+      "expect": "Error que nombra el campo; no se escribe un `settings.json` con modelo vacío y el previo queda igual."
+    }
+  ]
+}

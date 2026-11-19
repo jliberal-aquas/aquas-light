@@ -1,0 +1,19 @@
+{
+  "id": "F2",
+  "parent": "I1",
+  "name": "Verificar",
+  "capability": "C2",
+  "acceptance": "`aquas verify` rechaza con código distinto de 0 y un mensaje en español cada violación de los esquemas y de las reglas del backlog, y da verde en un repo recién instalado.",
+  "integration_test": "TestIntegrationVerify: instala en una carpeta temporal, rompe una regla por caso (tabla de casos) y comprueba el código y el mensaje.",
+  "slices": [
+    "S9",
+    "S10",
+    "S11",
+    "S12"
+  ],
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ]
+}

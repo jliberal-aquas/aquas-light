@@ -1,0 +1,36 @@
+{
+  "id": "S26",
+  "parent": "F9",
+  "name": "Cerrar un slice",
+  "what": "`aquas slice close <ID>` exige la salida roja de `slice start`, un informe escrito por el gancho con `agent_type` igual a `tester` y ningún caso abierto en `work/gate-bypass.jsonl`. Pone el slice en `done`, guarda `spec_sha256` y archiva la memoria en `archive/memory/`.",
+  "files": [
+    "tools/internal/work/slice.go"
+  ],
+  "functional_test": "El humano ve el slice en `done` y su memoria archivada.",
+  "technical_test": {
+    "name": "TestSliceCloseRequiresTesterReport",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Cerrar `S4` cuando en `work/reports/` solo existe el informe del tester de `S3`.",
+      "expect": "Código distinto de 0; `backlog.json` y la memoria quedan idénticos byte a byte."
+    },
+    {
+      "case": "Cerrar un slice cuyo informe del tester declara al menos un caso fallido.",
+      "expect": "Código distinto de 0; el slice sigue en `in_progress`."
+    },
+    {
+      "case": "Cerrar un slice en `proposed`, uno ya `done`, el ID `S999` y el ID `F1`.",
+      "expect": "Cuatro rechazos con código distinto de 0; `backlog.json` queda igual."
+    },
+    {
+      "case": "En `archive/memory/` ya existe un archivo con el nombre que usaría la memoria del slice.",
+      "expect": "El archivo previo queda idéntico byte a byte: el cierre falla o usa otro nombre, nunca lo sobrescribe."
+    },
+    {
+      "case": "Fallo inyectado al escribir en `archive/memory/`.",
+      "expect": "El slice sigue en `in_progress` y la memoria sigue en su ruta original."
+    }
+  ]
+}

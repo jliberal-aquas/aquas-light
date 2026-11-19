@@ -1,0 +1,37 @@
+{
+  "id": "S19",
+  "parent": "F3",
+  "name": "Skills copiadas",
+  "what": "Copia `grill-with-docs` fijada a su commit de origen y la skill `document` hacia `.claude/skills/`.",
+  "files": [
+    "tools/internal/compile/skills.go",
+    "canon/skills/"
+  ],
+  "functional_test": "El humano escribe una necesidad y la sesión abre la ronda con el formato de `grill-with-docs`.",
+  "technical_test": {
+    "name": "TestCompileSkills",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Skill del canon con subcarpetas anidadas y un archivo con espacio en el nombre.",
+      "expect": "Cada archivo aparece en `.claude/skills/` con la misma ruta relativa y la misma huella SHA-256."
+    },
+    {
+      "case": "Quitar una skill de `canon/skills/` y compilar.",
+      "expect": "Su carpeta desaparece de `.claude/skills/`."
+    },
+    {
+      "case": "Carpeta `canon/skills/x/` sin `SKILL.md`.",
+      "expect": "Error que nombra `x`; `.claude/skills/` queda como estaba."
+    },
+    {
+      "case": "Enlace simbólico dentro de `canon/skills/` que apunta a un archivo fuera del repo.",
+      "expect": "Error que nombra el enlace; el contenido externo no se copia."
+    },
+    {
+      "case": "El commit de origen declarado para `grill-with-docs` vale `main` en lugar de un SHA de 40 caracteres hexadecimales.",
+      "expect": "Error que nombra el valor: la fijación exige un SHA completo."
+    }
+  ]
+}

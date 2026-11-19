@@ -1,0 +1,33 @@
+{
+  "id": "S35",
+  "parent": "F7",
+  "name": "Dinero con tabla de precios",
+  "what": "Calcula el dinero con `canon/prices.json`, que lleva fuente y fecha de revisión por modelo.",
+  "files": [
+    "tools/internal/cost/prices.go",
+    "canon/prices.json"
+  ],
+  "functional_test": "El humano ve el dinero del turno y la fecha de la tabla usada.",
+  "technical_test": {
+    "name": "TestCostUsesPriceTable",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Turno que usa un modelo que no está en `canon/prices.json`.",
+      "expect": "La salida nombra el modelo sin precio y no le asigna monto; no muestra 0 como si fuera gratis."
+    },
+    {
+      "case": "Fixture con solo tokens de lectura de caché y de escritura de caché.",
+      "expect": "El monto es igual al calculado a mano con los precios de caché, no con el precio de entrada."
+    },
+    {
+      "case": "`canon/prices.json` con un modelo sin fecha de revisión, otro sin fuente y otro con precio negativo.",
+      "expect": "Tres rechazos de esquema, cada uno nombra su modelo."
+    },
+    {
+      "case": "Fixture con tres agentes y cantidades de tokens que no dan montos redondos.",
+      "expect": "La suma de los montos por agente es exactamente igual al total del turno; un turno de un solo token de entrada da un monto mayor que 0."
+    }
+  ]
+}

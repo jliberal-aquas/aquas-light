@@ -1,0 +1,36 @@
+{
+  "id": "S23",
+  "parent": "F4",
+  "name": "Validar encargos",
+  "what": "Define el esquema del encargo. El gancho `PreToolUse` sobre `Agent` valida el encargo contra ese esquema y lo niega si trae `model` o `effort`. Si la entrada no se puede leer, niega con código 2.",
+  "files": [
+    "tools/internal/hooks/pretooluse.go"
+  ],
+  "functional_test": "El humano ve en el registro un encargo negado con el campo que lo causó.",
+  "technical_test": {
+    "name": "TestHookPreToolUseDeniesModel",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Encargo cuyo `prompt` es un párrafo de prosa.",
+      "expect": "Se niega; el motivo dice que el encargo debe ser JSON del esquema."
+    },
+    {
+      "case": "Encargo con JSON válido del esquema seguido de una frase en prosa.",
+      "expect": "Se niega nombrando el contenido sobrante."
+    },
+    {
+      "case": "Encargo válido cuya llamada trae `model` con valor vacío `\"\"`, y otro con `effort`.",
+      "expect": "Los dos se niegan; el motivo nombra `model` y `effort` respectivamente."
+    },
+    {
+      "case": "La misma llamada inválida con `tool_name: Task` en lugar de `Agent`.",
+      "expect": "También se niega."
+    },
+    {
+      "case": "stdin vacío y stdin con JSON truncado.",
+      "expect": "Código 2 con mensaje en español en stderr; sin pánico: ante la duda, niega."
+    }
+  ]
+}

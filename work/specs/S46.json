@@ -1,0 +1,15 @@
+{
+  "id": "S46",
+  "destructive_cases": [],
+  "parent": "F9",
+  "name": "Barrido",
+  "what": "`aquas next` dice qué sigue: primero los bugs de la feature en curso, después los slices `ready` por prioridad. Al cerrar una feature, lista las necesidades `to_refine` para refinarlas en la sesión siguiente.",
+  "files": [
+    "tools/internal/work/next.go"
+  ],
+  "functional_test": "El humano cierra un slice con un bug abierto y el barrido le propone el bug primero.",
+  "technical_test": {
+    "name": "TestNextPutsBugsFirst",
+    "red_before_code": true
+  }
+}

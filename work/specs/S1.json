@@ -1,0 +1,35 @@
+{
+  "id": "S1",
+  "parent": "F1",
+  "name": "Esqueleto Go y CI en tres sistemas",
+  "what": "Crea el módulo Go en `tools/`, el binario `aquas` con el subcomando `version`, la configuración de `golangci-lint` y GitHub Actions con matriz ubuntu, macos y windows que corre `gofmt`, `go vet`, `golangci-lint` y `go test -race`.",
+  "files": [
+    "tools/go.mod",
+    "tools/cmd/aquas/main.go",
+    "tools/.golangci.yml",
+    ".github/workflows/ci.yml"
+  ],
+  "functional_test": "El humano abre la pestaña Actions del repo y ve tres trabajos en verde.",
+  "technical_test": {
+    "name": "TestVersion",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Correr `aquas` sin ningún subcomando.",
+      "expect": "Código de salida distinto de 0; stderr trae el uso en español; stdout queda vacío; la salida no contiene `panic` ni `goroutine`."
+    },
+    {
+      "case": "Correr `aquas noexiste`.",
+      "expect": "Código distinto de 0; stderr nombra `noexiste`; la salida no contiene `panic` ni `goroutine`."
+    },
+    {
+      "case": "Correr `aquas version` desde una carpeta temporal que no es un repo git.",
+      "expect": "Código 0; stdout es una sola línea que cumple `^\\d+\\.\\d+\\.\\d+` después de quitar un prefijo opcional; termina en `\\n` y no contiene `\\r` en ninguno de los tres sistemas."
+    },
+    {
+      "case": "Leer `tools/go.mod` desde el test.",
+      "expect": "El archivo no contiene ninguna directiva `require`: el módulo usa solo la biblioteca estándar."
+    }
+  ]
+}

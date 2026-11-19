@@ -1,0 +1,36 @@
+{
+  "id": "S3",
+  "parent": "F1",
+  "name": "Precondiciones de la instalación",
+  "what": "`aquas install` comprueba que la carpeta destino está completamente vacía, que Go está en una versión soportada y que `git` existe. Si algo falla, sale con código distinto de 0, un mensaje en español y sin crear nada.",
+  "files": [
+    "tools/internal/install/preflight.go"
+  ],
+  "functional_test": "El humano corre la skill en una carpeta con un `README.md` y ve el motivo del rechazo; la carpeta queda igual.",
+  "technical_test": {
+    "name": "TestPreflightRejectsNonEmptyFolder",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Carpeta destino que solo contiene el archivo oculto `.gitkeep` de 0 bytes.",
+      "expect": "Código distinto de 0; el mensaje en español nombra `.gitkeep`; el listado de la carpeta antes y después es idéntico."
+    },
+    {
+      "case": "Carpeta destino que solo contiene un directorio `.git` vacío.",
+      "expect": "Código distinto de 0; no se crea ningún archivo; `.git` sigue vacío."
+    },
+    {
+      "case": "Carpeta destino que solo contiene una subcarpeta vacía `a/`.",
+      "expect": "Código distinto de 0: no está completamente vacía; el listado antes y después es idéntico."
+    },
+    {
+      "case": "Carpeta destino vacía y `PATH` apuntando a un directorio temporal sin `git`.",
+      "expect": "Código distinto de 0; el mensaje nombra `git`; la carpeta sigue con 0 entradas."
+    },
+    {
+      "case": "Carpeta destino vacía y versión de Go inyectada `go1.10`.",
+      "expect": "Código distinto de 0; el mensaje nombra la versión encontrada y la mínima soportada; la carpeta sigue con 0 entradas."
+    }
+  ]
+}

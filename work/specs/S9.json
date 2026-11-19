@@ -1,0 +1,37 @@
+{
+  "id": "S9",
+  "parent": "F2",
+  "name": "Esquemas tipados",
+  "what": "Define en Go los tipos de backlog, especificación, solicitud y configuración; los decodifica rechazando campos sobrantes y valida techos de longitud. Publica sus esquemas en `schemas/`. Cada otro esquema nace en el slice que lo usa.",
+  "files": [
+    "tools/internal/schema/",
+    "schemas/"
+  ],
+  "functional_test": "El humano agrega un campo inventado a `backlog.json` y el verificador lo rechaza nombrando el campo.",
+  "technical_test": {
+    "name": "TestDecodeRejectsUnknownFields",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "`backlog.json` con un campo inventado `color` dentro del tercer elemento de `items`.",
+      "expect": "Rechazo; el mensaje nombra `color` y la posición del elemento."
+    },
+    {
+      "case": "`backlog.json` donde un elemento trae la clave `ID` en mayúsculas en lugar de `id`.",
+      "expect": "Rechazo que nombra `ID`: las claves no se aceptan sin distinguir mayúsculas."
+    },
+    {
+      "case": "Archivo JSON válido seguido de más contenido: `{...}{...}` o texto suelto después de la llave final.",
+      "expect": "Rechazo que nombra el contenido sobrante."
+    },
+    {
+      "case": "Campo de texto con techo N: probar N caracteres, N+1 caracteres y N letras «ñ».",
+      "expect": "N caracteres pasa; N+1 se rechaza nombrando el campo y el techo; N «ñ» pasa, porque se cuentan caracteres y no bytes."
+    },
+    {
+      "case": "Elemento con `priority: \"1\"` (texto), otro con `id: null` y otro sin el campo `type`.",
+      "expect": "Tres rechazos, cada uno nombra su campo; ninguno termina en pánico."
+    }
+  ]
+}

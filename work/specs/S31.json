@@ -1,0 +1,36 @@
+{
+  "id": "S31",
+  "parent": "F6",
+  "name": "Cadena hacia atrás",
+  "what": "Un cambio en un archivo o especificación vence todo documento que cubra ese elemento o cualquier eslabón de su cadena: bug, slice, feature, iniciativa y capacidad. La cadena se lee de `backlog.json` y de `archive/`.",
+  "files": [
+    "tools/internal/seal/chain.go"
+  ],
+  "functional_test": "El humano corrige un bug y ve la lista de páginas vencidas hasta la capacidad.",
+  "technical_test": {
+    "name": "TestStaleChainReachesCapability",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Cambiar un archivo de un slice de la feature Fa, con documentos sellados que cubren solo la feature Fb de otra capacidad.",
+      "expect": "Ningún documento de Fb queda vencido."
+    },
+    {
+      "case": "Cambiar solo los finales de línea de un archivo cubierto.",
+      "expect": "Ningún documento queda vencido."
+    },
+    {
+      "case": "Bug sobre un slice cuya feature ya está en `archive/I1.json`; cambiar un archivo de ese slice.",
+      "expect": "Quedan vencidos los documentos del slice, la feature, la iniciativa y la capacidad."
+    },
+    {
+      "case": "Slice S2b con `supersedes: S2`; cambiar un archivo de S2b con un documento que cubre a S2.",
+      "expect": "El documento que cubre a S2 queda vencido."
+    },
+    {
+      "case": "Dos slices con `supersedes` cruzado (A hacia B y B hacia A), y un bug que apunta a un slice inexistente.",
+      "expect": "Termina con código distinto de 0 y un mensaje que nombra los IDs; no se cuelga ni entra en pánico."
+    }
+  ]
+}

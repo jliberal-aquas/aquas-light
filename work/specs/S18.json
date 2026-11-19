@@ -1,0 +1,32 @@
+{
+  "id": "S18",
+  "parent": "F3",
+  "name": "CLAUDE.md",
+  "what": "Genera `CLAUDE.md` con las importaciones del canon en el orden fijo: constitución, método, comunicación, delegación.",
+  "files": [
+    "tools/internal/compile/claudemd.go"
+  ],
+  "functional_test": "El humano abre `CLAUDE.md` y ve solo importaciones del canon.",
+  "technical_test": {
+    "name": "TestCompileClaudeMd",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Compilar cuando falta `canon/delegation.md`.",
+      "expect": "Error que nombra el archivo; el `CLAUDE.md` previo queda idéntico."
+    },
+    {
+      "case": "`CLAUDE.md` previo con un párrafo escrito a mano.",
+      "expect": "Tras compilar, cada línea no vacía es una importación del canon; el párrafo ya no está."
+    },
+    {
+      "case": "Agregar `canon/extra.md` y cambiar las fechas de modificación de los cuatro archivos para que el orden por fecha sea inverso.",
+      "expect": "`CLAUDE.md` trae exactamente cuatro importaciones en el orden constitución, método, comunicación, delegación; `extra.md` no aparece."
+    },
+    {
+      "case": "Compilar en Windows.",
+      "expect": "Las rutas importadas usan `/` y el archivo no contiene `\\r`; es idéntico byte a byte al generado en Linux."
+    }
+  ]
+}

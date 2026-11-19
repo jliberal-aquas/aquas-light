@@ -1,0 +1,17 @@
+{
+  "id": "F8",
+  "parent": "I1",
+  "name": "Retrospectiva",
+  "capability": "C8",
+  "acceptance": "Al cerrar una feature, el auditor deja candidatos en `work/retro.json` y el cierre dice cuántos hay; ningún candidato cambia el canon sin que el humano corra `/retrospectiva`.",
+  "integration_test": "TestIntegrationRetro: cierra una feature con dos defectos nuevos y comprueba la línea de conteo y que el canon no cambió.",
+  "slices": [
+    "S37",
+    "S38"
+  ],
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ]
+}

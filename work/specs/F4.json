@@ -1,0 +1,20 @@
+{
+  "id": "F4",
+  "parent": "I1",
+  "name": "Controlar el turno",
+  "capability": "C4",
+  "acceptance": "Con los JSON que envía Claude Code, los ganchos guardan cada mensaje del humano, inyectan el host a todo agente, rechazan encargos e informes fuera de esquema, no dejan cerrar un turno que incumple alguno de los ocho puntos y registran todo segundo intento que dejan pasar.",
+  "integration_test": "TestIntegrationTurnHooks: alimenta cada gancho con JSON reales de Claude Code guardados como fixtures y comprueba salida y código.",
+  "slices": [
+    "S21",
+    "S22",
+    "S23",
+    "S24",
+    "S25"
+  ],
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ]
+}

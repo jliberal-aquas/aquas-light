@@ -1,0 +1,21 @@
+{
+  "id": "F9",
+  "parent": "I1",
+  "name": "Trabajar un slice",
+  "capability": "C9",
+  "acceptance": "Un slice solo empieza con su prueba técnica registrada en rojo y su memoria creada, solo cierra con el informe del tester escrito por el gancho, y una feature solo cierra con su prueba integral, la revisión del arquitecto y la auditoría; lo nuevo se aparca como necesidad o bug y el barrido elige qué sigue.",
+  "integration_test": "TestIntegrationWorkCycle: recorre en un repo instalado empezar, aparcar una necesidad, crear un bug, cerrar el slice, barrer y cerrar la feature, e intenta cada cierre sin su requisito.",
+  "slices": [
+    "S43",
+    "S44",
+    "S45",
+    "S26",
+    "S46",
+    "S27"
+  ],
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ]
+}

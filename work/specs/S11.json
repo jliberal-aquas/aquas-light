@@ -1,0 +1,36 @@
+{
+  "id": "S11",
+  "parent": "F2",
+  "name": "Capacidades con página",
+  "what": "Comprueba que cada capacidad de `backlog.json` tenga su página y que cada feature apunte a una capacidad declarada.",
+  "files": [
+    "tools/internal/verify/capabilities.go"
+  ],
+  "functional_test": "El humano declara una capacidad sin página y el verificador lo rechaza.",
+  "technical_test": {
+    "name": "TestVerifyCapabilityPages",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Capacidad cuyo `page` apunta a un directorio existente.",
+      "expect": "Rechazo que nombra la capacidad."
+    },
+    {
+      "case": "Capacidad con `page: ../fuera.md` y otra con una ruta absoluta.",
+      "expect": "Dos rechazos: la página debe estar dentro del repo."
+    },
+    {
+      "case": "Feature con `capability: C99` y otra feature sin el campo `capability`.",
+      "expect": "Dos rechazos, cada uno nombra su feature."
+    },
+    {
+      "case": "Dos capacidades con el mismo ID `C1`.",
+      "expect": "Rechazo que nombra `C1`."
+    },
+    {
+      "case": "En disco existe `docs/governance/c1-install-and-update.md` y la capacidad declara `docs/governance/C1-install-and-update.md`.",
+      "expect": "Rechazo en Linux, macOS y Windows: el nombre se compara con mayúsculas exactas."
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "S43",
+  "destructive_cases": [],
+  "parent": "F9",
+  "name": "Empezar un slice",
+  "what": "`aquas slice start <ID>` exige que no haya otro slice en `in_progress` ni casos abiertos en `work/gate-bypass.jsonl`, corre la prueba técnica y exige que exista y falle, guarda esa salida roja en `work/reports/<ID>-red.txt`, pone el slice en `in_progress` y crea `work/memory.json`. Define el esquema de la memoria.",
+  "files": [
+    "tools/internal/work/start.go",
+    "tools/internal/schema/memory.go"
+  ],
+  "functional_test": "El humano ve el slice en `in_progress`, su salida roja guardada y la memoria creada.",
+  "technical_test": {
+    "name": "TestSliceStartRequiresRedTest",
+    "red_before_code": true
+  }
+}

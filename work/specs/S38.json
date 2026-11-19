@@ -1,0 +1,33 @@
+{
+  "id": "S38",
+  "parent": "F8",
+  "name": "Comando /retrospective",
+  "what": "Compila el comando `/retrospective` hacia `.claude/commands/`; lo corre el auditor y propone cambios al canon que el humano aprueba uno por uno.",
+  "files": [
+    "tools/internal/compile/commands.go",
+    "canon/commands/retrospective.md"
+  ],
+  "functional_test": "El humano escribe `/retrospectiva` y recibe propuestas, sin cambios aplicados.",
+  "technical_test": {
+    "name": "TestCompileRetroCommand",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Calcular la huella de todos los archivos de `canon/`, compilar y volver a calcularla.",
+      "expect": "Las huellas son idénticas: compilar el comando no cambia el canon."
+    },
+    {
+      "case": "Compilar cuando falta `canon/commands/retrospectiva.md`.",
+      "expect": "Error que nombra el archivo; `.claude/commands/` queda como estaba."
+    },
+    {
+      "case": "Quitar un comando de `canon/commands/` y compilar.",
+      "expect": "Su archivo desaparece de `.claude/commands/`."
+    },
+    {
+      "case": "Editar `.claude/commands/retrospectiva.md` a mano y correr `aquas verify`.",
+      "expect": "Rechazo que nombra el archivo."
+    }
+  ]
+}

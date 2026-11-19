@@ -1,0 +1,36 @@
+{
+  "id": "S28",
+  "parent": "F6",
+  "name": "Extraer funciones",
+  "what": "`aquas symbols` lista las funciones de un archivo Go con `go/ast`; para el producto corre el comando `symbols` del componente y valida su JSON.",
+  "files": [
+    "tools/internal/symbols/"
+  ],
+  "functional_test": "El humano corre el comando sobre un archivo y ve la lista de sus funciones.",
+  "technical_test": {
+    "name": "TestSymbolsGoListsAllFuncs",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Archivo con `func (a A) Close()`, `func (b *B) Close()`, una función genérica y una función anónima asignada a una variable.",
+      "expect": "La lista trae `A.Close` y `B.Close` como entradas distintas y la genérica por su nombre; la función anónima no aparece."
+    },
+    {
+      "case": "Archivo Go con un error de sintaxis en la línea 7.",
+      "expect": "Código distinto de 0; el mensaje nombra el archivo y la línea 7; no se imprime una lista parcial."
+    },
+    {
+      "case": "Archivo que solo contiene `package x`.",
+      "expect": "Código 0 y salida `[]`, no `null`."
+    },
+    {
+      "case": "Archivo con la restricción `//go:build windows`, leído en Linux.",
+      "expect": "Lista sus funciones igual que en Windows."
+    },
+    {
+      "case": "Componente de producto cuyo comando `symbols` devuelve texto que no es JSON, y otro que sale con código 1.",
+      "expect": "Código distinto de 0 en ambos; el mensaje nombra el componente."
+    }
+  ]
+}

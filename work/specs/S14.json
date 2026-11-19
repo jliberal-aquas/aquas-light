@@ -1,0 +1,36 @@
+{
+  "id": "S14",
+  "parent": "F5",
+  "name": "commit-msg con línea Docs",
+  "what": "Exige en todo commit, salvo los de instalación y actualización, la línea `Docs: revisé=<ruta existente|nada>; falsa=<sí|no>; promesa=<sí|no>`. El registro se lee de `git log`; no se copia a ningún archivo.",
+  "files": [
+    "tools/internal/githooks/commitmsg.go"
+  ],
+  "functional_test": "El humano hace commit sin la línea y ve el rechazo con el formato esperado.",
+  "technical_test": {
+    "name": "TestCommitMsgRequiresDocsLine",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Mensaje con `Docs: revisé=nada; falsa=quizás; promesa=no`.",
+      "expect": "Rechazo que muestra el formato esperado y nombra `falsa`."
+    },
+    {
+      "case": "Mensaje con `Docs: revisé=docs/no-existe.md; falsa=no; promesa=no`.",
+      "expect": "Rechazo que nombra la ruta inexistente."
+    },
+    {
+      "case": "Mensaje donde la línea aparece comentada (`# Docs: ...`) y otro donde aparece en medio de una frase (`ver Docs: revisé=nada; ...`).",
+      "expect": "Dos rechazos: la línea debe estar sola y sin comentar."
+    },
+    {
+      "case": "Mensaje válido guardado con finales CRLF.",
+      "expect": "Se acepta; `work/log.md` recibe exactamente una línea nueva, sin `\\r`."
+    },
+    {
+      "case": "Mensaje sin la línea `Docs:`.",
+      "expect": "Rechazo; `work/log.md` queda idéntico byte a byte."
+    }
+  ]
+}

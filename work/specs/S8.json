@@ -1,0 +1,12 @@
+{
+  "id": "S8",
+  "parent": "F1",
+  "name": "SKILL.md de la skill",
+  "what": "Escribe la skill corta: revisa requisitos, baja la versión fijada del paquete, corre `aquas install` o `aquas update` y le pregunta al humano por cada conflicto con el formato de «Qué necesito de ti».",
+  "files": [
+    "skill/SKILL.md"
+  ],
+  "functional_test": "El humano invoca la skill en una carpeta vacía y termina con el repo instalado sin escribir comandos.",
+  "technical_test": "no aplica (sin código)",
+  "destructive_cases": []
+}

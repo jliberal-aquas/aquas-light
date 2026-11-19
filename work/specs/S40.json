@@ -1,0 +1,17 @@
+{
+  "id": "S40",
+  "destructive_cases": [],
+  "parent": "F5",
+  "name": "Instalar los ganchos de git",
+  "what": "Crea `.githooks/` con envoltorios `sh` que llaman a `bin/aquas`, los registra en git con el bit ejecutable (`git update-index --chmod=+x`) para que funcionen al cruzar de Windows a Linux o macOS, y activa `core.hooksPath`. La instalación y `setup` lo llaman.",
+  "files": [
+    ".githooks/pre-commit",
+    ".githooks/commit-msg",
+    "tools/internal/install/githooks.go"
+  ],
+  "functional_test": "El humano instala en Windows, clona en Linux y su primer commit pasa por los ganchos.",
+  "technical_test": {
+    "name": "TestGitHooksAreExecutableInIndex",
+    "red_before_code": true
+  }
+}

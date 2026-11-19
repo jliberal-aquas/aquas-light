@@ -1,0 +1,36 @@
+{
+  "id": "S27",
+  "parent": "F9",
+  "name": "Cerrar una feature",
+  "what": "`aquas feature close <ID>` exige todos sus slices `done`, la salida verde de la prueba integral y los informes escritos por el gancho del `architect` (code review y linters) y del `auditor`. Muda la feature y sus slices a `archive/<iniciativa>.json` con `closed_at` y `evidence`.",
+  "files": [
+    "tools/internal/work/feature.go"
+  ],
+  "functional_test": "El humano ve la feature fuera del backlog y dentro del archivo histórico.",
+  "technical_test": {
+    "name": "TestFeatureCloseArchives",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Feature con un slice en `in_progress`.",
+      "expect": "Código distinto de 0; el mensaje nombra el slice; `backlog.json` y `archive/` quedan iguales."
+    },
+    {
+      "case": "Feature con todos sus slices en `done` y solo la auditoría de otra feature presente.",
+      "expect": "Código distinto de 0; el mensaje dice que falta la auditoría de esta feature."
+    },
+    {
+      "case": "Cerrar `F2` cuando `archive/I1.json` ya contiene a `F1`; después intentar cerrar `F1` otra vez.",
+      "expect": "`archive/I1.json` contiene a `F1` y a `F2`, y la entrada de `F1` no cambió; el segundo cierre de `F1` se rechaza."
+    },
+    {
+      "case": "Cierre correcto de una feature.",
+      "expect": "La feature y sus slices ya no están en `backlog.json`; su entrada del archivo trae `closed_at` con fecha, hora y zona, y `evidence` no vacío."
+    },
+    {
+      "case": "Tras archivar `F1`, un slice de otra feature declara `supersedes` hacia un slice de `F1`; correr `aquas verify`.",
+      "expect": "Código 0: el verificador encuentra el slice archivado."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": "S10",
+  "parent": "F2",
+  "name": "Reglas del backlog",
+  "what": "Comprueba formato de IDs y contadores globales, que cada padre exista en `backlog.json` o en `archive/` y sea del tipo correcto, un solo slice en `in_progress`, que cada necesidad `to_refine` tenga `source`, que `supersedes` apunte a un slice `done` (también archivado) y que la especificación de un slice `done` coincida con la huella `spec_sha256` guardada al cerrarlo.",
+  "files": [
+    "tools/internal/verify/backlog.go"
+  ],
+  "functional_test": "El humano pone dos slices en `in_progress` y el verificador lo rechaza nombrando ambos.",
+  "technical_test": {
+    "name": "TestVerifyBacklogRules",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "`next_ids.S` vale 5 y existe el slice `S38`.",
+      "expect": "Rechazo que nombra el contador `S` y el ID `S38`."
+    },
+    {
+      "case": "Dos elementos con el mismo ID `S3`.",
+      "expect": "Rechazo que nombra `S3`."
+    },
+    {
+      "case": "Slice con `parent: I1` y otro slice con `parent: F99`, que no existe.",
+      "expect": "Dos rechazos: uno dice que el padre de un slice debe ser una feature; el otro nombra `F99`."
+    },
+    {
+      "case": "Slice con `supersedes` hacia sí mismo, otro hacia un slice `proposed` y otro hacia `S999`.",
+      "expect": "Tres rechazos, cada uno nombra el slice que declara y el apuntado."
+    },
+    {
+      "case": "Especificación de un slice `done` cambiada en un byte y agregada al índice con `git add`; después se restaura solo en el árbol de trabajo.",
+      "expect": "Rechazo que nombra el slice: se compara lo que entraría al commit, no solo el archivo en disco."
+    }
+  ]
+}

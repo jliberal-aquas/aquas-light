@@ -1,0 +1,15 @@
+{
+  "id": "S44",
+  "destructive_cases": [],
+  "parent": "F9",
+  "name": "Aparcar una necesidad",
+  "what": "`aquas need add <turno>` crea una necesidad `to_refine` en el backlog con el siguiente ID `N`, y su `work/requests/<ID>.json` apunta al turno de `work/turns.jsonl`. Funciona con un slice en curso y no lo toca.",
+  "files": [
+    "tools/internal/work/need.go"
+  ],
+  "functional_test": "El humano pide algo nuevo con un slice en curso y lo encuentra aparcado en el backlog con sus palabras exactas.",
+  "technical_test": {
+    "name": "TestNeedAddParksRawTurn",
+    "red_before_code": true
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "S13",
+  "parent": "F5",
+  "name": "pre-commit por lado",
+  "what": "Clasifica los archivos del índice en gobierno o producto; corre las herramientas de `canon/toolchain.json` o las del componente en `product/toolchain.json`. Rechaza código de producto si su componente no tiene comandos. Si `bin/aquas` no existe, rechaza el commit y dice que corras `setup`.",
+  "files": [
+    "tools/internal/githooks/precommit.go"
+  ],
+  "functional_test": "El humano hace commit de un archivo Go mal formateado y ve el rechazo con el nombre del archivo.",
+  "technical_test": {
+    "name": "TestPreCommitRunsSideTools",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Commit con `tools/internal/x/a.go` mal formateado y un archivo de producto válido, con herramientas falsas que anotan qué archivos reciben.",
+      "expect": "Rechazo que nombra `a.go`; las herramientas del gobierno no reciben el archivo de producto y las del producto no reciben `a.go`."
+    },
+    {
+      "case": "Commit con `product/api/main.py` cuando el componente `api` no tiene comandos declarados.",
+      "expect": "Rechazo que nombra el componente `api`."
+    },
+    {
+      "case": "Archivo Go mal formateado en el índice y corregido en el árbol de trabajo sin `git add`.",
+      "expect": "Rechazo: se evalúa el contenido del índice."
+    },
+    {
+      "case": "Commit con el archivo `tools/internal/x/año nuevo.go` mal formateado.",
+      "expect": "Rechazo que nombra la ruta completa con el espacio y la «ñ»; no hay error de análisis de rutas."
+    },
+    {
+      "case": "Correr `.githooks/pre-commit` cuando `bin/aquas` no existe.",
+      "expect": "Código distinto de 0 y mensaje en español que dice cómo compilar el binario; el commit no entra."
+    }
+  ]
+}

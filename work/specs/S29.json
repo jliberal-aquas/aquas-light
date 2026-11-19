@@ -1,0 +1,36 @@
+{
+  "id": "S29",
+  "parent": "F6",
+  "name": "Referencia completa",
+  "what": "El verificador exige en `docs/<lado>/reference/<ruta>.md` una sección por función con cinco partes: para qué sirve, qué recibe, qué devuelve, qué errores da y un ejemplo.",
+  "files": [
+    "tools/internal/verify/reference.go"
+  ],
+  "functional_test": "El humano agrega una función sin documentar y el commit se rechaza nombrándola.",
+  "technical_test": {
+    "name": "TestVerifyReferenceSections",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Página de referencia donde una función tiene solo cuatro de las cinco partes.",
+      "expect": "Rechazo que nombra la función y la parte que falta."
+    },
+    {
+      "case": "Página con una sección para una función que ya no existe en el código.",
+      "expect": "Rechazo que nombra la sección huérfana."
+    },
+    {
+      "case": "Código con `A.Close` y `B.Close`; la página solo documenta `A.Close`.",
+      "expect": "Rechazo que nombra `B.Close`."
+    },
+    {
+      "case": "Sección con los cinco títulos pero una parte sin ningún texto debajo.",
+      "expect": "Rechazo que nombra la función y la parte vacía."
+    },
+    {
+      "case": "Archivo de código nuevo sin página de referencia.",
+      "expect": "Rechazo que nombra la ruta esperada `docs/<lado>/reference/<ruta>.md` ya resuelta."
+    }
+  ]
+}

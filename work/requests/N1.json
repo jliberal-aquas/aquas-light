@@ -1,0 +1,230 @@
+{
+  "id": "N1",
+  "date": "2026-11-18T17:17:00-03:00",
+  "type": "need",
+  "raw_file": "work/requests/N1-raw.txt",
+  "attachments": [
+    "work/requests/N1-constitution-input.md"
+  ],
+  "raw_message": "Fable piensa, opus orquesta, sonnet y haiku implementan , de acuerdo?",
+  "scenario": "El humano abre Claude Code en una carpeta vacía y llama la skill. La skill corre git init, instala canon, herramientas Go y ganchos, y hace el commit de instalación. Desde su siguiente mensaje, el orquestador clasifica, refina, planifica, delega, prueba, sella la documentación y audita; el humano aprueba leyendo páginas narradas.",
+  "rounds": [
+    {
+      "round": 0,
+      "items": [
+        {
+          "question": "Reparto de modelos",
+          "answer": "Opus orquesta; Fable arquitecto y auditor solo por feature; Sonnet implementa; Haiku testea y lee. Haiku no escribe código."
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "items": [
+        {
+          "question": "Q1-Q20",
+          "answer": "Aceptadas todas, salvo Q3: lenguaje Go en lugar de Python; Q18: linters del gobierno desde el inicio y del producto por componente; Q19: documentación narrada de todo el código."
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "items": [
+        {
+          "question": "Q1-Q16",
+          "answer": "Aceptadas todas: Go soportado, solo biblioteca estándar, golangci-lint v2 fijado, gobierno y producto separados, tools/ bloqueado en instancia, docs por lado, referencia narrada, plantilla por capas, sellos con cadena y resello con razón, memoria, registro de solicitud, ocho puntos del Stop, validación de encargos e informes."
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "items": [
+        {
+          "question": "Q1-Q11",
+          "answer": "Aceptadas todas salvo Q6: también Windows, con configuración del host inyectada a todos los agentes."
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "items": [
+        {
+          "question": "Q1-Q9",
+          "answer": "Aceptadas todas: host.json por máquina, inyección por gancho, Git for Windows exigido, modelo por defecto del orquestador, LF y sellos normalizados, rutas con /, CI en tres sistemas, golangci-lint bajado en Go."
+        },
+        {
+          "question": "Carpeta destino",
+          "answer": "La carpeta debe estar completamente vacía; si no, no se crea nada. Si está vacía, la skill corre git init y crea todo."
+        }
+      ]
+    }
+  ],
+  "result": [
+    "I1"
+  ],
+  "adr": [
+    "0001",
+    "0002",
+    "0003",
+    "0004",
+    "0005",
+    "0006",
+    "0007",
+    "0008"
+  ],
+  "glossary": "GLOSSARY.md",
+  "decisions": {
+    "roles": {
+      "orchestrator": "claude-opus-5-5 medium: habla con el humano, refina, redacta el plan, delega en lote",
+      "architect": "claude-fable-5-2 high: critica el plan de cada feature, escribe los casos destructivos, hace code review y linters al cerrar la feature",
+      "auditor": "claude-fable-5-2 high: contexto limpio, audita el cierre de la feature y anota candidatos de retrospectiva; nunca slices",
+      "implementer": "claude-sonnet-5-5 medium: único rol que escribe código",
+      "tester": "claude-haiku-5-5 low: ejecuta la prueba técnica y los casos destructivos escritos; verde con el código, rojo sin él; no inventa casos",
+      "reader": "claude-haiku-5-5 low: lee y junta evidencia"
+    },
+    "skill": "Solo instala y actualiza; el comportamiento vive en el canon compilado. SKILL.md corto que revisa requisitos, baja la versión fijada del paquete y corre aquas install o aquas update; pregunta al humano cada conflicto.",
+    "target_folder": "Carpeta completamente vacía, ni siquiera .git. Si trae algo, no se crea nada. Si está vacía, git init y se crea todo. Un remoto se agrega después con git remote add.",
+    "language": "Go, solo biblioteca estándar en el gobierno. Un binario aquas con subcomandos install, update, setup, verify, compile, hook <evento>, seal, symbols, cost, slice, feature, need, bug, next.",
+    "go_version": "go.mod declara la versión soportada más antigua al instalar; cada versión mayor tiene soporte hasta que salen dos más nuevas.",
+    "governance_linters": "gofmt, go vet, go test -race y golangci-lint v2 con versión fijada en canon/toolchain.json; el binario se baja en Go según os y arch y se verifica su checksum; no se usa go tool ni install.sh.",
+    "product_toolchain": "product/toolchain.json lista componentes, cada uno con path y comandos test, lint, format y symbols. Se llena en la primera feature con código de producto; sin comandos, no entra código de ese componente.",
+    "formats": "JSON para la máquina, Markdown para el humano. Rutas en JSON relativas a la raíz y con /. .gitattributes fuerza LF y las huellas normalizan finales de línea.",
+    "repo_config": "canon/config.json: rol (pack o instance), modelo por defecto del orquestador, idioma.",
+    "host_config": {
+      "file": "work/host.json, fuera del repo, regenerado por SessionStart e inyectado por SessionStart y SubagentStart",
+      "fields": [
+        "os",
+        "arch",
+        "shell_tool (bash|git-bash|powershell)",
+        "path_style (posix|windows)",
+        "line_ending",
+        "go_version",
+        "git_version",
+        "golangci_lint_version",
+        "harness",
+        "harness_version",
+        "detected_at",
+        "hints"
+      ],
+      "hints_source": "canon/hosts.json, editable"
+    },
+    "windows": "Soportado en v1. Exige Git for Windows (Git Bash). CI con matriz ubuntu, macos y windows; verde en los tres es parte de cada aceptación.",
+    "backlog": "Liviano: id, type, parent, state, priority, spec y, en features, capability. IDs con contadores globales por tipo: I, F, S, B, N, C. Estados: to_refine, proposed, ready, in_progress, done. Un solo slice en in_progress. El detalle vive en work/specs/<ID>.json.",
+    "parking": "Con un slice en curso, toda necesidad o error se aparca en backlog.json como to_refine con source; no existe work/inbox.json.",
+    "sweep": "Al cerrar un slice: primero los bugs de la feature en curso. Las necesidades to_refine se refinan al cerrar la feature, en sesión nueva, salvo urgencia del humano.",
+    "bug": "Entrada propia con padre en un slice done; nace con una prueba roja que reproduce la falla. El slice no se reabre.",
+    "scope_change": "Un slice done nunca se modifica: el cambio crea un slice con supersedes; si toca una feature archivada, nace una feature nueva que la referencia.",
+    "refinement": "grill-with-docs solo para necesidades y errores; preguntas, comentarios, respuestas y órdenes no se interrogan. Copiada en .claude/skills/ y fijada a su commit de origen.",
+    "request_record": {
+      "file": "work/requests/<N>.json",
+      "created_on_arrival": [
+        "date",
+        "turn",
+        "type"
+      ],
+      "filled_on_refinement": [
+        "scenario",
+        "rounds (pregunta, recomendación, respuesta)",
+        "result",
+        "adr",
+        "glossary"
+      ],
+      "raw": "El texto crudo lo guarda el gancho UserPromptSubmit en work/turns.jsonl; la solicitud apunta al turno."
+    },
+    "hot_memory": {
+      "file": "work/memory.json",
+      "fields": [
+        "slice",
+        "step (plan|red|green|tester|docs|commit)",
+        "done",
+        "next",
+        "files",
+        "blockers",
+        "updated_at"
+      ],
+      "rule": "El gancho Stop bloquea si un archivo cambió después de updated_at. Al cerrar el slice se archiva en archive/memory/<ID>.json."
+    },
+    "stop_points": [
+      "La primera línea dice «Tipo:».",
+      "La última línea dice «Refinar:».",
+      "Si cambió código, corrieron test y lint de su lado con código 0.",
+      "La memoria está al día.",
+      "No hay sellos vencidos.",
+      "Hay como máximo un slice en in_progress.",
+      "Si hay un slice con código en done, existe su informe del tester.",
+      "Se agregó la línea de telemetría."
+    ],
+    "delegation": {
+      "call": "Una sola llamada con context compartido y lista tasks.",
+      "task_fields": {
+        "context": "≤1200 caracteres",
+        "tasks[].agent": "un rol distinto de orchestrator",
+        "tasks[].task": "≤2000 caracteres; qué hacer, qué archivos, qué no hacer y una oración que empieza con «Terminas cuando»",
+        "tasks[].solutionSpace": "≤300 caracteres"
+      },
+      "forbidden": [
+        "model",
+        "effort"
+      ],
+      "report_fields": {
+        "conclusion": "≤2000",
+        "findings": "≤20 objetos what, where, why, certainty, severity",
+        "evidence": "≤20 objetos file, line, quote ≤300",
+        "output": "≤2000, opcional",
+        "pending": "lista",
+        "certainty": "verified|inferred|hypothesis|unknown"
+      },
+      "severity": [
+        "blocker",
+        "major",
+        "minor"
+      ]
+    },
+    "docs": {
+      "sides": "docs/product/ para capacidades y referencia del producto; docs/governance/ para el paquete, que llega narrado y sellado. README.md es la entrada única.",
+      "capability_template_layers": [
+        "Qué es, para qué sirve y qué no cubre",
+        "El problema con un caso concreto",
+        "Cómo encaja, con un diagrama",
+        "De punta a punta con un dato real",
+        "Reglas y controles con prueba técnica y funcional",
+        "Qué no cubre"
+      ],
+      "reference_parts": [
+        "para qué sirve",
+        "qué recibe",
+        "qué devuelve",
+        "qué errores da",
+        "un ejemplo"
+      ],
+      "reference_scope": "Cada función, exportada o no; los tests aparecen en la tabla de controles de su capacidad.",
+      "levels": "Iniciativa, feature y slice se documentan en su especificación; la prosa para el humano vive en las páginas de capacidad."
+    },
+    "seals": {
+      "file": "work/seals.json",
+      "rule": "Huella SHA-256 del documento y de cada archivo o especificación que cubre. Si cambia, el documento queda vencido y el commit se bloquea.",
+      "chain": "bug, slice, feature, iniciativa, capacidad",
+      "reseal": "Vale si el documento cambió o si trae unchanged_reason ≤300 caracteres; el auditor lee las razones al cerrar la feature."
+    },
+    "governance_code": "tools/ no se edita en una instancia; las mejoras van a work/retro.json como candidatas para el paquete.",
+    "retrospective": "Al cerrar cada feature el auditor anota candidatos en work/retro.json y el cierre dice cuántos hay; ningún control se aplica sin /retrospective del humano.",
+    "telemetry": "Siempre tokens de entrada, salida, caché leída y escrita, llamadas, duración y herramientas por turno, agente y modelo; el dinero con canon/prices.json con fuente y fecha.",
+    "pack_repo": "Repo nuevo jliberal-aquas/aquas-light, gobernado por su propio paquete; lo crea el humano.",
+    "build_order": [
+      "F1",
+      "F2",
+      "F5",
+      "F3",
+      "F4",
+      "F9",
+      "F6",
+      "F7",
+      "F8"
+    ]
+  },
+  "architect_review": {
+    "date": "2026-11-18",
+    "verdict": "Aprobable con cambios",
+    "applied": "Se agregaron las decisiones completas, F9 Trabajar un slice, S39 a S46, y se corrigieron S5, S6, S7, S9, S10, S13, S14, S15, S17, S19, S20, S22 a S27, S29 a S31, S33, S37 y S38."
+  }
+}

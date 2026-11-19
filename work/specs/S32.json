@@ -1,0 +1,32 @@
+{
+  "id": "S32",
+  "parent": "F6",
+  "name": "Reglas del resello",
+  "what": "Un resello vale solo si el documento cambió o si trae `unchanged_reason` de hasta 300 caracteres.",
+  "files": [
+    "tools/internal/seal/reseal.go"
+  ],
+  "functional_test": "El humano intenta resellar sin cambio ni razón y ve el rechazo.",
+  "technical_test": {
+    "name": "TestResealRequiresChangeOrReason",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Resello sin cambio en el documento y con `unchanged_reason` vacío, y otro con solo espacios.",
+      "expect": "Dos rechazos."
+    },
+    {
+      "case": "Resello sin cambio con razón de 300 caracteres, de 301 caracteres y de 300 letras «ñ».",
+      "expect": "300 pasa; 301 se rechaza nombrando el techo; 300 «ñ» pasa."
+    },
+    {
+      "case": "Documento cuyo único cambio es pasar de LF a CRLF, resellado sin razón.",
+      "expect": "Rechazo: un cambio de finales de línea no cuenta como cambio."
+    },
+    {
+      "case": "Entrada de `work/seals.json` reescrita a mano con las huellas correctas y sin razón, con el documento sin cambios; correr `aquas verify`.",
+      "expect": "Rechazo que nombra el documento: el resello no pasó por las reglas."
+    }
+  ]
+}
