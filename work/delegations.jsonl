@@ -22,3 +22,6 @@
 {"date": "2026-11-18", "item": "F1", "role": "tester", "model": "haiku", "task": "Verificar TestIntegrationInstall: verde, tres mutaciones y cobertura contra la spec", "tokens": 84658, "tool_uses": 10, "duration_s": 87}
 {"date": "2026-11-18", "item": "F1", "role": "implementer", "model": "sonnet", "task": "Corrección F1: update con paquete nuevo, hashes del manifiesto y hooksPath (continuación del mismo agente)", "tokens": null, "tool_uses": null, "duration_s": null}
 {"date": "2026-11-18", "item": "F1", "role": "tester", "model": "haiku", "task": "Re-verificar TestIntegrationInstall ampliada: mutaciones d-f (continuación del mismo agente)", "tokens": null, "tool_uses": null, "duration_s": null}
+{"date": "2026-11-18", "item": "F1", "role": "implementer", "model": "sonnet", "task": "Escribir docs/governance/C1-install-and-update.md desde el código", "tokens": 120033, "tool_uses": 10, "duration_s": 118}
+{"date": "2026-11-19", "item": "F1", "role": "auditor", "model": "fable", "task": "Auditar el cierre de F1 y escribir work/retro.json", "tokens": 197019, "tool_uses": 24, "duration_s": 358}
+{"date": "2026-11-19", "item": "F1", "role": "implementer", "model": "sonnet", "task": "Corrección de la página C1 según la auditoría (continuación del mismo agente)", "tokens": null, "tool_uses": null, "duration_s": null}

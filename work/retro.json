@@ -1,0 +1,69 @@
+{
+  "feature": "F1",
+  "created_at": "2026-11-19T00:03:46-03:00",
+  "candidates": [
+    {
+      "id": "R1",
+      "what": "Ningún paso del ciclo compara el campo `what` de la spec con el código. El tester verifica la prueba técnica y los casos destructivos, y un slice pasa a `done` aunque una frase de su `what` no esté hecha.",
+      "evidence": "work/specs/S7.json:5 pide «Escribe en el manifiesto la versión nueva»; tools/internal/install/copy.go:43-47 y tools/internal/update/update.go:197 escriben solo `schema_version`, `algorithm` y `files`; work/reports/S7-tester.json dio `pass` sin nombrarlo; work/specs/S15.json:5 depende de «la versión del manifiesto». work/specs/S39.json pide `go run ./tools/cmd/aquas setup`; corrido desde la raíz sale con código 1 («go.mod file not found»). La aceptación de F1 dice «reemplaza solo lo que el humano no editó» y update.go:126 solo detecta ediciones en `canon/`.",
+      "proposal": "Agregar al encargo del tester una lista de las afirmaciones del `what`, cada una con la línea de código o la prueba que la cumple, y negar `done` si queda una sin respaldo.",
+      "severity": "major"
+    },
+    {
+      "id": "R2",
+      "what": "El canon describe controles y archivos que no existen en este entorno, y no dice cuáles reglas valen hoy solo por palabra. Los desvíos quedaron en `work/handoff.json`, un archivo que el método no define y que se reescribe en cada chat.",
+      "evidence": "No existen `.claude/agents/`, `.claude/skills/` (skill `document`, `grill-with-docs`), `.githooks/` (hook `commit-msg`), `schemas/report.schema.json`, `README.md` en la raíz, `work/gate-bypass.jsonl` ni `work/seals.json`. `backlog.json` declara las capacidades C2 a C9 y `docs/governance/` solo tiene la página de C1 (constitución 14, método 5). work/handoff.json manda delegar con `general-purpose` y el parámetro `model`, lo contrario de método 6. El desvío de B1 solo consta en work/handoff.json, campo `known_deviation`.",
+      "proposal": "Llevar en el canon una tabla de reglas con su estado (con control, por palabra, aún no aplica) y un registro fijo de desvíos que no dependa del handoff.",
+      "severity": "major"
+    },
+    {
+      "id": "R3",
+      "what": "Los informes de los subagentes y la bitácora de delegaciones no se validan contra nada. Hay informes con valores fuera de las listas cerradas y delegaciones sin datos de uso.",
+      "evidence": "work/reports/F1-tester.json usa `certainty` «verificado», «hipotesis» y una frase libre en el campo raíz; work/reports/S7-tester.json usa `severity` «nit» y work/reports/S39-tester.json usa «low»; tres informes traen `line` como número y canon/delegation.md pide texto. work/delegations.jsonl líneas 9, 20, 23 y 24 tienen `tokens`, `tool_uses` y `duration_s` en `null`; el campo `model` es lo que escribió el orquestador, sin otra fuente.",
+      "proposal": "Crear `schemas/report.schema.json` y validar cada informe al recibirlo; prohibir las correcciones por mensaje al mismo agente o registrarles el uso.",
+      "severity": "minor"
+    },
+    {
+      "id": "R4",
+      "what": "El slice pasa a `done` y se hace commit antes de tener evidencia en macOS y Windows. El tester solo corre en Linux y el CI corre después del push.",
+      "evidence": "El commit aa3126a puso S1 en `done` y su corrida 44439732664 falló en `windows-latest`; de ahí nació B1. Los informes del tester de S1, S5, S6 y F1 dejan macOS y Windows en `pending`. La parte «en Linux, macOS y Windows» de la aceptación solo quedó probada por la corrida 44447914168, posterior al commit.",
+      "proposal": "Separar el commit del cambio de estado: el slice pasa a `done` en un commit posterior, que cita el número de la corrida de CI en verde en los tres sistemas.",
+      "severity": "major"
+    },
+    {
+      "id": "R5",
+      "what": "Los hallazgos y pendientes de los informes del tester no tienen un destino fijo. Unos pasaron al handoff y otros se perdieron sin decisión.",
+      "evidence": "work/reports/S5-tester.json pide decidir si «queda con 0 entradas» acepta la carpeta ausente; no hay respuesta en ningún archivo. work/reports/F1-tester.json deja como hipótesis que `rollback` borró `notes.txt` del usuario bajo la mutación (b); tools/internal/install/rollback.go:44-55 vacía la carpeta si ya existía, y nadie lo cerró. work/reports/S6-tester.json señala dos debilidades de pruebas (detect_test.go:53 y :157) sin seguimiento.",
+      "proposal": "Al cerrar cada slice, el orquestador convierte cada hallazgo y cada pendiente del informe en una entrada `to_refine` o lo descarta con una razón escrita.",
+      "severity": "major"
+    },
+    {
+      "id": "R6",
+      "what": "Los roles no cubren todo el trabajo y un rol hizo trabajo ajeno. La documentación no tiene rol, la revisión de código del arquitecto al cierre no está en el método y el orquestador corrigió un bug él mismo.",
+      "evidence": "canon/roles.json dice que el arquitecto «hace la revisión de código y los linters al cerrar la feature»; canon/method.md regla 6 no lo menciona, work/handoff.json `state.next` no lo incluye y work/delegations.jsonl no tiene esa delegación para F1. work/delegations.jsonl líneas 5, 19 y 25: el implementador escribió el canon, la skill y la página C1. work/handoff.json `known_deviation`: el orquestador corrigió B1; B1 no tiene línea en work/delegations.jsonl.",
+      "proposal": "Decidir qué rol escribe documentación y canon, y alinear `canon/roles.json` con la regla 6 sobre la revisión de código al cierre.",
+      "severity": "major"
+    },
+    {
+      "id": "R7",
+      "what": "La prueba funcional de cada slice («lo que el humano observa») no deja registro, y un slice pasó a `done` con una prueba funcional imposible de correr.",
+      "evidence": "Ningún archivo de work/ ni de archive/ registra que el humano observó las pruebas funcionales de S1 a S8 y S39. work/specs/S8.json pide instalar con la skill; skill/SKILL.md:39 clona la etiqueta `v0.1.0`, que no existe (`git ls-remote --tags origin` no devuelve nada) y que el humano crea después del cierre. work/handoff.json `open_notes_for_f1_close`: «S8 no tiene prueba funcional hecha».",
+      "proposal": "Registrar en la memoria archivada del slice quién observó la prueba funcional y cuándo, o el motivo por el que queda pendiente y qué la desbloquea.",
+      "severity": "major"
+    },
+    {
+      "id": "R8",
+      "what": "El trabajo de cierre de la feature y los archivos reales de cada slice quedan fuera del ciclo. El campo `files` de la spec declara menos archivos de los que el commit toca, y la regla 15 no dice si el código de un slice `done` se puede cambiar.",
+      "evidence": "El commit 4bfa49b agregó 382 líneas de `tools/cmd/aquas/integration_test.go` sin slice, sin `work/memory.json` y sin archivo de rojo. work/specs/S39.json declara solo `setup.go`; el commit 4404702 cambió además `lintdownload.go` (archivo de S5), `templates/gitignore` (archivo de S4) y `main.go` (archivo de S1). El commit 38f91f1 de S6 cambió `install.go` (archivo de S5).",
+      "proposal": "Dar a la prueba de integración su propio slice final en cada feature, y aclarar en la regla 15 si lo inmutable es la spec o también los archivos.",
+      "severity": "minor"
+    },
+    {
+      "id": "R9",
+      "what": "La verdad de una página de `docs/` depende solo de la muestra del auditor. La línea `Docs:` de todos los commits dice lo mismo, y la página se redactó sin la skill `document` ni el revisor `lint-mensaje --doc`, que no existen aquí.",
+      "evidence": "Los 14 commits con línea `Docs:` dicen «revisé=nada; falsa=no; promesa=no». docs/governance/C1-install-and-update.md:3 afirma que cada afirmación cita su prueba, y las líneas 93, 95, 117, 129, 131 y 145 no citan ninguna. La línea 71 dice que sin `user.name` el commit falla; tools/internal/install/install_test.go:233-238 acepta que no falle. La línea 199 habla en primera persona («no lo verifiqué», «corrí») y omite `golangci-lint`, que .github/workflows/ci.yml:32-35 sí corre. Las líneas 81, 87 y 186 citan work/handoff.json como fuente.",
+      "proposal": "Exigir que la página traiga una tabla de afirmación, archivo y prueba que una herramienta pueda comprobar, y prohibir como fuente los archivos que el método no define.",
+      "severity": "major"
+    }
+  ]
+}
