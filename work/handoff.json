@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-18T22:56-03:00",
+  "date": "2026-11-18T23:49-03:00",
   "for": "Orquestador de un chat nuevo en la aplicación web de Claude, con el modelo Claude Opus 5.5 elegido por el humano.",
   "read_first": [
     "canon/constitution.md",
@@ -12,14 +12,12 @@
   ],
   "state": {
     "initiative": "I1 in_progress",
-    "feature": "F1 in_progress (instalar y actualizar)",
+    "feature": "F1 in_progress (instalar y actualizar): sus nueve slices están done; falta el cierre de la feature.",
     "done": [
       "S1",
       "S2",
-      "B1"
-    ],
-    "next_slice": "S3 (precondiciones de la instalación): work/specs/S3.json",
-    "then": [
+      "B1",
+      "S3",
       "S4",
       "S5",
       "S6",
@@ -27,7 +25,9 @@
       "S39",
       "S8"
     ],
-    "approval": "El humano aprobó I1, el orden de features, los campos item y result del informe, y F1. Cada feature siguiente necesita revisión del arquitecto y aprobación del humano antes de empezar."
+    "next": "Cerrar F1, en este orden: (1) implementador escribe TestIntegrationInstall según work/specs/F1.json (integration_test) y el tester lo verifica; (2) escribir docs/governance/C1-install-and-update.md (capacidad C1) con lo que hace hoy el código; (3) auditor (fable) audita el cierre de F1 y anota candidatos en work/retro.json; (4) mudar F1 con sus slices S1-S8, S39 y el bug B1 a archive/I1.json con closed_at y evidence (lectura del orquestador: los slices se mudan con la feature; confirmarlo con el humano si duda); (5) decir «Hay N candidatos para retrospectiva»; (6) pedir al humano que cree la etiqueta v0.1.0 (opción C aprobada: el humano la crea al aprobar el cierre; la regla 11 prohíbe que la cree Claude).",
+    "then": "Después de F1 viene F2 (verificar, capacidad C2). Necesita revisión del arquitecto (fable) y aprobación del humano antes de empezar.",
+    "approval": "El humano aprobó I1, el orden de features, los campos item y result del informe y F1. El 2026-11-18 aprobó la opción C para S8: la skill apunta a v0.1.0 y el humano crea esa etiqueta al aprobar el cierre de F1."
   },
   "how_to_work_here": {
     "environment": "Aplicación web de Claude con espacio de trabajo en la nube. No hay ganchos de Claude Code: las reglas de roles son tu palabra hasta F3 y F4.",
@@ -35,7 +35,8 @@
     "prompt_format": "El encargo va en JSON según canon/delegation.md, con tasks[].item; el informe vuelve en JSON con item y result.",
     "log": "Después de cada delegación agrega una línea a work/delegations.jsonl con date, item, role, model, task, tokens, tool_uses y duration_s, copiados del uso que devuelve la herramienta Agent. Es la evidencia para el humano hasta que F7 lo automatice.",
     "slice_cycle": "Pon el slice en in_progress y crea work/memory.json; implementador: test rojo guardado en work/reports/<ID>-red.txt, código, verde en work/reports/<ID>-green.txt; tester: verde, rojo sin el código y casos destructivos, informe en work/reports/<ID>-tester.json; luego done con spec_sha256, memoria a archive/memory/<ID>.json, commit con la línea Docs y push; revisa el CI con gh run list.",
-    "commits": "Rama main. Mensaje en inglés que empieza con el ID, línea `Docs: revisé=<ruta|nada>; falsa=<sí|no>; promesa=<sí|no>` y las líneas de atribución de la sesión."
+    "commits": "Rama main. Mensaje en inglés que empieza con el ID, línea `Docs: revisé=<ruta|nada>; falsa=<sí|no>; promesa=<sí|no>` y las líneas de atribución de la sesión.",
+    "delegation_notes": "La herramienta Agent a veces corre en segundo plano aunque se pida run_in_background false; el uso (tokens, tool_uses, duration) llega en la notificación de fin. Una corrección mandada con SendMessage al mismo agente no trae uso: se anota con null en work/delegations.jsonl."
   },
   "environment_facts": [
     "Go local 1.24.7; no se pueden bajar otros toolchains (proxy.golang.org bloqueado); go.mod declara go 1.24.",
@@ -48,5 +49,19 @@
     "Aplicar canon/communication.md en cada mensaje: decir dónde, qué hacer paso a paso y qué escribir; explicar todo ID la primera vez.",
     "El humano revisa a qué modelo fue cada trabajo: mantén work/delegations.jsonl al día."
   ],
-  "known_deviation": "En el chat anterior el orquestador corrigió B1 (.gitattributes) él mismo en lugar de delegarlo al implementador."
+  "known_deviation": "En el chat anterior el orquestador corrigió B1 (.gitattributes) él mismo. En este chat no hubo desvíos: todo el código y las pruebas los hicieron implementador (sonnet) y tester (haiku).",
+  "decisions_this_chat": [
+    "`aquas update` se corre desde el paquete nuevo, como install: `go run ./cmd/aquas update <instancia>` con cwd en <paquete>/tools. `--take ours|theirs` aplica a todos los conflictos; `--take <ruta>=ours|theirs` a uno.",
+    "work/host.json va en templates/gitignore: es por máquina (N1, ronda 4) y setup no debe dejar el árbol sucio. El commit de instalación no lo incluye; el archivo sí queda en disco.",
+    "Las huellas de golangci-lint 2.5.0 están fijadas en tools/internal/install/lintdownload.go, copiadas del checksums.txt oficial del release v2.5.0.",
+    "Las plantillas de la instancia viven en templates/ del paquete (backlog.json, README.md, gitignore, gitattributes)."
+  ],
+  "open_notes_for_f1_close": [
+    "install no deja templates/ en la instancia, pero el primer update la crea (S7 la espeja). Decidir en la wiki o en el cierre si la instancia debe tenerla desde install.",
+    "Si falta Go, el mensaje de preflight (S3) agrega el texto en inglés de exec de Go.",
+    "canon/delegation.md cita schemas/report.schema.json, que no existe; los informes no se validan contra un esquema.",
+    "setup deja bin/aquas si falla la descarga de golangci-lint (bin/ está ignorado).",
+    "El formato de work/seals.json en update es una hipótesis hasta F6.",
+    "S8 no tiene prueba funcional hecha: requiere la etiqueta v0.1.0."
+  ]
 }
