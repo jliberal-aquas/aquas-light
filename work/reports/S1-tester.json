@@ -1,0 +1,51 @@
+{
+  "item": "S1",
+  "conclusion": "S1 pasa en Linux. La suite con -race queda verde (exit 0, ejecutada sin caché). Con un main.go stub la suite queda roja (exit 1) por fallos de aserción, no de compilación. main.go se restauró byte a byte desde la copia (cmp idéntico) y la suite volvió a quedar verde. Los cuatro casos destructivos cumplen su expect con el binario real. Quedan pendientes macOS, Windows y la pestaña Actions.",
+  "findings": [
+    {
+      "what": "La verificación de los tres sistemas no se hizo; solo se ejecutó en Linux.",
+      "where": "tools/cmd/aquas/main_test.go y tools/cmd/aquas/main.go",
+      "why": "El expect de la caja de versión exige ausencia de \\r en los tres sistemas, y solo se comprobó en Linux.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El chequeo con git diff no detecta cambios en main.go porque tools/ es untracked.",
+      "where": "git status de /home/claude/aquas-light (tools/ aparece como ??)",
+      "why": "git diff --stat no muestra archivos sin seguimiento, así que su salida vacía no prueba la restauración; la prueba real es cmp contra /tmp/s1-main.go.bak.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "/home/claude/aquas-light/tools/cmd/aquas/main.go",
+      "line": 12,
+      "quote": "func run(args []string, stdout, stderr io.Writer) int {"
+    },
+    {
+      "file": "/home/claude/aquas-light/tools/cmd/aquas/main.go",
+      "line": 28,
+      "quote": "return \"Uso: aquas <subcomando>\\n\\nSubcomandos:\\n  version    imprime la versión de aquas\\n\""
+    },
+    {
+      "file": "/home/claude/aquas-light/tools/cmd/aquas/main_test.go",
+      "line": 26,
+      "quote": "versión inválida: \"\" (salida del test con stub: el aserto de versión falla)"
+    },
+    {
+      "file": "/home/claude/aquas-light/tools/go.mod",
+      "line": 3,
+      "quote": "go 1.24"
+    }
+  ],
+  "output": "[paso1] go test -count=1 -race -v ./... -> PASS ... ok github.com/jliberal-aquas/aquas-light/tools/cmd/aquas 1.014s, EXIT=0\n[paso2] stub -> FAIL TestVersion, TestVersionOutsideGitRepo, TestNoArgs, TestUnknownSubcommand; TestGoModHasNoRequire pasa; FAIL github.com/jliberal-aquas/aquas-light/tools/cmd/aquas, EXIT=1\n[paso3] cmp main.go vs /tmp/s1-main.go.bak -> RESTORED_IDENTICAL; git diff --stat -> vacío (no concluyente, tools/ untracked); go test -count=1 -race ./... -> ok, EXIT=0\n[caso1] /tmp/aquas (sin args) -> exit=2, stdout_bytes=0, stderr=\"Uso: aquas <subcomando>\\n\\nSubcomandos:\\n  version    imprime la versión de aquas\\n\"\n[caso2] /tmp/aquas noexiste -> exit=2, stdout_bytes=0, stderr=\"aquas: subcomando desconocido \\\"noexiste\\\"\\n\\nUso: ...\"\n[caso3] cd /tmp/s1-nogit.* && /tmp/aquas version -> exit=0, stdout=\"0.1.0\\n\" (sin \\r), stderr_bytes=0; git rev-parse fuera de repo -> exit 128\n[caso4] grep require tools/go.mod -> sin coincidencias (grep exit=1); contenido: module ..., go 1.24\n[caso1-3] grep panic|goroutine -> sin coincidencias",
+  "pending": [
+    "Verificar go test -race y el comportamiento de version en macOS y Windows (salida sin \\r).",
+    "Confirmar en la pestaña Actions del repo que los tres trabajos quedan en verde (prueba funcional humana).",
+    "Ejecutar gofmt, go vet y golangci-lint (no forman parte de esta tarea).",
+    "Repetir el chequeo de restauración con sha256sum o git una vez que tools/ esté versionado, porque git diff no sirve aquí."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

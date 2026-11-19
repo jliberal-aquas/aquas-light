@@ -1,0 +1,22 @@
+{
+  "slice": "S1",
+  "step": "commit",
+  "done": [
+    "plan",
+    "red",
+    "green",
+    "tester"
+  ],
+  "next": "Commit de S1 y empezar S2.",
+  "files": [
+    "tools/go.mod",
+    "tools/cmd/aquas/main.go",
+    "tools/cmd/aquas/main_test.go",
+    "tools/.golangci.yml",
+    ".github/workflows/ci.yml"
+  ],
+  "blockers": [
+    "Go local 1.24.7; no se puede bajar otra versión desde este entorno"
+  ],
+  "updated_at": "2026-11-18T22:48:55-03:00"
+}

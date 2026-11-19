@@ -60,7 +60,7 @@
       "id": "I1",
       "type": "initiative",
       "parent": null,
-      "state": "proposed",
+      "state": "in_progress",
       "priority": 1,
       "spec": "work/specs/I1.json"
     },
@@ -68,7 +68,7 @@
       "id": "F1",
       "type": "feature",
       "parent": "I1",
-      "state": "proposed",
+      "state": "in_progress",
       "priority": 1,
       "capability": "C1",
       "spec": "work/specs/F1.json"
@@ -77,15 +77,16 @@
       "id": "S1",
       "type": "slice",
       "parent": "F1",
-      "state": "proposed",
+      "state": "done",
       "priority": 1,
-      "spec": "work/specs/S1.json"
+      "spec": "work/specs/S1.json",
+      "spec_sha256": "9ae5151a946cb49bf73e8fb8620546c1da6930166994c02f6d781884b9ce2060"
     },
     {
       "id": "S2",
       "type": "slice",
       "parent": "F1",
-      "state": "proposed",
+      "state": "ready",
       "priority": 2,
       "spec": "work/specs/S2.json"
     },
@@ -93,7 +94,7 @@
       "id": "S3",
       "type": "slice",
       "parent": "F1",
-      "state": "proposed",
+      "state": "ready",
       "priority": 3,
       "spec": "work/specs/S3.json"
     },
@@ -101,7 +102,7 @@
       "id": "S4",
       "type": "slice",
       "parent": "F1",
-      "state": "proposed",
+      "state": "ready",
       "priority": 4,
       "spec": "work/specs/S4.json"
     },
@@ -109,7 +110,7 @@
       "id": "S5",
       "type": "slice",
       "parent": "F1",
-      "state": "proposed",
+      "state": "ready",
       "priority": 5,
       "spec": "work/specs/S5.json"
     },
@@ -117,7 +118,7 @@
       "id": "S6",
       "type": "slice",
       "parent": "F1",
-      "state": "proposed",
+      "state": "ready",
       "priority": 6,
       "spec": "work/specs/S6.json"
     },
@@ -125,7 +126,7 @@
       "id": "S7",
       "type": "slice",
       "parent": "F1",
-      "state": "proposed",
+      "state": "ready",
       "priority": 7,
       "spec": "work/specs/S7.json"
     },
@@ -133,7 +134,7 @@
       "id": "S39",
       "type": "slice",
       "parent": "F1",
-      "state": "proposed",
+      "state": "ready",
       "priority": 8,
       "spec": "work/specs/S39.json"
     },
@@ -141,7 +142,7 @@
       "id": "S8",
       "type": "slice",
       "parent": "F1",
-      "state": "proposed",
+      "state": "ready",
       "priority": 9,
       "spec": "work/specs/S8.json"
     },

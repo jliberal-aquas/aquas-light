@@ -1,0 +1,14 @@
+--- FAIL: TestVersion (0.00s)
+    main_test.go:27: versión inválida: ""
+    main_test.go:30: debe ser una línea terminada en LF sin CR: ""
+--- FAIL: TestVersionOutsideGitRepo (0.00s)
+    main_test.go:44: salida inesperada: ""
+--- FAIL: TestNoArgs (0.00s)
+    main_test.go:53: se esperaba código distinto de 0
+    main_test.go:59: stderr debe traer el uso en español: ""
+--- FAIL: TestUnknownSubcommand (0.00s)
+    main_test.go:68: se esperaba código distinto de 0
+    main_test.go:71: stderr debe nombrar noexiste: ""
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	0.003s
+FAIL
