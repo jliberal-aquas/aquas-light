@@ -28,3 +28,4 @@
 {"date": "2026-11-19", "item": "B2", "role": "implementer", "model": "sonnet", "task": "Arreglar B2 con TDD: campo version en canon/manifest.json", "tokens": 88783, "tool_uses": 8, "duration_s": 97}
 {"date": "2026-11-19", "item": "B2", "role": "tester", "model": "haiku", "task": "Verde, rojo por mutación y casos destructivos de B2", "tokens": 88833, "tool_uses": 12, "duration_s": 104}
 {"date": "2026-11-19", "item": "F1", "role": "implementer", "model": "sonnet", "task": "Actualizar la página C1 tras B2 (continuación; uso acumulado del agente según la notificación)", "tokens": 138338, "tool_uses": 4, "duration_s": 17}
+{"date": "2026-11-19", "item": "F1", "role": "architect", "model": "fable", "task": "Revisión de código y linters al cierre de F1", "tokens": 133528, "tool_uses": 15, "duration_s": 365}
