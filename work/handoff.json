@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-19T01:15-03:00",
+  "date": "2026-11-19T09:55-03:00",
   "for": "Orquestador de un chat nuevo en la aplicación web de Claude, con el modelo Claude Opus 5.5 elegido por el humano.",
   "read_first": [
     "canon/constitution.md",
@@ -8,16 +8,17 @@
     "canon/delegation.md",
     "canon/roles.json",
     "backlog.json",
-    "archive/I1.json",
+    "work/specs/F2.json",
+    "work/specs/S9.json",
     "work/retro.json",
     "work/defects.md"
   ],
   "state": {
     "initiative": "I1 in_progress",
-    "feature": "F1 cerrada el 2026-11-19 y archivada en archive/I1.json con S1-S8, S39 y B1-B6 (commit e4e48ed). Ninguna feature en curso.",
-    "next": "(1) Si el humano ya creó la etiqueta v0.1.0 (comprobar con `git ls-remote --tags origin`), hacer la prueba funcional de S8: un lector o tester (haiku) sigue skill/SKILL.md en una carpeta temporal y reporta; si falla, nace un bug con padre S8. Si no existe, pedírsela con los pasos exactos. (2) Refinar N2 (work/requests/N2.json, once hallazgos menores del arquitecto) con el humano, según la regla 17 de canon/method.md. (3) Empezar F2 (verificar, capacidad C2): el arquitecto (fable) revisa el plan de work/specs/F2.json y sus slices; el humano aprueba antes del primer slice.",
-    "retro": "Hay 9 candidatos en work/retro.json. Solo el humano dispara la retrospectiva con /retrospective.",
-    "approval": "El humano aprobó I1, F1, B2 y B3-B6. Falta que cree la etiqueta v0.1.0 (regla 11: Claude no la crea) y que apruebe F2 al empezarla."
+    "feature": "F2 in_progress (verificar, capacidad C2). El humano la aprobó el 2026-11-19 tras la revisión del arquitecto (fable), ya aplicada a work/specs/F2.json y S9-S12 (commit 3e557f5). Sus slices S9, S10, S11 y S12 están ready.",
+    "next": "(1) Empezar S9 con el slice_cycle: S9 a in_progress, crear work/memory.json, implementador (sonnet) con prueba roja, código y verde; tester (haiku) con verde, rojo sin el código y los casos destructivos de la spec; luego done con spec_sha256, memoria archivada, commit, push y CI en los tres sistemas. (2) Seguir con S10, S11 y S12 en ese orden. (3) Al cerrar F2: página docs/governance/C2-verify.md, auditor (fable), revisión de código del arquitecto (fable), candidatos en work/retro.json y mudanza a archive/I1.json. (4) Si existe la etiqueta v0.1.0 (`git ls-remote --tags origin`), hacer la prueba funcional de S8 con un tester (haiku); si falla, nace un bug con padre S8.",
+    "retro": "Hay 9 candidatos de F1 en work/retro.json. Solo el humano dispara la retrospectiva con /retrospective.",
+    "approval": "El humano aprobó I1, F1, B2-B6 y F2 (con las decisiones de work/specs/F2.json campo review). Falta que cree la etiqueta v0.1.0 (regla 11: Claude no la crea)."
   },
   "how_to_work_here": {
     "environment": "Aplicación web de Claude con espacio de trabajo en la nube. No hay ganchos de Claude Code: las reglas de roles son tu palabra hasta F3 y F4.",
@@ -45,12 +46,17 @@
     "update rechaza enlaces simbólicos dentro de la instancia (B3) y valida todo antes de escribir; un fallo de escritura es PartialError con mensaje de actualización incompleta (B4).",
     "install rechaza un destino dentro del paquete y argumentos que empiezan con guion (B5).",
     "La skill no usa variables de shell entre comandos (B6).",
-    "Los slices y bugs se mudan al archivo junto con su feature (confirmado por el humano)."
+    "Los slices y bugs se mudan al archivo junto con su feature (confirmado por el humano).",
+    "F2: S9 no valida techos de longitud; S11 exige página solo a capacidades con feature archivada; las solicitudes aceptan sus campos actuales con `turn` opcional (aprobado por el humano).",
+    "F2: código 3 = no se pudo verificar; un bug in_progress cuenta para el límite de uno; necesidad con padre null o cualquier ID; role pack|instance.",
+    "Recomendación del arquitecto para S11 y S12: mirar el CI de los tres sistemas antes de poner el slice en done."
   ],
   "open_notes_for_f1_close": [],
   "open_notes": [
     "Los hallazgos menores del arquitecto están en N2.",
     "canon/delegation.md cita schemas/report.schema.json, que no existe.",
-    "canon/roles.json pide revisión de código del arquitecto al cierre y canon/method.md regla 6 no; candidato R6 de work/retro.json."
+    "canon/roles.json pide revisión de código del arquitecto al cierre y canon/method.md regla 6 no; candidato R6 de work/retro.json.",
+    "N2 (hallazgos menores de F1) sigue en to_refine; su punto de las huellas de schemas/ en update toca a S9: conviene refinarlo antes de publicar una versión con schemas/.",
+    "Al refinar F5: decir qué slice hace que el pre-commit corra `aquas verify --staged`, y quién escribe `role: instance` en canon/config.json."
   ]
 }
