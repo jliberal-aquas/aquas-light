@@ -60,7 +60,9 @@ El archivo de plantilla `.gitattributes` contiene `* text=auto eol=lf`, es decir
 
 El manifiesto lista una huella SHA-256 por cada archivo copiado de `canon/`, `schemas/` y `tools/`, sin contar el propio manifiesto. La huella se calcula después de convertir los finales CRLF en LF (`internal/hashing/hash.go`, funciones `Normalize` y `Sum`). Pruebas: `TestManifestHashIgnoresCRLF` y `TestHashOnlyNormalizesLineEndings`.
 
-El manifiesto tiene `schema_version` 1 y `algorithm` `sha256-lf`. Las rutas usan `/` y salen ordenadas, porque `json.Marshal` ordena las claves de un mapa (`writeManifest`). No tiene campo de versión del paquete. Prueba: `TestCopyManifestDeterministicAndConsistent`.
+El manifiesto tiene `schema_version` 1 y `algorithm` `sha256-lf`. Las rutas usan `/` y salen ordenadas, porque `json.Marshal` ordena las claves de un mapa (`writeManifest`). Prueba: `TestCopyManifestDeterministicAndConsistent`.
+
+El manifiesto tiene además el campo `version`, con la versión del paquete sin la «v», por ejemplo `0.1.0` (`Manifest` y `writeManifest` en `copy.go`). `install` lo escribe al copiar. Un manifiesto viejo sin el campo se lee sin error. Pruebas: `TestManifestRecordsVersion` y `TestManifestWithoutVersionIsReadAndFilled`, en `internal/update/update_test.go`.
 
 ### Qué commit deja
 
@@ -122,7 +124,7 @@ No toca `backlog.json`, `product/`, `docs/product/` ni el resto de `work/`. Prue
 
 `update` también toca `work/seals.json`. Reemplaza solo las entradas cuya clave empieza con `docs/governance/` (`updateSeals`). Nunca crea ese archivo. Prueba: `TestUpdateDeletesDroppedAndSeals` y `TestUpdateDoesNotCreateSeals`. El formato real de `work/seals.json` es una `hipótesis` hasta la feature F6, la que lo define. El código acepta un objeto con las claves `seals` o `files`, o el objeto raíz.
 
-Al terminar, reescribe `canon/manifest.json` con las huellas de `canon/` y `tools/` del paquete nuevo (`update.go`, `newFiles`). No guarda las de `schemas/`, que `install` sí guarda (`copy.go`, `Copy`). Tampoco guarda las de `templates/`, `.githooks/` ni `docs/governance/`. Sin prueba.
+Al terminar, reescribe `canon/manifest.json` con la versión del paquete nuevo y las huellas de `canon/` y `tools/` (`update.go`, `Update`). Si queda algún conflicto sin resolver, no escribe nada y la versión anterior se conserva. Prueba: `TestManifestVersionUnchangedOnConflict`. Un manifiesto sin versión recibe la nueva en el primer `update` que termina sin conflictos. No guarda las de `schemas/`, que `install` sí guarda (`copy.go`, `Copy`). Tampoco guarda las de `templates/`, `.githooks/` ni `docs/governance/`. Sin prueba.
 
 ### Conflictos
 
@@ -205,20 +207,19 @@ La configuración de integración continua corre `gofmt`, `go vet`, `golangci-li
 1. `install` no deja `templates/` ni `docs/governance/` en la instancia. El primer `update` las crea, porque están en `mirrored`. `Copy` solo copia `canon/`, `schemas/` y `tools/`. `TestUpdateNeverTouchesProductAndReplacesGovernance` lo da por hecho. Está sin decidir si la instancia debe tenerlas desde `install`.
 2. Si falta Go, el mensaje del preflight incluye el texto en inglés del error original.
 3. `canon/delegation.md` cita `schemas/report.schema.json`, pero ese archivo no existe en el paquete. Ningún informe se valida contra un esquema.
-4. Si la descarga de `golangci-lint` falla en `setup`, `bin/aquas` queda en disco. `bin/` está ignorado, así que no ensucia el árbol (`Setup` solo limpia `bin/` cuando falla la compilación).
+4. Si la descarga de `golangci-lint` falla en `setup`, `bin/aquas` queda en disco. `bin/` está ignorado, así que git no lo lista como cambio (`Setup` solo limpia `bin/` cuando falla la compilación).
 5. El formato de `work/seals.json` es una `hipótesis` hasta F6.
 6. La prueba funcional de la skill está pendiente hasta que exista la etiqueta `v0.1.0`.
 7. `update` sobrescribe sin avisar las ediciones locales de `tools/`, `templates/`, `.githooks/` y `docs/governance/`.
 8. `update` no recompila `bin/aquas`: tras actualizar, el binario sigue siendo el anterior hasta correr `setup` o compilar a mano.
-9. El manifiesto no guarda la versión del paquete, aunque `work/specs/S7.json` dice que `update` la escribe. `work/specs/S15.json` la necesita. Hoy `canon/manifest.json` solo tiene `schema_version`, `algorithm` y `files`.
-10. Las huellas de `golangci-lint` nunca se contrastaron en las pruebas con el servidor real de GitHub.
+9. Las huellas de `golangci-lint` nunca se contrastaron en las pruebas con el servidor real de GitHub.
 
 ## Qué prueba cubre cada afirmación
 
 Todas las pruebas están en `tools/` y corren con `go test ./...`.
 
 - Preflight: `TestPreflightRejectsNonEmptyFolder`, `TestPreflightCreatesMissingAndAcceptsEmpty`, `TestPreflightMissingGit`, `TestPreflightGoVersion` en `internal/install/preflight_test.go`.
-- Copia y manifiesto: `TestCopyBinaryIdentical`, `TestCopyManifestDeterministicAndConsistent`, `TestCopyStarterFiles`, `TestFindPackageRoot` en `copy_test.go`; `TestManifestHashIgnoresCRLF` y `TestHashOnlyNormalizesLineEndings` en `internal/hashing/hash_test.go`.
+- Copia y manifiesto: `TestCopyBinaryIdentical`, `TestCopyManifestDeterministicAndConsistent`, `TestCopyStarterFiles`, `TestFindPackageRoot` en `copy_test.go`; `TestManifestHashIgnoresCRLF` y `TestHashOnlyNormalizesLineEndings` en `internal/hashing/hash_test.go`; `TestManifestRecordsVersion`, `TestManifestWithoutVersionIsReadAndFilled` y `TestManifestVersionUnchangedOnConflict` en `internal/update/update_test.go`.
 - Instalación completa, commit y rollback: `TestInstallSuccess`, `TestInstallRollsBackOnFailure`, `TestInstallLintServerError`, `TestInstallLintChecksumMismatch`, `TestInstallRollbackRemovesReadOnlyGit`, `TestInstallWithoutGitIdentity`, `TestInstallIgnoresGlobalHooks` en `install_test.go`.
 - Host: `TestDetectHostWritesHints`, `TestShellAndPathStyle`, `TestUnknownOSKeepsPreviousHost`, `TestNonJSONPreviousIsReplaced`, `TestConcurrentWrites`, `TestBrokenHostsJSON` en `internal/host/detect_test.go`.
 - Actualización: las nueve pruebas `TestUpdate*` de `internal/update/update_test.go`.
