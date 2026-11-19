@@ -116,3 +116,19 @@ func TestHostSubcommandOutsideRepo(t *testing.T) {
 		t.Errorf("código %d, stderr %q", code, errb.String())
 	}
 }
+
+func TestUpdateInvalidTakeExits2(t *testing.T) {
+	var out, errb bytes.Buffer
+	if code := run([]string{"update", t.TempDir(), "--take", "mine"}, &out, &errb); code != 2 {
+		t.Fatalf("código %d", code)
+	}
+	if !strings.Contains(errb.String(), "ours") || !strings.Contains(errb.String(), "theirs") {
+		t.Fatalf("stderr = %q", errb.String())
+	}
+	if code := run([]string{"update", t.TempDir(), "--take", "canon/a.md=mine"}, &out, &errb); code != 2 {
+		t.Fatalf("código %d", code)
+	}
+	if code := run([]string{"update"}, &out, &errb); code != 2 {
+		t.Fatalf("código %d", code)
+	}
+}

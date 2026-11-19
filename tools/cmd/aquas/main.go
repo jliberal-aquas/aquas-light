@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/jliberal-aquas/aquas-light/tools/internal/host"
 	"github.com/jliberal-aquas/aquas-light/tools/internal/install"
+	"github.com/jliberal-aquas/aquas-light/tools/internal/update"
 )
 
 const version = "0.1.0"
@@ -23,6 +25,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return 0
 	case "install":
 		return runInstall(args[1:], stdout, stderr)
+	case "update":
+		return runUpdate(args[1:], stdout, stderr)
 	case "host":
 		return runHost(stdout, stderr)
 	default:
@@ -54,6 +58,67 @@ func runInstall(args []string, stdout, stderr io.Writer) int {
 	return 0
 }
 
+func parseUpdateArgs(args []string) (string, update.Takes, error) {
+	takes := update.Takes{Files: map[string]string{}}
+	instance := ""
+	for i := 0; i < len(args); i++ {
+		a := args[i]
+		val := ""
+		switch {
+		case a == "--take":
+			if i+1 >= len(args) {
+				return "", takes, fmt.Errorf("falta el valor de --take: los valores válidos son `ours` y `theirs`")
+			}
+			i++
+			val = args[i]
+		case strings.HasPrefix(a, "--take="):
+			val = strings.TrimPrefix(a, "--take=")
+		case strings.HasPrefix(a, "-"):
+			return "", takes, fmt.Errorf("opción desconocida %q", a)
+		default:
+			if instance != "" {
+				return "", takes, fmt.Errorf("sobra el argumento %q", a)
+			}
+			instance = a
+			continue
+		}
+		if j := strings.LastIndex(val, "="); j >= 0 {
+			takes.Files[strings.ReplaceAll(val[:j], "\\", "/")] = val[j+1:]
+		} else {
+			takes.Default = val
+		}
+	}
+	if instance == "" {
+		return "", takes, fmt.Errorf("falta la ruta de la instancia")
+	}
+	return instance, takes, takes.Validate()
+}
+
+func runUpdate(args []string, stdout, stderr io.Writer) int {
+	instance, takes, err := parseUpdateArgs(args)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: %v\n\n%s", err, usage())
+		return 2
+	}
+	wd, err := os.Getwd()
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se pudo leer el directorio actual: %v\n", err)
+		return 1
+	}
+	root, err := install.FindPackageRoot(wd)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se puede actualizar: %v\n", err)
+		return 1
+	}
+	res, err := update.Update(root, instance, takes)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se actualizó nada: %v\n", err)
+		return 1
+	}
+	_, _ = fmt.Fprintf(stdout, "Aquas Light actualizado en %s: %d archivos cambiados y %d archivos en conflicto.\n", instance, len(res.Changed), len(res.Conflicts))
+	return 0
+}
+
 func runHost(stdout, stderr io.Writer) int {
 	wd, err := os.Getwd()
 	if err != nil {
@@ -74,7 +139,7 @@ func runHost(stdout, stderr io.Writer) int {
 }
 
 func usage() string {
-	return "Uso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  host              detecta el sistema y escribe work/host.json\n  version           imprime la versión de aquas\n"
+	return "Uso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  update <ruta> [--take ours|theirs] [--take <ruta>=ours|theirs]...\n                    actualiza el canon y las herramientas de la instancia; los archivos del canon editados a mano son conflicto\n  host              detecta el sistema y escribe work/host.json\n  version           imprime la versión de aquas\n"
 }
 
 func main() {

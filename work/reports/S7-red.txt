@@ -1,0 +1,5 @@
+--- FAIL: TestUpdateStopsOnLocalEdit (0.00s)
+    update_test.go:64: se esperaba ConflictError, llegó <nil>
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/update	0.005s
+FAIL

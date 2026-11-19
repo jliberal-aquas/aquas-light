@@ -140,9 +140,10 @@
       "id": "S7",
       "type": "slice",
       "parent": "F1",
-      "state": "ready",
+      "state": "done",
       "priority": 7,
-      "spec": "work/specs/S7.json"
+      "spec": "work/specs/S7.json",
+      "spec_sha256": "3f3bdb3a33a37b5c3930dbdd765e88070a08b27134ecfaaddc84727113da979e"
     },
     {
       "id": "S39",

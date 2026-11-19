@@ -1,0 +1,42 @@
+{
+  "item": "S7",
+  "conclusion": "S7 verificado. La suite completa pasa con -race, la prueba TestUpdateStopsOnLocalEdit falla sin la detección de conflictos y pasa con ella, y los cinco destructive_cases de la spec se cumplen con el binario real. El código del implementador no cambió (sha256 de update.go idéntico al original).",
+  "findings": [
+    {
+      "what": "Tras una instalación con `aquas install`, la instancia no tiene la carpeta `templates/`; el primer `aquas update` la crea con 4 archivos (README.md, backlog.json, gitattributes, gitignore).",
+      "where": "tools/internal/update/update.go:29 (lista de carpetas espejo) y tools/internal/install/copy.go:119 (install lee templates/ del paquete pero no la deja en la instancia)",
+      "why": "La spec pide que update reemplace `templates/`, así que el comportamiento es el esperado, pero install y update no dejan la instancia con la misma forma de carpetas.",
+      "certainty": "verified",
+      "severity": "nit"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "tools/internal/update/update.go",
+      "line": 133,
+      "quote": "if want, ok := old.Files[rel]; ok && hashing.Sum(data) == want {"
+    },
+    {
+      "file": "tools/internal/update/update.go",
+      "line": 29,
+      "quote": "var mirrored = []string{\"canon\", \"schemas\", \"tools\", \".githooks\", \"templates\", \"docs/governance\"}"
+    },
+    {
+      "file": "tools/internal/update/update.go",
+      "line": 55,
+      "quote": "archivos del canon editados localmente, sin resolver (use --take ours o --take theirs):"
+    },
+    {
+      "file": "tools/internal/update/update.go",
+      "line": 62,
+      "quote": "valor de --take no válido %q%s: los valores válidos son `ours` y `theirs`"
+    }
+  ],
+  "output": "1) go test -count=1 -race ./... -> EXIT=0 (cmd/aquas, hashing, host, install, update ok). 2) Stub `if true {` en update.go:133: go test -run TestUpdateStopsOnLocalEdit -> `update_test.go:65: se esperaba ConflictError, llegó <nil>`, FAIL, exit 1. Restaurado; sha256 3202d6117dfe8946e3f29a6c020fcd35088e0e3f3be7673694944988d8913b0b, idéntico al original; verde final EXIT=0. 3) install real funcionó (hay red; no hizo falta el atajo). Caso 1 LF->CRLF en canon/communication.md: `Aquas Light actualizado en /tmp/s7/inst: 5 archivos cambiados y 0 archivos en conflicto.` exit 0; el archivo quedó igual al paquete. Caso 2 (canon/method.md editado): exit 1, lista `canon/method.md`, snapshot sha256 sin cambios. Caso 3 (--take mine): exit 2, `valor de --take no válido \"mine\": los valores válidos son `ours` y `theirs``, sin cambios. Caso 4: exit 0; backlog.json, work/x.json, docs/product/x.md y product/x.txt byte a byte iguales a los previos; docs/governance/x.md igual al paquete. Caso 5: corrida 1 exit 0 (5 cambiados); corrida 2 `0 archivos cambiados y 0 archivos en conflicto`, exit 0, sin diferencias de sha256.",
+  "pending": [
+    "Decidir si `templates/` debe existir en las instancias (ver finding).",
+    "Preparación de casos (no es defecto): en el caso 1 el paquete es igual al repo, así que la versión nueva es la original LF. En los casos 2 y 5 se añadió un espacio a canon/roles.json en el paquete para que el archivo sin conflicto tuviera algo que cambiar. Los temporales en /tmp se borraron; el repo no se modificó."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

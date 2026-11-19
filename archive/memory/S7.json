@@ -1,0 +1,17 @@
+{
+  "slice": "S7",
+  "step": "commit",
+  "done": [
+    "plan",
+    "red",
+    "green",
+    "tester"
+  ],
+  "next": "Commit de S7; luego S39.",
+  "files": [
+    "tools/internal/update/update.go",
+    "tools/cmd/aquas/main.go"
+  ],
+  "blockers": [],
+  "updated_at": "2026-11-18T23:33:36-03:00"
+}
