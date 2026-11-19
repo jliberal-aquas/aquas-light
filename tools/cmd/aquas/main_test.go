@@ -80,3 +80,39 @@ func TestGoModHasNoRequire(t *testing.T) {
 		t.Error("go.mod no debe contener require")
 	}
 }
+
+func TestHostSubcommand(t *testing.T) {
+	root := t.TempDir()
+	if err := os.MkdirAll(root+"/canon", 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(root+"/tools/sub", 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(root+"/tools/go.mod", []byte("module x\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	hosts := `{"linux":{"hints":["a"]},"darwin":{"hints":["a"]},"windows":{"hints":["a"]}}`
+	if err := os.WriteFile(root+"/canon/hosts.json", []byte(hosts), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	t.Chdir(root + "/tools/sub")
+	var out, errb bytes.Buffer
+	if code := run([]string{"host"}, &out, &errb); code != 0 {
+		t.Fatalf("código %d: %s", code, errb.String())
+	}
+	if _, err := os.Stat(root + "/work/host.json"); err != nil {
+		t.Errorf("falta work/host.json: %v", err)
+	}
+	if !strings.Contains(usage(), "host") {
+		t.Errorf("usage no menciona host")
+	}
+}
+
+func TestHostSubcommandOutsideRepo(t *testing.T) {
+	t.Chdir(t.TempDir())
+	var out, errb bytes.Buffer
+	if code := run([]string{"host"}, &out, &errb); code != 1 || errb.Len() == 0 {
+		t.Errorf("código %d, stderr %q", code, errb.String())
+	}
+}

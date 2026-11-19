@@ -1,0 +1,25 @@
+--- FAIL: TestDetectHostWritesHints (0.00s)
+    detect_test.go:53: Write: no implementado
+--- FAIL: TestShellAndPathStyle (0.00s)
+    detect_test.go:74: no implementado
+--- FAIL: TestUnknownOSKeepsPreviousHost (0.00s)
+    detect_test.go:95: error = no implementado
+--- FAIL: TestNonJSONPreviousIsReplaced (0.00s)
+    detect_test.go:112: no implementado
+--- FAIL: TestConcurrentWrites (0.00s)
+    detect_test.go:134: Write concurrente: no implementado
+    detect_test.go:134: Write concurrente: no implementado
+    detect_test.go:134: Write concurrente: no implementado
+    detect_test.go:134: Write concurrente: no implementado
+    detect_test.go:134: Write concurrente: no implementado
+    detect_test.go:134: Write concurrente: no implementado
+    detect_test.go:134: Write concurrente: no implementado
+    detect_test.go:134: Write concurrente: no implementado
+    detect_test.go:134: Write concurrente: no implementado
+    detect_test.go:134: Write concurrente: no implementado
+    detect_test.go:137: open /tmp/TestConcurrentWrites1720916965/001/work/host.json: no such file or directory
+--- FAIL: TestBrokenHostsJSON (0.00s)
+    detect_test.go:152: error = no implementado
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/host	0.004s
+FAIL

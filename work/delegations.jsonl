@@ -10,3 +10,5 @@
 {"date": "2026-11-18", "item": "S4", "role": "tester", "model": "haiku", "task": "Verde, rojo sin código y casos destructivos de S4", "tokens": 86296, "tool_uses": 13, "duration_s": 80}
 {"date": "2026-11-18", "item": "S5", "role": "implementer", "model": "sonnet", "task": "Construir S5 con TDD: git, build, descarga verificada, commit y rollback", "tokens": 90501, "tool_uses": 9, "duration_s": 220}
 {"date": "2026-11-18", "item": "S5", "role": "tester", "model": "haiku", "task": "Verde, rojo sin código y casos destructivos de S5", "tokens": 112992, "tool_uses": 14, "duration_s": 169}
+{"date": "2026-11-18", "item": "S6", "role": "implementer", "model": "sonnet", "task": "Construir S6 con TDD: detección del host y work/host.json", "tokens": 78149, "tool_uses": 8, "duration_s": 78}
+{"date": "2026-11-18", "item": "S6", "role": "tester", "model": "haiku", "task": "Verde, rojo sin código y casos destructivos de S6", "tokens": 99776, "tool_uses": 17, "duration_s": 142}

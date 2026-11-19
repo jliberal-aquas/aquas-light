@@ -131,9 +131,10 @@
       "id": "S6",
       "type": "slice",
       "parent": "F1",
-      "state": "ready",
+      "state": "done",
       "priority": 6,
-      "spec": "work/specs/S6.json"
+      "spec": "work/specs/S6.json",
+      "spec_sha256": "0f2e75e2af85769a9198f38c77e5cfc30a9eb99ef38e0ee95c0239f645977bdf"
     },
     {
       "id": "S7",

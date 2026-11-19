@@ -1,13 +1,14 @@
 package install
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+
+	"github.com/jliberal-aquas/aquas-light/tools/internal/host"
 )
 
 // Options configures Run. The zero value installs with real dependencies.
@@ -112,15 +113,7 @@ func buildAquas(dest string) error {
 }
 
 func writeHost(dest string) error {
-	data, err := json.MarshalIndent(map[string]string{"os": runtime.GOOS, "arch": runtime.GOARCH}, "", "  ")
-	if err != nil {
-		return err
-	}
-	data = append(data, '\n')
-	if err := os.WriteFile(filepath.Join(dest, "work", "host.json"), data, 0o644); err != nil {
-		return fmt.Errorf("no se pudo escribir work/host.json: %v", err)
-	}
-	return nil
+	return host.Write(dest, host.Options{GOOS: runtime.GOOS, GOARCH: runtime.GOARCH})
 }
 
 var errNoIdentity = errors.New("git no tiene user.name ni user.email configurados; ejecuta `git config --global user.name \"Tu Nombre\"` y `git config --global user.email tu@correo`")

@@ -1,0 +1,62 @@
+{
+  "item": "S6",
+  "conclusion": "S6 pasa todos los puntos del encargo. El verde con -race da 0 antes y después de las pruebas temporales. Sin código, TestDetectHostWritesHints falla con código 1 en la comprobación de error de Write. Los cinco destructive_cases de la spec pasan tal como están escritos. El binario aquas host escribe work/host.json válido con código 0. detect.go y detect_test.go quedan con sha256 idénticos a los originales. Hay dos observaciones menores sobre la fuerza de las pruebas; no contradicen la spec.",
+  "findings": [
+    {
+      "what": "La prueba roja falla en la comprobación de error de Write (t.Fatalf), no en las aserciones de contenido. Con el stub, las comprobaciones de os, shell_tool y hints nunca se ejecutan.",
+      "where": "tools/internal/host/detect_test.go:53",
+      "why": "La spec pide un rojo por aserción. El rojo sí viene de la falta de código, pero no ejercita las aserciones de contenido.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "En la comprobación de temporales de TestBrokenHostsJSON se ignora el error de os.ReadDir. Si work/ no existe, la comprobación pasa sin verificar nada.",
+      "where": "tools/internal/host/detect_test.go:157",
+      "why": "El caso 5 exige no dejar un host.json parcial. La verificación de temporales queda vacía cuando work/ no se crea.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "tools/internal/host/detect_test.go",
+      "line": "53",
+      "quote": "t.Fatalf(\"Write: %v\", err)"
+    },
+    {
+      "file": "tools/internal/host/detect_test.go",
+      "line": "157",
+      "quote": "entries, _ := os.ReadDir(filepath.Join(root, \"work\"))"
+    },
+    {
+      "file": "tools/internal/host/detect.go",
+      "line": "84",
+      "quote": "return fmt.Errorf(\"el sistema %q no está en canon/hosts.json; no se escribió work/host.json\", opts.GOOS)"
+    },
+    {
+      "file": "tools/internal/host/detect.go",
+      "line": "115",
+      "quote": "return writeAtomic(filepath.Join(repoRoot, \"work\"), \"host.json\", data)"
+    },
+    {
+      "file": "tools/cmd/aquas/main.go",
+      "line": "68",
+      "quote": "if err := host.Write(root, host.Options{}); err != nil {"
+    },
+    {
+      "file": "canon/hosts.json",
+      "line": "22",
+      "quote": "Git Bash usa rutas /c/..., por ejemplo /c/Users/nombre/repo."
+    }
+  ],
+  "output": "$ cd tools && go test -count=1 -race ./...\nok  github.com/jliberal-aquas/aquas-light/tools/cmd/aquas 1.018s\nok  github.com/jliberal-aquas/aquas-light/tools/internal/hashing 1.010s\nok  github.com/jliberal-aquas/aquas-light/tools/internal/host 1.027s\nok  github.com/jliberal-aquas/aquas-light/tools/internal/install 4.021s\nexit 0\n\nRojo (stub de Write que no escribe):\n$ go test -count=1 ./internal/host/ -run TestDetectHostWritesHints\n    detect_test.go:53: Write: stub: no escribe work/host.json\n--- FAIL: TestDetectHostWritesHints (0.00s)\nexit 1. detect.go restaurado desde copia; sha256 692e97a1... igual al original.\n\nCasos destructivos (go test -race -v, test temporal zz_tester_test.go, borrado):\nPASS TestTstCase1Windows: host.json os windows, shell_tool git-bash, hints iguales a canon/hosts.json windows (6 hints).\nPASS TestTstCase2Plan9: error \"el sistema plan9 no está en canon/hosts.json; no se escribió work/host.json\"; host.json previo byte a byte igual.\nPASS TestTstCase3NonJSONPrevious: host.json previo no JSON reemplazado por JSON completo, sin error.\nPASS TestTstCase4Concurrent: 10 ejecuciones, sin pánico ni errores, host.json completo, sin temporales en work/.\nPASS TestTstCase5BrokenHosts: error \"canon/hosts.json no es JSON válido: unexpected end of JSON input\"; sin host.json.\n\nBinario (go build ./cmd/aquas, copia mínima con canon/hosts.json y tools/go.mod):\n$ aquas host -> \"work/host.json escrito.\" exit 0\nhost.json: os linux, arch amd64, shell_tool bash, path_style posix, line_ending lf, versions go1.24.7 y git version 2.43.0, 5 hints. JSON válido.\n\nVerde final tras borrar temporales: 4 paquetes ok, exit 0.",
+  "pending": [
+    "La concurrencia se probó solo en Linux. La rama de Windows (20 reintentos al renombrar) no se ejercitó.",
+    "Windows se probó solo con GOOS inyectado. No se corrió en un Windows real ni se verificó Git Bash.",
+    "El código de salida distinto de 0 para plan9 y para hosts.json roto se verificó por la API Go (err != nil). El binario usa runtime.GOOS y no puede inyectar plan9; runHost devuelve 1 cuando Write falla (main.go:68-70).",
+    "No se tocaron backlog.json, work/memory.json ni canon/, y no hubo commit. Los cambios que ya había en el árbol de trabajo (main.go, install.go, main_test.go, backlog.json, delegations.jsonl) quedaron como estaban.",
+    "Temporales borrados: tools/internal/host/zz_tester_test.go y los directorios /tmp/s6_*."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

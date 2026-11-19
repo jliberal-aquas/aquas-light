@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/jliberal-aquas/aquas-light/tools/internal/host"
 	"github.com/jliberal-aquas/aquas-light/tools/internal/install"
 )
 
@@ -22,6 +23,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return 0
 	case "install":
 		return runInstall(args[1:], stdout, stderr)
+	case "host":
+		return runHost(stdout, stderr)
 	default:
 		_, _ = fmt.Fprintf(stderr, "aquas: subcomando desconocido %q\n\n%s", args[0], usage())
 		return 2
@@ -51,8 +54,27 @@ func runInstall(args []string, stdout, stderr io.Writer) int {
 	return 0
 }
 
+func runHost(stdout, stderr io.Writer) int {
+	wd, err := os.Getwd()
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se pudo leer el directorio actual: %v\n", err)
+		return 1
+	}
+	root, err := install.FindPackageRoot(wd)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se puede detectar el host: %v\n", err)
+		return 1
+	}
+	if err := host.Write(root, host.Options{}); err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se puede detectar el host: %v\n", err)
+		return 1
+	}
+	_, _ = fmt.Fprintln(stdout, "work/host.json escrito.")
+	return 0
+}
+
 func usage() string {
-	return "Uso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  version           imprime la versión de aquas\n"
+	return "Uso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  host              detecta el sistema y escribe work/host.json\n  version           imprime la versión de aquas\n"
 }
 
 func main() {

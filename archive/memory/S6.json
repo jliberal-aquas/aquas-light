@@ -1,0 +1,18 @@
+{
+  "slice": "S6",
+  "step": "commit",
+  "done": [
+    "plan",
+    "red",
+    "green",
+    "tester"
+  ],
+  "next": "Commit de S6; luego S7.",
+  "files": [
+    "tools/internal/host/detect.go",
+    "tools/internal/install/install.go",
+    "tools/cmd/aquas/main.go"
+  ],
+  "blockers": [],
+  "updated_at": "2026-11-18T23:25:58-03:00"
+}
