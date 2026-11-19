@@ -1,0 +1,18 @@
+{
+  "slice": "S10",
+  "step": "commit",
+  "done": [
+    "plan",
+    "red",
+    "green",
+    "tester"
+  ],
+  "next": "Commit, push y CI.",
+  "files": [
+    "tools/internal/verify/backlog.go",
+    "tools/internal/verify/backlog_test.go",
+    "tools/internal/verify/verify.go"
+  ],
+  "blockers": [],
+  "updated_at": "2026-11-19T13:00:00-03:00"
+}

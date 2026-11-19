@@ -1,0 +1,59 @@
+{
+  "item": "S10",
+  "conclusion": "Pasa. go test ./... -race y golangci-lint run ./... salen con 0 (lint: 0 issues). Sin el código del slice (backlogRules anulada en una copia en /tmp) fallan TestVerifyBacklogRules y sus subpruebas, y también los dos de --staged. Los 19 casos destructivos tienen una subprueba que nombra los IDs o archivos del expect. Los seis casos que dependen del código de salida o del disco (9, 13, 14, 15, 18, 19) se ejecutaron con el binario y dieron lo esperado. Quedan brechas menores de calidad de pruebas, sin bloqueadores. El repo real quedó idéntico: sumas sha256, git diff --stat y cmp.",
+  "findings": [
+    {
+      "what": "El helper lines calcula el código de salida (1 si hay violaciones) en lugar de llamar al CLI; los códigos 0 y 1 de las pruebas de paquete no prueban el mapeo real de runVerify.",
+      "where": "tools/internal/verify/verify_test.go:64-78",
+      "why": "Un cambio en runVerify (por ejemplo, devolver 0 con violaciones) no lo detecta ninguna prueba de paquete; el mapeo quedó comprobado solo con las corridas manuales de este informe.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El caso de ID mal formado «S» comprueba solo que el mensaje contenga una S mayúscula.",
+      "where": "tools/internal/verify/backlog_test.go:148",
+      "why": "Casi cualquier mensaje con esa letra lo cumple; el caso no garantiza que el mensaje nombre el ID.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El caso de slice done sin archivo de spec (S3) comprueba S3 y work/specs/S3.json, pero no el campo spec_sha256 que el mensaje sí nombra.",
+      "where": "tools/internal/verify/backlog_test.go:289",
+      "why": "Una regresión que quitara el nombre del campo del mensaje pasaría la prueba.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "TestVerifyBacklogRulesStagedWithoutGit solo comprueba que Index devuelva error con el texto «no es un repositorio git»; no comprueba el código 3 de runVerify.",
+      "where": "tools/internal/verify/backlog_test.go:386",
+      "why": "El código 3 quedó verificado con el binario en este informe, pero ninguna prueba automática lo fija.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "La prueba de GIT_DIR llama a Index() y no al CLI; el código 1 solo se comprobó con el binario en este informe.",
+      "where": "tools/internal/verify/backlog_test.go:365-371",
+      "why": "Un fallo en el cableado de runVerify con --staged no lo detectaría la suite.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {"file": "tools/internal/verify/backlog.go", "line": 89, "quote": "func backlogRules(src Source, bk *schema.Backlog, archives map[string]*schema.Archive, complete bool) ([]Violation, error) {"},
+    {"file": "tools/internal/verify/verify.go", "line": 107, "quote": "return nil, fmt.Errorf(\"%s no es un repositorio git propio: está dentro de otro repositorio y no tiene su propio .git\", root)"},
+    {"file": "tools/internal/verify/verify_test.go", "line": 74, "quote": "code := 0"},
+    {"file": "tools/internal/verify/backlog_test.go", "line": 148, "quote": "for _, id := range []string{\"s3\", \"S03\", \"S0\", \"S-1\", \"X1\", \"S\", \"S99999999999999999999\"} {"},
+    {"file": "tools/internal/verify/backlog_test.go", "line": 289, "quote": "[]string{\"S3\", \"work/specs/S3.json\"},"},
+    {"file": "tools/internal/verify/backlog_test.go", "line": 371, "quote": "expect(t, idx, []string{\"S2\", \"S3\", \"in_progress\"})"},
+    {"file": "tools/internal/verify/backlog_test.go", "line": 386, "quote": "mustContain(t, err.Error(), \"no es un repositorio git\")"},
+    {"file": "cmd/aquas/main.go", "line": 185, "quote": "// runVerify checks the governed JSON files. Exit codes: 0 green, 1 violations,"}
+  ],
+  "output": "1) En /home/claude/aquas-light/tools: go test ./... -race exit 0 (8 paquetes ok); golangci-lint run ./... exit 0, 0 issues. TestVerifyBacklogRules y subpruebas PASS, así como los tres TestVerifyBacklogRulesStaged* PASS. 2) Rojo: copia del tools en /tmp/s10-red con backlogRules que devuelve nil al inicio; go test -run TestVerifyBacklogRules: FAIL en TestVerifyBacklogRules, en 25 subpruebas y en TestVerifyBacklogRulesStagedReadsIndexNotDisk y TestVerifyBacklogRulesStagedIgnoresInheritedGitDir. El repo real no se modificó en esta parte. 3) Cobertura de los 19 casos: 1 contador S (TestVerifyBacklogRules/contador atrasado...ID del backlog, expect con backlog.json, next_ids.S, 5, S38): cubierto y completo. 2 contador B con B6 archivado: cubierto, incluye archive/I1.json. 3 contador S 47/48: cubierto, ambos lados. 4 siete IDs mal formados: cubierto (un expect por ID; el caso «S» tiene la brecha de la finding 2). 5 F3 como slice: cubierto. 6 ID repetido en backlog y en archivo: cubierto, dos expects. 7 seis padres inválidos: cubierto, seis subpruebas con elemento, padre y tipo. 8 padre archivado y necesidad: cubierto, código 0. 9 archive/I1.json ilegible: cubierto y verificado con binario (exit 1, mensaje «archive/I1.json: raíz: el archivo termina antes de cerrar el valor JSON», sin cascada). 10 in_progress: cubierto en las tres partes. 11 supersedes inválido: cuatro subpruebas más una en elemento no slice, nombran elemento y destino. 12 supersedes archivado: cubierto, código 0. 13 espacio en spec: cubierto en paquete y verificado con binario (ver abajo). 14 --staged con cambio en índice: cubierto por TestVerifyBacklogRulesStagedReadsIndexNotDisk y verificado con binario (ver abajo). 15 CRLF: cubierto y verificado con binario (exit 0). 16 huellas: cubierto, cuatro expects (la brecha del campo está en la finding 3). 17 necesidades: cubierto, incluye los tres casos más uno de traversal. 18 GIT_DIR: cubierto por TestVerifyBacklogRulesStagedIgnoresInheritedGitDir y verificado con binario. 19 sin .git: cubierto por TestVerifyBacklogRulesStagedWithoutGit y verificado con binario (exit 3). 4) Binario verificado en copias de /tmp, sin tocar el repo real: caso 9 (exit 1, archivo nombrado); caso 13 con espacio al final de S9 (exit 1, nombra S9, work/specs/S9.json y spec_sha256; S9 se usó porque S7 no está done en el repo, el mecanismo es el mismo); caso 14 con un byte cambiado en S9, git add y restauración en disco (disco exit 0, --staged exit 1 con el mensaje de spec_sha256 de S9; cmp confirmó la restauración); caso 15 con CRLF en S9 (exit 0); caso 18 con next_ids.S=5 solo en el índice y GIT_DIR apuntando a otro repo (disco exit 0; --staged exit 1 con next_ids.S y S46; sin la variable también 1); caso 19 sin .git (exit 3, «aquas: no se pudo verificar: /tmp/... no es un repositorio git: --staged lee el índice de git y no hay un .git en esa carpeta»). 5) Corridas en la raíz real: aquas verify exit 0 («Verificación en verde: no hay violaciones.»); aquas verify --staged exit 0 (mismo mensaje). 6) Integridad: sha256 de backlog.go, backlog_test.go, verify.go, backlog.json, work/memory.json y work/delegations.jsonl idénticas antes y después; git diff --stat idéntico (backlog.json, verify.go, delegations.jsonl). cmp de backlog.go contra su copia previa: idéntico. Estado previo no tocado: backlog.json y work/delegations.jsonl modificados, work/memory.json sin seguimiento; no se hizo commit ni push. Este informe es el único archivo nuevo.",
+  "pending": [
+    "functional_test de S10 (dos slices in_progress rechazados por el CLI, nombrando ambos) no se ejecutó con el binario; solo la subprueba de paquete.",
+    "Los casos 3 (48 pasa), 4, 8, 10 (tercera parte), 11, 12 y 16 solo tienen cobertura de paquete con memSource; no se repitieron con el binario.",
+    "Caso 13 y 14: se usó S9 en lugar de S7 porque S7 no está done en el repo real."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

@@ -1,0 +1,104 @@
+$ go test ./... -run TestVerifyBacklogRules -v
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	0.005s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/hashing	0.003s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/host	0.002s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/install	0.005s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/schema	0.003s [no tests to run]
+?   	github.com/jliberal-aquas/aquas-light/tools/internal/schema/gen	[no test files]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/update	0.004s [no tests to run]
+=== RUN   TestVerifyBacklogRules
+=== RUN   TestVerifyBacklogRules/contador_atrasado_respecto_de_un_ID_del_backlog
+=== RUN   TestVerifyBacklogRules/contador_atrasado_respecto_de_un_ID_archivado
+=== RUN   TestVerifyBacklogRules/contador_de_capacidades
+=== RUN   TestVerifyBacklogRules/contador_igual_al_mayor_ID
+=== RUN   TestVerifyBacklogRules/IDs_mal_formados
+=== RUN   TestVerifyBacklogRules/letra_distinta_del_tipo
+=== RUN   TestVerifyBacklogRules/ID_repetido
+=== RUN   TestVerifyBacklogRules/padres_inválidos
+=== RUN   TestVerifyBacklogRules/padres_inválidos/slice_con_padre_iniciativa
+=== RUN   TestVerifyBacklogRules/padres_inválidos/slice_con_padre_inexistente
+=== RUN   TestVerifyBacklogRules/padres_inválidos/feature_con_padre_feature
+=== RUN   TestVerifyBacklogRules/padres_inválidos/bug_con_padre_slice_proposed
+=== RUN   TestVerifyBacklogRules/padres_inválidos/iniciativa_con_padre
+=== RUN   TestVerifyBacklogRules/padres_inválidos/slice_sin_padre
+=== RUN   TestVerifyBacklogRules/padre_archivado
+=== RUN   TestVerifyBacklogRules/archivo_archivado_ilegible
+=== RUN   TestVerifyBacklogRules/un_slice_o_bug_en_curso
+=== RUN   TestVerifyBacklogRules/supersedes_inválido
+=== RUN   TestVerifyBacklogRules/supersedes_inválido/a_sí_mismo
+=== RUN   TestVerifyBacklogRules/supersedes_inválido/a_un_slice_proposed
+=== RUN   TestVerifyBacklogRules/supersedes_inválido/a_un_ID_inexistente
+=== RUN   TestVerifyBacklogRules/supersedes_inválido/a_una_feature
+=== RUN   TestVerifyBacklogRules/supersedes_inválido/en_un_elemento_que_no_es_slice
+=== RUN   TestVerifyBacklogRules/supersedes_hacia_un_slice_done_archivado
+=== RUN   TestVerifyBacklogRules/spec_alterada_con_un_espacio
+=== RUN   TestVerifyBacklogRules/spec_con_finales_CRLF
+=== RUN   TestVerifyBacklogRules/huella_inválida_o_fuera_de_lugar
+=== RUN   TestVerifyBacklogRules/una_feature_no_lleva_huella
+=== RUN   TestVerifyBacklogRules/necesidades_por_refinar
+--- PASS: TestVerifyBacklogRules (0.00s)
+    --- PASS: TestVerifyBacklogRules/contador_atrasado_respecto_de_un_ID_del_backlog (0.00s)
+    --- PASS: TestVerifyBacklogRules/contador_atrasado_respecto_de_un_ID_archivado (0.00s)
+    --- PASS: TestVerifyBacklogRules/contador_de_capacidades (0.00s)
+    --- PASS: TestVerifyBacklogRules/contador_igual_al_mayor_ID (0.00s)
+    --- PASS: TestVerifyBacklogRules/IDs_mal_formados (0.00s)
+    --- PASS: TestVerifyBacklogRules/letra_distinta_del_tipo (0.00s)
+    --- PASS: TestVerifyBacklogRules/ID_repetido (0.00s)
+    --- PASS: TestVerifyBacklogRules/padres_inválidos (0.00s)
+        --- PASS: TestVerifyBacklogRules/padres_inválidos/slice_con_padre_iniciativa (0.00s)
+        --- PASS: TestVerifyBacklogRules/padres_inválidos/slice_con_padre_inexistente (0.00s)
+        --- PASS: TestVerifyBacklogRules/padres_inválidos/feature_con_padre_feature (0.00s)
+        --- PASS: TestVerifyBacklogRules/padres_inválidos/bug_con_padre_slice_proposed (0.00s)
+        --- PASS: TestVerifyBacklogRules/padres_inválidos/iniciativa_con_padre (0.00s)
+        --- PASS: TestVerifyBacklogRules/padres_inválidos/slice_sin_padre (0.00s)
+    --- PASS: TestVerifyBacklogRules/padre_archivado (0.00s)
+    --- PASS: TestVerifyBacklogRules/archivo_archivado_ilegible (0.00s)
+    --- PASS: TestVerifyBacklogRules/un_slice_o_bug_en_curso (0.00s)
+    --- PASS: TestVerifyBacklogRules/supersedes_inválido (0.00s)
+        --- PASS: TestVerifyBacklogRules/supersedes_inválido/a_sí_mismo (0.00s)
+        --- PASS: TestVerifyBacklogRules/supersedes_inválido/a_un_slice_proposed (0.00s)
+        --- PASS: TestVerifyBacklogRules/supersedes_inválido/a_un_ID_inexistente (0.00s)
+        --- PASS: TestVerifyBacklogRules/supersedes_inválido/a_una_feature (0.00s)
+        --- PASS: TestVerifyBacklogRules/supersedes_inválido/en_un_elemento_que_no_es_slice (0.00s)
+    --- PASS: TestVerifyBacklogRules/supersedes_hacia_un_slice_done_archivado (0.00s)
+    --- PASS: TestVerifyBacklogRules/spec_alterada_con_un_espacio (0.00s)
+    --- PASS: TestVerifyBacklogRules/spec_con_finales_CRLF (0.00s)
+    --- PASS: TestVerifyBacklogRules/huella_inválida_o_fuera_de_lugar (0.00s)
+    --- PASS: TestVerifyBacklogRules/una_feature_no_lleva_huella (0.00s)
+    --- PASS: TestVerifyBacklogRules/necesidades_por_refinar (0.00s)
+=== RUN   TestVerifyBacklogRulesStagedReadsIndexNotDisk
+--- PASS: TestVerifyBacklogRulesStagedReadsIndexNotDisk (0.04s)
+=== RUN   TestVerifyBacklogRulesStagedIgnoresInheritedGitDir
+--- PASS: TestVerifyBacklogRulesStagedIgnoresInheritedGitDir (0.05s)
+=== RUN   TestVerifyBacklogRulesStagedWithoutGit
+--- PASS: TestVerifyBacklogRulesStagedWithoutGit (0.02s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/verify	0.112s
+exit=0
+
+$ go test ./...
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	2.796s
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/hashing	(cached)
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/host	(cached)
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/install	14.809s
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/schema	(cached)
+?   	github.com/jliberal-aquas/aquas-light/tools/internal/schema/gen	[no test files]
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/update	(cached)
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/verify	(cached)
+exit=0
+
+$ golangci-lint run ./...
+0 issues.
+exit=0

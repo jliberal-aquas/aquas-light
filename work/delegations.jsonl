@@ -40,3 +40,5 @@
 {"date": "2026-11-19", "item": "F2", "role": "architect", "model": "fable", "task": "Revisar el plan de F2 y escribir casos destructivos de S9 a S12", "tokens": 151289, "tool_uses": 10, "duration_s": 303}
 {"date": "2026-11-19", "item": "S9", "role": "implementer", "model": "sonnet", "task": "Construir S9 con TDD: aquas verify, tipos y esquemas", "tokens": 153522, "tool_uses": 16, "duration_s": 451}
 {"date": "2026-11-19", "item": "S9", "role": "tester", "model": "haiku", "task": "Verde, rojo por mutación y casos destructivos de S9", "tokens": 125778, "tool_uses": 15, "duration_s": 148}
+{"date": "2026-11-19", "item": "S10", "role": "implementer", "model": "sonnet", "task": "Construir S10 con TDD: reglas del backlog en verify", "tokens": 120494, "tool_uses": 9, "duration_s": 270}
+{"date": "2026-11-19", "item": "S10", "role": "tester", "model": "haiku", "task": "Verde, rojo sin el código y casos destructivos de S10", "tokens": 125103, "tool_uses": 19, "duration_s": 225}

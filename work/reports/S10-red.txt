@@ -1,0 +1,96 @@
+=== RUN   TestVerifyBacklogRules
+=== RUN   TestVerifyBacklogRules/contador_atrasado_respecto_de_un_ID_del_backlog
+    backlog_test.go:124: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/contador_atrasado_respecto_de_un_ID_archivado
+    backlog_test.go:133: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/contador_de_capacidades
+    backlog_test.go:138: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/contador_igual_al_mayor_ID
+    backlog_test.go:143: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/IDs_mal_formados
+    backlog_test.go:150: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/letra_distinta_del_tipo
+    backlog_test.go:156: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/ID_repetido
+    backlog_test.go:161: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/padres_inválidos
+=== RUN   TestVerifyBacklogRules/padres_inválidos/slice_con_padre_iniciativa
+    backlog_test.go:182: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/padres_inválidos/slice_con_padre_inexistente
+    backlog_test.go:182: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/padres_inválidos/feature_con_padre_feature
+    backlog_test.go:182: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/padres_inválidos/bug_con_padre_slice_proposed
+    backlog_test.go:182: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/padres_inválidos/iniciativa_con_padre
+    backlog_test.go:182: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/padres_inválidos/slice_sin_padre
+    backlog_test.go:182: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/padre_archivado
+=== RUN   TestVerifyBacklogRules/archivo_archivado_ilegible
+=== RUN   TestVerifyBacklogRules/un_slice_o_bug_en_curso
+    backlog_test.go:219: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/supersedes_inválido
+=== RUN   TestVerifyBacklogRules/supersedes_inválido/a_sí_mismo
+    backlog_test.go:243: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/supersedes_inválido/a_un_slice_proposed
+    backlog_test.go:243: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/supersedes_inválido/a_un_ID_inexistente
+    backlog_test.go:243: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/supersedes_inválido/a_una_feature
+    backlog_test.go:243: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/supersedes_inválido/en_un_elemento_que_no_es_slice
+    backlog_test.go:250: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/supersedes_hacia_un_slice_done_archivado
+=== RUN   TestVerifyBacklogRules/spec_alterada_con_un_espacio
+    backlog_test.go:267: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/spec_con_finales_CRLF
+=== RUN   TestVerifyBacklogRules/huella_inválida_o_fuera_de_lugar
+    backlog_test.go:287: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/una_feature_no_lleva_huella
+    backlog_test.go:297: se esperaba código 1 y salió 0
+=== RUN   TestVerifyBacklogRules/necesidades_por_refinar
+    backlog_test.go:309: se esperaba código 1 y salió 0
+--- FAIL: TestVerifyBacklogRules (0.00s)
+    --- FAIL: TestVerifyBacklogRules/contador_atrasado_respecto_de_un_ID_del_backlog (0.00s)
+    --- FAIL: TestVerifyBacklogRules/contador_atrasado_respecto_de_un_ID_archivado (0.00s)
+    --- FAIL: TestVerifyBacklogRules/contador_de_capacidades (0.00s)
+    --- FAIL: TestVerifyBacklogRules/contador_igual_al_mayor_ID (0.00s)
+    --- FAIL: TestVerifyBacklogRules/IDs_mal_formados (0.00s)
+    --- FAIL: TestVerifyBacklogRules/letra_distinta_del_tipo (0.00s)
+    --- FAIL: TestVerifyBacklogRules/ID_repetido (0.00s)
+    --- FAIL: TestVerifyBacklogRules/padres_inválidos (0.00s)
+        --- FAIL: TestVerifyBacklogRules/padres_inválidos/slice_con_padre_iniciativa (0.00s)
+        --- FAIL: TestVerifyBacklogRules/padres_inválidos/slice_con_padre_inexistente (0.00s)
+        --- FAIL: TestVerifyBacklogRules/padres_inválidos/feature_con_padre_feature (0.00s)
+        --- FAIL: TestVerifyBacklogRules/padres_inválidos/bug_con_padre_slice_proposed (0.00s)
+        --- FAIL: TestVerifyBacklogRules/padres_inválidos/iniciativa_con_padre (0.00s)
+        --- FAIL: TestVerifyBacklogRules/padres_inválidos/slice_sin_padre (0.00s)
+    --- PASS: TestVerifyBacklogRules/padre_archivado (0.00s)
+    --- PASS: TestVerifyBacklogRules/archivo_archivado_ilegible (0.00s)
+    --- FAIL: TestVerifyBacklogRules/un_slice_o_bug_en_curso (0.00s)
+    --- FAIL: TestVerifyBacklogRules/supersedes_inválido (0.00s)
+        --- FAIL: TestVerifyBacklogRules/supersedes_inválido/a_sí_mismo (0.00s)
+        --- FAIL: TestVerifyBacklogRules/supersedes_inválido/a_un_slice_proposed (0.00s)
+        --- FAIL: TestVerifyBacklogRules/supersedes_inválido/a_un_ID_inexistente (0.00s)
+        --- FAIL: TestVerifyBacklogRules/supersedes_inválido/a_una_feature (0.00s)
+        --- FAIL: TestVerifyBacklogRules/supersedes_inválido/en_un_elemento_que_no_es_slice (0.00s)
+    --- PASS: TestVerifyBacklogRules/supersedes_hacia_un_slice_done_archivado (0.00s)
+    --- FAIL: TestVerifyBacklogRules/spec_alterada_con_un_espacio (0.00s)
+    --- PASS: TestVerifyBacklogRules/spec_con_finales_CRLF (0.00s)
+    --- FAIL: TestVerifyBacklogRules/huella_inválida_o_fuera_de_lugar (0.00s)
+    --- FAIL: TestVerifyBacklogRules/una_feature_no_lleva_huella (0.00s)
+    --- FAIL: TestVerifyBacklogRules/necesidades_por_refinar (0.00s)
+=== RUN   TestVerifyBacklogRulesStagedReadsIndexNotDisk
+    backlog_test.go:343: se esperaba código 1 y salió 0
+--- FAIL: TestVerifyBacklogRulesStagedReadsIndexNotDisk (0.02s)
+=== RUN   TestVerifyBacklogRulesStagedIgnoresInheritedGitDir
+    backlog_test.go:371: se esperaba código 1 y salió 0
+--- FAIL: TestVerifyBacklogRulesStagedIgnoresInheritedGitDir (0.02s)
+=== RUN   TestVerifyBacklogRulesStagedWithoutGit
+    backlog_test.go:386: el mensaje "no se pudo leer el índice de git en /tmp/TestVerifyBacklogRulesStagedWithoutGit1249430174/001 (git ls-files): fatal: not a git repository (or any of the parent directories): .git" no contiene "no es un repositorio git"
+    backlog_test.go:395: una carpeta sin .git propio dentro de otro repo debe fallar
+--- FAIL: TestVerifyBacklogRulesStagedWithoutGit (0.01s)
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/verify	0.069s
+FAIL

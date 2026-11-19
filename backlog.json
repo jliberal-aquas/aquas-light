@@ -95,9 +95,10 @@
       "id": "S10",
       "type": "slice",
       "parent": "F2",
-      "state": "ready",
+      "state": "done",
       "priority": 2,
-      "spec": "work/specs/S10.json"
+      "spec": "work/specs/S10.json",
+      "spec_sha256": "fd99b4a42a2a5a12041572f99f7d8c39beafd0727e687497c2dde6b6d470d98e"
     },
     {
       "id": "S11",

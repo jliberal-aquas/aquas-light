@@ -96,6 +96,16 @@ type indexSource struct {
 // hook running inside another repo's environment still looks at root.
 func Index(root string) (Source, error) {
 	s := &indexSource{root: root, env: gitEnv()}
+	prefix, err := s.git("rev-parse", "--show-prefix")
+	if err != nil {
+		if errors.Is(err, errNotRepo) {
+			return nil, fmt.Errorf("%s no es un repositorio git: --staged lee el índice de git y no hay un .git en esa carpeta", root)
+		}
+		return nil, err
+	}
+	if strings.TrimSpace(string(prefix)) != "" {
+		return nil, fmt.Errorf("%s no es un repositorio git propio: está dentro de otro repositorio y no tiene su propio .git", root)
+	}
 	out, err := s.git("ls-files", "-z")
 	if err != nil {
 		return nil, err
@@ -125,8 +135,10 @@ func gitEnv() []string {
 		}
 		env = append(env, kv)
 	}
-	return env
+	return append(env, "LC_ALL=C") // stable git messages, for the not-a-repo check
 }
+
+var errNotRepo = errors.New("no es un repositorio git")
 
 func (s *indexSource) git(args ...string) ([]byte, error) {
 	cmd := exec.Command("git", args...)
@@ -136,6 +148,13 @@ func (s *indexSource) git(args ...string) ([]byte, error) {
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
+		if strings.Contains(stderr.String(), "not a git repository") {
+			return nil, errNotRepo
+		}
+		var notFound *exec.Error
+		if errors.As(err, &notFound) {
+			return nil, fmt.Errorf("no se pudo leer el índice de git: git no está instalado o no está en el PATH")
+		}
 		detail := strings.TrimSpace(stderr.String())
 		if detail == "" {
 			detail = err.Error()
@@ -221,9 +240,11 @@ func Run(src Source) ([]Violation, error) {
 		files = append(files, typedFile{"work/requests/" + n, new(schema.Request), false})
 	}
 
+	broken, missing := map[string]bool{}, map[string]bool{}
 	for _, f := range files {
 		data, err := src.Read(f.path)
 		if errors.Is(err, fs.ErrNotExist) {
+			missing[f.path] = true
 			if f.required {
 				out = append(out, Violation{File: f.path, Pos: "raíz", Msg: "falta el archivo"})
 			}
@@ -232,13 +253,33 @@ func Run(src Source) ([]Violation, error) {
 		if err != nil {
 			return nil, fmt.Errorf("no se pudo leer %s: %w", f.path, err)
 		}
-		for _, v := range schema.Decode(data, f.target) {
+		found := schema.Decode(data, f.target)
+		broken[f.path] = len(found) > 0
+		for _, v := range found {
 			pos := v.Path
 			if pos == "" {
 				pos = "raíz"
 			}
 			out = append(out, Violation{File: f.path, Pos: pos, Msg: v.Msg, offset: v.Offset})
 		}
+	}
+	if bk, ok := files[0].target.(*schema.Backlog); ok && !broken[RootMarker] && !missing[RootMarker] {
+		archives := map[string]*schema.Archive{}
+		complete := true
+		for _, f := range files {
+			if a, ok := f.target.(*schema.Archive); ok {
+				if broken[f.path] {
+					complete = false
+				} else {
+					archives[f.path] = a
+				}
+			}
+		}
+		rules, err := backlogRules(src, bk, archives, complete)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, rules...)
 	}
 	sort.SliceStable(out, func(i, j int) bool {
 		if out[i].File != out[j].File {
