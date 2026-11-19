@@ -112,7 +112,7 @@ func runUpdate(args []string, stdout, stderr io.Writer) int {
 		_, _ = fmt.Fprintf(stderr, "aquas: no se puede actualizar: %v\n", err)
 		return 1
 	}
-	res, err := update.Update(root, instance, takes)
+	res, err := update.Update(root, instance, version, takes)
 	if err != nil {
 		_, _ = fmt.Fprintf(stderr, "aquas: no se actualizó nada: %v\n", err)
 		return 1

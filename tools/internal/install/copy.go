@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/jliberal-aquas/aquas-light/tools/internal/hashing"
 )
@@ -42,15 +43,18 @@ func isFile(p string) bool {
 
 // Manifest is the content of canon/manifest.json.
 type Manifest struct {
-	SchemaVersion int               `json:"schema_version"`
-	Algorithm     string            `json:"algorithm"`
-	Files         map[string]string `json:"files"`
+	SchemaVersion int    `json:"schema_version"`
+	Algorithm     string `json:"algorithm"`
+	// Version is the package version without the leading "v", such as "0.1.0".
+	// Manifests written before it existed lack it and are still read.
+	Version string            `json:"version,omitempty"`
+	Files   map[string]string `json:"files"`
 }
 
 // Copy installs the package found at root into dest, which must already have
 // passed Preflight. It copies canon/, schemas/ (if present) and tools/ byte by
-// byte, copies templates/ into the root of dest, creates the starter folders and folders, and writes canon/manifest.json.
-func Copy(root, dest string) error {
+// byte, records version in the manifest, copies templates/ into the root of dest, creates the starter folders and folders, and writes canon/manifest.json.
+func Copy(root, dest, version string) error {
 	files := map[string]string{}
 	for _, top := range []string{"canon", "schemas", "tools"} {
 		src := filepath.Join(root, top)
@@ -94,7 +98,7 @@ func Copy(root, dest string) error {
 	if err := writeStarter(root, dest); err != nil {
 		return err
 	}
-	return writeManifest(dest, files)
+	return writeManifest(dest, version, files)
 }
 
 func copyFile(src, dst string, d fs.DirEntry) ([]byte, error) {
@@ -144,9 +148,9 @@ func writeStarter(root, dest string) error {
 	return nil
 }
 
-func writeManifest(dest string, files map[string]string) error {
+func writeManifest(dest, version string, files map[string]string) error {
 	// json.Marshal sorts map keys, so the output is deterministic.
-	out, err := json.MarshalIndent(Manifest{SchemaVersion: 1, Algorithm: "sha256-lf", Files: files}, "", "  ")
+	out, err := json.MarshalIndent(Manifest{SchemaVersion: 1, Algorithm: "sha256-lf", Version: strings.TrimPrefix(version, "v"), Files: files}, "", "  ")
 	if err != nil {
 		return err
 	}

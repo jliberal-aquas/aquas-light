@@ -1,0 +1,17 @@
+=== RUN   TestManifestRecordsVersion
+    update_test.go:272: version tras instalar = "" (presente false), want 0.1.0
+--- FAIL: TestManifestRecordsVersion (0.01s)
+=== RUN   TestManifestWithoutVersionIsReadAndFilled
+    update_test.go:299: version = "" (presente false), want 0.2.0
+--- FAIL: TestManifestWithoutVersionIsReadAndFilled (0.01s)
+=== RUN   TestManifestVersionUnchangedOnConflict
+    update_test.go:311: version = "" (presente false), debe seguir en 0.1.0
+--- FAIL: TestManifestVersionUnchangedOnConflict (0.00s)
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/update	0.032s
+FAIL
+--- FAIL: TestIntegrationInstall (1.72s)
+    integration_test.go:208: manifest version = "", want "0.1.0"
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	1.729s
+FAIL

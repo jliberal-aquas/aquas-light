@@ -1,6 +1,7 @@
 package update
 
 import (
+	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
@@ -48,7 +49,7 @@ func newInstance(t *testing.T, pkg string) string {
 	if err := os.Mkdir(dest, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := install.Copy(pkg, dest); err != nil {
+	if err := install.Copy(pkg, dest, "0.1.0"); err != nil {
 		t.Fatal(err)
 	}
 	return dest
@@ -59,7 +60,7 @@ func TestUpdateStopsOnLocalEdit(t *testing.T) {
 	inst := newInstance(t, v1)
 	write(t, inst, "canon/method.md", "editado a mano\n")
 
-	res, err := Update(v2, inst, Takes{})
+	res, err := Update(v2, inst, "0.2.0", Takes{})
 	var ce *ConflictError
 	if !errors.As(err, &ce) {
 		t.Fatalf("se esperaba ConflictError, llegó %v", err)
@@ -112,7 +113,7 @@ func TestUpdateCRLFOnlyIsNotConflict(t *testing.T) {
 	v1, v2 := newPackage(t, "v1"), newPackage(t, "v2")
 	inst := newInstance(t, v1)
 	write(t, inst, "canon/method.md", "metodo v1\r\n")
-	res, err := Update(v2, inst, Takes{})
+	res, err := Update(v2, inst, "0.2.0", Takes{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -129,7 +130,7 @@ func TestUpdateConflictChangesNothing(t *testing.T) {
 	inst := newInstance(t, v1)
 	write(t, inst, "canon/method.md", "editado\n")
 	before := snapshot(t, inst)
-	_, err := Update(v2, inst, Takes{})
+	_, err := Update(v2, inst, "0.2.0", Takes{})
 	if err == nil || !strings.Contains(err.Error(), "canon/method.md") {
 		t.Fatalf("error = %v", err)
 	}
@@ -143,7 +144,7 @@ func TestUpdateInvalidTakeChangesNothing(t *testing.T) {
 	inst := newInstance(t, v1)
 	write(t, inst, "canon/method.md", "editado\n")
 	before := snapshot(t, inst)
-	_, err := Update(v2, inst, Takes{Default: "mine"})
+	_, err := Update(v2, inst, "0.2.0", Takes{Default: "mine"})
 	if err == nil || !strings.Contains(err.Error(), "ours") || !strings.Contains(err.Error(), "theirs") {
 		t.Fatalf("error = %v", err)
 	}
@@ -167,7 +168,7 @@ func TestUpdateNeverTouchesProductAndReplacesGovernance(t *testing.T) {
 		write(t, v2, k, "del paquete "+k+"\n")
 	}
 	write(t, v2, "docs/governance/x.md", "gob v2\n")
-	if _, err := Update(v2, inst, Takes{}); err != nil {
+	if _, err := Update(v2, inst, "0.2.0", Takes{}); err != nil {
 		t.Fatal(err)
 	}
 	for k, v := range keep {
@@ -183,10 +184,10 @@ func TestUpdateNeverTouchesProductAndReplacesGovernance(t *testing.T) {
 func TestUpdateTwiceIsNoop(t *testing.T) {
 	v1, v2 := newPackage(t, "v1"), newPackage(t, "v2")
 	inst := newInstance(t, v1)
-	if _, err := Update(v2, inst, Takes{}); err != nil {
+	if _, err := Update(v2, inst, "0.2.0", Takes{}); err != nil {
 		t.Fatal(err)
 	}
-	res, err := Update(v2, inst, Takes{})
+	res, err := Update(v2, inst, "0.2.0", Takes{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -199,18 +200,18 @@ func TestUpdateOursKeepsAndReappears(t *testing.T) {
 	v1, v2 := newPackage(t, "v1"), newPackage(t, "v2")
 	inst := newInstance(t, v1)
 	write(t, inst, "canon/method.md", "editado\n")
-	if _, err := Update(v2, inst, Takes{Files: map[string]string{"canon/method.md": Ours}}); err != nil {
+	if _, err := Update(v2, inst, "0.2.0", Takes{Files: map[string]string{"canon/method.md": Ours}}); err != nil {
 		t.Fatal(err)
 	}
 	if got := read(t, inst, "canon/method.md"); got != "editado\n" {
 		t.Fatalf("ours no conservó: %q", got)
 	}
-	res, err := Update(v2, inst, Takes{})
+	res, err := Update(v2, inst, "0.2.0", Takes{})
 	var ce *ConflictError
 	if !errors.As(err, &ce) || len(res.Changed) != 0 {
 		t.Fatalf("debía reaparecer el conflicto: %v", err)
 	}
-	if _, err := Update(v2, inst, Takes{Default: Theirs}); err != nil {
+	if _, err := Update(v2, inst, "0.2.0", Takes{Default: Theirs}); err != nil {
 		t.Fatal(err)
 	}
 	if got := read(t, inst, "canon/method.md"); got != "metodo v2\n" {
@@ -227,7 +228,7 @@ func TestUpdateDeletesDroppedAndSeals(t *testing.T) {
 	write(t, inst, "tools/bin/aquas", "binario")
 	write(t, inst, "work/seals.json", `{"docs/governance/a.md":"viejo","work/otro":"mio"}`)
 	write(t, v2, "work/seals.json", `{"docs/governance/a.md":"nuevo","work/otro":"paquete"}`)
-	if _, err := Update(v2, inst, Takes{}); err != nil {
+	if _, err := Update(v2, inst, "0.2.0", Takes{}); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := os.Stat(filepath.Join(inst, "tools", "main.go")); err == nil {
@@ -246,10 +247,67 @@ func TestUpdateDoesNotCreateSeals(t *testing.T) {
 	v1, v2 := newPackage(t, "v1"), newPackage(t, "v2")
 	inst := newInstance(t, v1)
 	write(t, v2, "work/seals.json", `{}`)
-	if _, err := Update(v2, inst, Takes{}); err != nil {
+	if _, err := Update(v2, inst, "0.2.0", Takes{}); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := os.Stat(filepath.Join(inst, "work", "seals.json")); err == nil {
 		t.Fatal("no debía crearse")
+	}
+}
+
+func manifestVersion(t *testing.T, inst string) (string, bool) {
+	t.Helper()
+	var m map[string]any
+	if err := json.Unmarshal([]byte(read(t, inst, "canon/manifest.json")), &m); err != nil {
+		t.Fatal(err)
+	}
+	v, ok := m["version"].(string)
+	return v, ok
+}
+
+func TestManifestRecordsVersion(t *testing.T) {
+	v1, v2 := newPackage(t, "v1"), newPackage(t, "v2")
+	inst := newInstance(t, v1)
+	if v, ok := manifestVersion(t, inst); !ok || v != "0.1.0" {
+		t.Fatalf("version tras instalar = %q (presente %v), want 0.1.0", v, ok)
+	}
+	if _, err := Update(v2, inst, "0.2.0", Takes{}); err != nil {
+		t.Fatal(err)
+	}
+	if v, ok := manifestVersion(t, inst); !ok || v != "0.2.0" {
+		t.Fatalf("version tras actualizar = %q (presente %v), want 0.2.0", v, ok)
+	}
+}
+
+func TestManifestWithoutVersionIsReadAndFilled(t *testing.T) {
+	v1, v2 := newPackage(t, "v1"), newPackage(t, "v2")
+	inst := newInstance(t, v1)
+	var m map[string]any
+	if err := json.Unmarshal([]byte(read(t, inst, "canon/manifest.json")), &m); err != nil {
+		t.Fatal(err)
+	}
+	delete(m, "version")
+	old, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	write(t, inst, "canon/manifest.json", string(old)+"\n")
+	if _, err := Update(v2, inst, "0.2.0", Takes{}); err != nil {
+		t.Fatalf("un manifiesto sin version debe leerse: %v", err)
+	}
+	if v, ok := manifestVersion(t, inst); !ok || v != "0.2.0" {
+		t.Fatalf("version = %q (presente %v), want 0.2.0", v, ok)
+	}
+}
+
+func TestManifestVersionUnchangedOnConflict(t *testing.T) {
+	v1, v2 := newPackage(t, "v1"), newPackage(t, "v2")
+	inst := newInstance(t, v1)
+	write(t, inst, "canon/method.md", "editado\n")
+	if _, err := Update(v2, inst, "0.2.0", Takes{}); err == nil {
+		t.Fatal("se esperaba un error por el conflicto")
+	}
+	if v, ok := manifestVersion(t, inst); !ok || v != "0.1.0" {
+		t.Fatalf("version = %q (presente %v), debe seguir en 0.1.0", v, ok)
 	}
 }

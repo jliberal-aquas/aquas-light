@@ -204,6 +204,9 @@ func TestIntegrationInstall(t *testing.T) {
 	if mf.SchemaVersion != 1 || len(mf.Files) == 0 {
 		t.Fatalf("manifest unexpected: %+v", mf)
 	}
+	if mf.Version != version {
+		t.Errorf("manifest version = %q, want %q", mf.Version, version)
+	}
 	var canonFile string
 	for p := range mf.Files {
 		if strings.HasPrefix(p, "canon/") && p != "canon/manifest.json" && (canonFile == "" || p < canonFile) {

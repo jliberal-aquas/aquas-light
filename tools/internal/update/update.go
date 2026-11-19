@@ -87,7 +87,7 @@ func (t Takes) resolve(rel string) string {
 // Update replaces the instance with what pkgRoot carries. It runs from the
 // new package, like install. Nothing is written until every conflict is
 // resolved.
-func Update(pkgRoot, instance string, takes Takes) (Result, error) {
+func Update(pkgRoot, instance, version string, takes Takes) (Result, error) {
 	var res Result
 	if err := takes.Validate(); err != nil {
 		return res, err
@@ -194,7 +194,7 @@ func Update(pkgRoot, instance string, takes Takes) (Result, error) {
 		res.Changed = append(res.Changed, rel)
 	}
 
-	out, err := json.MarshalIndent(install.Manifest{SchemaVersion: 1, Algorithm: "sha256-lf", Files: newFiles}, "", "  ")
+	out, err := json.MarshalIndent(install.Manifest{SchemaVersion: 1, Algorithm: "sha256-lf", Version: strings.TrimPrefix(version, "v"), Files: newFiles}, "", "  ")
 	if err != nil {
 		return res, err
 	}

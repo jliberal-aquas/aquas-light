@@ -1,0 +1,11 @@
+=== RUN   TestIntegrationInstall
+--- PASS: TestIntegrationInstall (2.02s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	3.047s
+PASS
+PASS
+PASS
+=== RUN   TestManifestRecordsVersion
+--- PASS: TestManifestRecordsVersion (0.01s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/update	1.028s

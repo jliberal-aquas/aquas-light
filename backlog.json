@@ -4,7 +4,7 @@
     "I": 2,
     "F": 10,
     "S": 47,
-    "B": 2,
+    "B": 3,
     "N": 2,
     "C": 10
   },
@@ -162,6 +162,15 @@
       "priority": 9,
       "spec": "work/specs/S8.json",
       "spec_sha256": "a75dcab4b2ba3277c0e19e3147286c36c3380055c6f01ecea6e6b0207b7563c6"
+    },
+    {
+      "id": "B2",
+      "type": "bug",
+      "parent": "S7",
+      "state": "done",
+      "priority": 0,
+      "spec": "work/specs/B2.json",
+      "spec_sha256": "b96f506278a5a03fcd9444d5493d6020b6b8f417fbd14a0d17ea6ec7d1f6ad07"
     },
     {
       "id": "F2",

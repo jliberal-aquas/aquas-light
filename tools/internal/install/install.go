@@ -80,7 +80,7 @@ func Run(root, dest string, opts Options) (err error) {
 			return err
 		}
 	}
-	if err := Copy(root, abs); err != nil {
+	if err := Copy(root, abs, opts.Version); err != nil {
 		return err
 	}
 	if err := buildAquas(abs); err != nil {

@@ -1,0 +1,46 @@
+{
+  "item": "B2",
+  "conclusion": "Los tres tests TestManifest* pasan y la suite completa con -race esta en verde. Las tres mutaciones temporales (a) install no escribe version, (b) update conserva la version vieja y (c) update escribe la version aunque haya conflicto pendiente, cada una dio al menos un test en rojo. Los archivos se restauraron byte a byte desde /tmp/b2-backup y git diff --stat quedo igual al inicial (9 archivos, 103 insertions, 29 deletions). Los dos destructive_cases quedan cubiertos a nivel de funcion de biblioteca; el codigo de salida del CLI no lo prueba ningun test.",
+  "findings": [
+    {
+      "what": "TestManifestWithoutVersionIsReadAndFilled no detecta la mutacion (a): install deja Version vacio y el test sigue en verde.",
+      "where": "tools/internal/update/update_test.go (TestManifestWithoutVersionIsReadAndFilled)",
+      "why": "Update reescribe el manifiesto con la version nueva, asi que el test no aisla la escritura de install. Lo detectan TestManifestRecordsVersion y TestManifestVersionUnchangedOnConflict.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "Los destructive_cases de B2.json (exit 0 sin conflicto, exit distinto de 0 con conflicto) no se verifican por el codigo de salida del CLI.",
+      "where": "tools/cmd/aquas/main.go (runUpdate, lineas 115-121); tools/cmd/aquas/integration_test.go (solo agrega la comprobacion de mf.Version en TestIntegrationInstall)",
+      "why": "Los tests de update llaman update.Update directamente. El exit 0 y el 1 de runUpdate no tienen test que los fije. Lo que si cubren es el error de Update y el contenido del manifiesto.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "TestManifestVersionUnchangedOnConflict no detecta la mutacion (b): update conserva la version vieja y el test sigue en verde.",
+      "where": "tools/internal/update/update_test.go (TestManifestVersionUnchangedOnConflict)",
+      "why": "Con conflicto el flujo original retorna antes de escribir el manifiesto, asi que la version vieja se conserva por accidente. El test solo protege el caso de conflicto; la escritura de version en el camino sin conflicto la cubre TestManifestRecordsVersion.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {"file": "tools/internal/update/update_test.go", "line": 272, "quote": "version tras instalar = %q (presente %v), want 0.1.0 (rojo con mutacion a)"},
+    {"file": "tools/internal/update/update_test.go", "line": 278, "quote": "version tras actualizar = %q (presente %v), want 0.2.0 (rojo con mutacion b)"},
+    {"file": "tools/internal/update/update_test.go", "line": 299, "quote": "version = %q (presente %v), want 0.2.0 (rojo con mutacion b)"},
+    {"file": "tools/internal/update/update_test.go", "line": 311, "quote": "version = %q (presente %v), debe seguir en 0.1.0 (rojo con mutacion a y c)"},
+    {"file": "tools/internal/update/update.go", "line": 197, "quote": "Version: strings.TrimPrefix(version, \"v\"), Files: newFiles (mutacion b: Version: old.Version)"},
+    {"file": "tools/internal/update/update.go", "line": 155, "quote": "return res, &ConflictError{Paths: unresolved} (mutacion c inserta la escritura del manifiesto justo antes)"},
+    {"file": "tools/internal/install/copy.go", "line": 101, "quote": "return writeManifest(dest, version, files) (mutacion a: TrimPrefix(\"\", \"v\"))"},
+    {"file": "work/specs/B2.json", "line": 0, "quote": "destructive_cases: instancia sin version + update 0.2.0 -> codigo 0, version 0.2.0; update con conflicto sin --take -> codigo distinto de 0, version sin cambio"}
+  ],
+  "output": "go test -race -count=1 -run TestManifest -v ./internal/update/: PASS TestManifestRecordsVersion, TestManifestWithoutVersionIsReadAndFilled, TestManifestVersionUnchangedOnConflict. go test -race -count=1 ./...: ok en cmd/aquas, hashing, host, install, update. Mutacion a (install sin version): FAIL TestManifestRecordsVersion y TestManifestVersionUnchangedOnConflict; PASS TestManifestWithoutVersionIsReadAndFilled. Mutacion b (update conserva version vieja): FAIL TestManifestRecordsVersion y TestManifestWithoutVersionIsReadAndFilled; PASS TestManifestVersionUnchangedOnConflict. Mutacion c (update escribe version con conflicto): FAIL TestManifestVersionUnchangedOnConflict (version quedo en 0.2.0); PASS los otros dos. Restauracion: cmp contra /tmp/b2-backup identico (copy.go sha256 e87b344e..., update.go sha256 5664d849...). Suite final con -race: verde. git diff --stat: 9 files changed, 103 insertions(+), 29 deletions(-), igual al inicio. No se uso git checkout ni git stash.",
+  "pending": [
+    "No se corrio TestIntegrationInstall (que agrega la comprobacion mf.Version == version) bajo la mutacion a; deberia dar rojo, pero no esta verificado.",
+    "No se corrieron los tests existentes (por ejemplo TestUpdateConflictChangesNothing) bajo las mutaciones; solo se corrieron los tres TestManifest*.",
+    "Codigo de salida del CLI (exit 0 y exit distinto de 0) no verificado con el binario: requiere una prueba de integracion de update que no existe hoy.",
+    "No se verifico la lectura de un manifiesto sin version desde el CLI real, solo desde la funcion Update."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

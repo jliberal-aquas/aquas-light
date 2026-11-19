@@ -56,7 +56,7 @@ func TestCopyBinaryIdentical(t *testing.T) {
 	if err := os.Mkdir(dest, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := Copy(root, dest); err != nil {
+	if err := Copy(root, dest, "0.1.0"); err != nil {
 		t.Fatal(err)
 	}
 	for _, rel := range []string{"tools/data.bin", "canon/a.md", "templates/plantilla.bin"} {
@@ -84,7 +84,7 @@ func TestCopyManifestDeterministicAndConsistent(t *testing.T) {
 		if err := os.Mkdir(dest, 0o755); err != nil {
 			t.Fatal(err)
 		}
-		if err := Copy(root, dest); err != nil {
+		if err := Copy(root, dest, "0.1.0"); err != nil {
 			t.Fatal(err)
 		}
 		_, raw := readManifest(t, dest)
@@ -161,7 +161,7 @@ func TestCopyManifestDeterministicAndConsistent(t *testing.T) {
 
 func TestCopyStarterFiles(t *testing.T) {
 	dest := t.TempDir()
-	if err := Copy(fakeRoot(t), dest); err != nil {
+	if err := Copy(fakeRoot(t), dest, "0.1.0"); err != nil {
 		t.Fatal(err)
 	}
 	for _, d := range []string{"work", "archive", "product", "docs"} {

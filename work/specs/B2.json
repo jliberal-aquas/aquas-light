@@ -1,0 +1,30 @@
+{
+  "id": "B2",
+  "parent": "S7",
+  "name": "El manifiesto no guarda la versión",
+  "what": "La spec de S7 pide que `aquas update` escriba en `canon/manifest.json` la versión nueva, pero el tipo `Manifest` no tiene campo de versión. Se agrega el campo `version` (texto, sin la «v», p. ej. «0.1.0»): `aquas install` lo escribe con la versión del paquete y `aquas update` lo reemplaza por la versión del paquete nuevo. Un manifiesto sin el campo se sigue leyendo. S15 usa esta versión.",
+  "files": [
+    "tools/internal/install/copy.go",
+    "tools/internal/update/update.go",
+    "tools/cmd/aquas/main.go"
+  ],
+  "repro": {
+    "name": "TestManifestRecordsVersion",
+    "red": "Tras instalar la versión 0.1.0 y actualizar desde un paquete 0.2.0, `canon/manifest.json` no tiene `version`."
+  },
+  "functional_test": "El humano abre `canon/manifest.json` de una instancia recién instalada y ve `\"version\": \"0.1.0\"`.",
+  "technical_test": {
+    "name": "TestManifestRecordsVersion",
+    "red_before_code": true
+  },
+  "destructive_cases": [
+    {
+      "case": "Instancia cuyo `canon/manifest.json` no tiene el campo `version` (instalada antes de B2); correr `aquas update` desde un paquete 0.2.0.",
+      "expect": "Código 0 si no hay conflictos; el manifiesto queda con `\"version\": \"0.2.0\"`."
+    },
+    {
+      "case": "`aquas update` con un conflicto pendiente y sin `--take`.",
+      "expect": "Código distinto de 0 y el campo `version` del manifiesto no cambia."
+    }
+  ]
+}

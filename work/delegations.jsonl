@@ -25,3 +25,5 @@
 {"date": "2026-11-18", "item": "F1", "role": "implementer", "model": "sonnet", "task": "Escribir docs/governance/C1-install-and-update.md desde el código", "tokens": 120033, "tool_uses": 10, "duration_s": 118}
 {"date": "2026-11-19", "item": "F1", "role": "auditor", "model": "fable", "task": "Auditar el cierre de F1 y escribir work/retro.json", "tokens": 197019, "tool_uses": 24, "duration_s": 358}
 {"date": "2026-11-19", "item": "F1", "role": "implementer", "model": "sonnet", "task": "Corrección de la página C1 según la auditoría (continuación del mismo agente)", "tokens": null, "tool_uses": null, "duration_s": null}
+{"date": "2026-11-19", "item": "B2", "role": "implementer", "model": "sonnet", "task": "Arreglar B2 con TDD: campo version en canon/manifest.json", "tokens": 88783, "tool_uses": 8, "duration_s": 97}
+{"date": "2026-11-19", "item": "B2", "role": "tester", "model": "haiku", "task": "Verde, rojo por mutación y casos destructivos de B2", "tokens": 88833, "tool_uses": 12, "duration_s": 104}
