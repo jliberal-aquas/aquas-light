@@ -37,12 +37,26 @@ func runInstall(args []string, stdout, stderr io.Writer) int {
 		_, _ = fmt.Fprintf(stderr, "aquas: no se puede instalar:\n%v\n", err)
 		return 1
 	}
-	_, _ = fmt.Fprintf(stdout, "Las precondiciones se cumplen para %s. El resto de la instalación llega en S4 y S5.\n", args[0])
+	wd, err := os.Getwd()
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se pudo leer el directorio actual: %v\n", err)
+		return 1
+	}
+	root, err := install.FindPackageRoot(wd)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se puede instalar: %v\n", err)
+		return 1
+	}
+	if err := install.Copy(root, args[0]); err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se puede instalar: %v\n", err)
+		return 1
+	}
+	_, _ = fmt.Fprintf(stdout, "Archivos copiados en %s con su manifiesto. El commit inicial y la reversión ante fallos llegan en S5.\n", args[0])
 	return 0
 }
 
 func usage() string {
-	return "Uso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    comprueba las precondiciones de instalación en la carpeta destino\n  version           imprime la versión de aquas\n"
+	return "Uso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    copia el paquete en la carpeta destino\n  version           imprime la versión de aquas\n"
 }
 
 func main() {

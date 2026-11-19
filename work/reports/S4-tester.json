@@ -1,0 +1,51 @@
+{
+  "item": "S4",
+  "conclusion": "S4 pasa todas las comprobaciones. La suite va en verde con -race (exit 0), la prueba TestManifestHashIgnoresCRLF pasa a rojo cuando la huella no normaliza CRLF y vuelve a verde al restaurar hash.go (sha256 idéntico al original), y los cinco destructive_cases se cumplen tal como están escritos. Único hallazgo: canon/manifest.json también lista 10 entradas de tools/, no solo las 8 de canon/; no contradice la spec, pero conviene saberlo.",
+  "findings": [
+    {
+      "what": "La prueba TestManifestHashIgnoresCRLF falla en rojo con una huella que no normaliza CRLF (Sum sin Normalize).",
+      "where": "tools/internal/hashing/hash.go:18 (stub temporal, restaurado) y tools/internal/hashing/hash_test.go:17",
+      "why": "La aserción de CRLF es la que detecta la ausencia de normalización: las tres huellas difieren.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "Con el stub que devuelve la cadena vacía, la prueba falla por la aserción de formato de huella, no por la de CRLF.",
+      "where": "tools/internal/hashing/hash_test.go:14",
+      "why": "El rojo con cadena vacía no demuestra la normalización; la variante sin normalizar sí lo hace. Es una prueba roja más débil de lo deseable.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El manifiesto incluye 10 entradas de tools/ además de las 8 de canon/.",
+      "where": "tools/internal/install/copy.go:85 (files se llena también al recorrer tools/)",
+      "why": "El caso 5 pide cruzar canon/ con el manifiesto; el cruce pasa, pero el manifiesto excede el alcance de canon/ que describe la functional_test. Es un comportamiento del implementador, no un fallo.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "tools/internal/hashing/hash.go",
+      "line": "17-18",
+      "quote": "func Sum(data []byte) string { h := sha256.Sum256(Normalize(data))"
+    },
+    {
+      "file": "tools/internal/hashing/hash_test.go",
+      "line": "16-18",
+      "quote": "if Sum(crlf) != h || Sum(mixed) != h { t.Errorf(\"las huellas difieren: lf=%s crlf=%s mixed=%s\", h, Sum(crlf), Sum(mixed))"
+    },
+    {
+      "file": "tools/internal/install/copy.go",
+      "line": "85",
+      "quote": "files[filepath.ToSlash(rel)] = hashing.Sum(data)"
+    }
+  ],
+  "output": "1) cd tools && go test -count=1 -race ./... -> ok cmd/aquas, ok internal/hashing, ok internal/install; EXIT=0.\n2) Stub sin normalizar (Sum256(data)): --- FAIL: TestManifestHashIgnoresCRLF; hash_test.go:17 las huellas difieren lf=880553fc... crlf=a2124968... mixed=8ed8bbec...; EXIT=1. Stub vacio: hash_test.go:14 huella invalida: \"\"; EXIT=1. Restaurado: sha256 d50d21c0ca71ae04db3ca9a1d60c05582e9631bb5cbb2e059bbd7b3c136b3ed8 igual al original; go test -race de nuevo EXIT=0.\n3) Caso 1: lf, crlf y mixed = 880553fca8fcea94e325ee2cfb48e5a985cc797f39a14cc6d3cedecfeb2ae4d2, PASS. Caso 2: con espacio 6cb059c3eb00b48f..., sin espacio 911169ddaaf146af..., PASS. zz_tester_test.go borrado.\n4) Caso 3: plantilla con bytes 41 0d 0a 42 0d 0a 00 ff; instalada con /tmp/aquas (build de la copia) en carpeta nueva; cmp exit 0, bytes identicos.\n5) Caso 4: dos instalaciones desde el repo; cmp canon/manifest.json exit 0; 18 entradas, ordenadas, sin barra invertida, sin rutas absolutas ni ..., sin nombre temporal, manifest no se lista.\n6) Caso 5: 8 archivos en canon/ sin manifest.json, 8 entradas canon/ una vez cada una, ninguna huerfana en canon/, manifest no se lista, huellas recalculadas con CRLF->LF coinciden; las 18 entradas existen en disco.\n7) Verde final: exit 0. Temporales en /tmp borrados.",
+  "pending": [
+    "La functional_test pide que una persona abra canon/manifest.json; no lo hizo una persona, solo se verificó por lectura y script.",
+    "No se probó la reversion ante fallos ni el commit inicial: son de S5."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

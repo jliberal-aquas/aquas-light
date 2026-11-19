@@ -1,0 +1,19 @@
+{
+  "slice": "S4",
+  "step": "commit",
+  "done": [
+    "plan",
+    "red",
+    "green",
+    "tester"
+  ],
+  "next": "Commit de S4; luego S5.",
+  "files": [
+    "tools/internal/hashing/hash.go",
+    "tools/internal/install/copy.go",
+    "templates/",
+    "tools/cmd/aquas/main.go"
+  ],
+  "blockers": [],
+  "updated_at": "2026-11-18T23:08:57-03:00"
+}

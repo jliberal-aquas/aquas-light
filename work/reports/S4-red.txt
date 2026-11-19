@@ -1,0 +1,8 @@
+--- FAIL: TestManifestHashIgnoresCRLF (0.00s)
+    hash_test.go:14: huella inválida: ""
+--- FAIL: TestHashOnlyNormalizesLineEndings (0.00s)
+    hash_test.go:23: un espacio al final de línea debe cambiar la huella
+    hash_test.go:26: un CR suelto no debe normalizarse
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/hashing	0.001s
+FAIL

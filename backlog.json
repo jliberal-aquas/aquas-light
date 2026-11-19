@@ -113,9 +113,10 @@
       "id": "S4",
       "type": "slice",
       "parent": "F1",
-      "state": "ready",
+      "state": "done",
       "priority": 4,
-      "spec": "work/specs/S4.json"
+      "spec": "work/specs/S4.json",
+      "spec_sha256": "d2bc7cf41ecf8d5a2a40035b7a7623f758000854f34939128c93411569c3b7d3"
     },
     {
       "id": "S5",
