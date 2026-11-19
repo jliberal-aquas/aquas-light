@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-18T23:49-03:00",
+  "date": "2026-11-19T01:15-03:00",
   "for": "Orquestador de un chat nuevo en la aplicación web de Claude, con el modelo Claude Opus 5.5 elegido por el humano.",
   "read_first": [
     "canon/constitution.md",
@@ -8,26 +8,16 @@
     "canon/delegation.md",
     "canon/roles.json",
     "backlog.json",
+    "archive/I1.json",
+    "work/retro.json",
     "work/defects.md"
   ],
   "state": {
     "initiative": "I1 in_progress",
-    "feature": "F1 in_progress (instalar y actualizar): sus nueve slices están done; falta el cierre de la feature.",
-    "done": [
-      "S1",
-      "S2",
-      "B1",
-      "S3",
-      "S4",
-      "S5",
-      "S6",
-      "S7",
-      "S39",
-      "S8"
-    ],
-    "next": "Cerrar F1, en este orden: (1) implementador escribe TestIntegrationInstall según work/specs/F1.json (integration_test) y el tester lo verifica; (2) escribir docs/governance/C1-install-and-update.md (capacidad C1) con lo que hace hoy el código; (3) auditor (fable) audita el cierre de F1 y anota candidatos en work/retro.json; (4) mudar F1 con sus slices S1-S8, S39 y el bug B1 a archive/I1.json con closed_at y evidence (lectura del orquestador: los slices se mudan con la feature; confirmarlo con el humano si duda); (5) decir «Hay N candidatos para retrospectiva»; (6) pedir al humano que cree la etiqueta v0.1.0 (opción C aprobada: el humano la crea al aprobar el cierre; la regla 11 prohíbe que la cree Claude).",
-    "then": "Después de F1 viene F2 (verificar, capacidad C2). Necesita revisión del arquitecto (fable) y aprobación del humano antes de empezar.",
-    "approval": "El humano aprobó I1, el orden de features, los campos item y result del informe y F1. El 2026-11-18 aprobó la opción C para S8: la skill apunta a v0.1.0 y el humano crea esa etiqueta al aprobar el cierre de F1."
+    "feature": "F1 cerrada el 2026-11-19 y archivada en archive/I1.json con S1-S8, S39 y B1-B6 (commit e4e48ed). Ninguna feature en curso.",
+    "next": "(1) Si el humano ya creó la etiqueta v0.1.0 (comprobar con `git ls-remote --tags origin`), hacer la prueba funcional de S8: un lector o tester (haiku) sigue skill/SKILL.md en una carpeta temporal y reporta; si falla, nace un bug con padre S8. Si no existe, pedírsela con los pasos exactos. (2) Refinar N2 (work/requests/N2.json, once hallazgos menores del arquitecto) con el humano, según la regla 17 de canon/method.md. (3) Empezar F2 (verificar, capacidad C2): el arquitecto (fable) revisa el plan de work/specs/F2.json y sus slices; el humano aprueba antes del primer slice.",
+    "retro": "Hay 9 candidatos en work/retro.json. Solo el humano dispara la retrospectiva con /retrospective.",
+    "approval": "El humano aprobó I1, F1, B2 y B3-B6. Falta que cree la etiqueta v0.1.0 (regla 11: Claude no la crea) y que apruebe F2 al empezarla."
   },
   "how_to_work_here": {
     "environment": "Aplicación web de Claude con espacio de trabajo en la nube. No hay ganchos de Claude Code: las reglas de roles son tu palabra hasta F3 y F4.",
@@ -49,19 +39,18 @@
     "Aplicar canon/communication.md en cada mensaje: decir dónde, qué hacer paso a paso y qué escribir; explicar todo ID la primera vez.",
     "El humano revisa a qué modelo fue cada trabajo: mantén work/delegations.jsonl al día."
   ],
-  "known_deviation": "En el chat anterior el orquestador corrigió B1 (.gitattributes) él mismo. En este chat no hubo desvíos: todo el código y las pruebas los hicieron implementador (sonnet) y tester (haiku).",
+  "known_deviation": "En el chat de cierre de F1 el orquestador corrió una vez `go test ./...` para confirmar antes de un commit; ese trabajo es del tester. El tester de B3 creó por error una tarea programada «noop» de una sola ejecución; ya se ejecutó y se desactivó.",
   "decisions_this_chat": [
-    "`aquas update` se corre desde el paquete nuevo, como install: `go run ./cmd/aquas update <instancia>` con cwd en <paquete>/tools. `--take ours|theirs` aplica a todos los conflictos; `--take <ruta>=ours|theirs` a uno.",
-    "work/host.json va en templates/gitignore: es por máquina (N1, ronda 4) y setup no debe dejar el árbol sucio. El commit de instalación no lo incluye; el archivo sí queda en disco.",
-    "Las huellas de golangci-lint 2.5.0 están fijadas en tools/internal/install/lintdownload.go, copiadas del checksums.txt oficial del release v2.5.0.",
-    "Las plantillas de la instancia viven en templates/ del paquete (backlog.json, README.md, gitignore, gitattributes)."
+    "canon/manifest.json lleva `version` sin la «v» (B2); install la escribe y update la reemplaza solo sin conflictos.",
+    "update rechaza enlaces simbólicos dentro de la instancia (B3) y valida todo antes de escribir; un fallo de escritura es PartialError con mensaje de actualización incompleta (B4).",
+    "install rechaza un destino dentro del paquete y argumentos que empiezan con guion (B5).",
+    "La skill no usa variables de shell entre comandos (B6).",
+    "Los slices y bugs se mudan al archivo junto con su feature (confirmado por el humano)."
   ],
-  "open_notes_for_f1_close": [
-    "install no deja templates/ en la instancia, pero el primer update la crea (S7 la espeja). Decidir en la wiki o en el cierre si la instancia debe tenerla desde install.",
-    "Si falta Go, el mensaje de preflight (S3) agrega el texto en inglés de exec de Go.",
-    "canon/delegation.md cita schemas/report.schema.json, que no existe; los informes no se validan contra un esquema.",
-    "setup deja bin/aquas si falla la descarga de golangci-lint (bin/ está ignorado).",
-    "El formato de work/seals.json en update es una hipótesis hasta F6.",
-    "S8 no tiene prueba funcional hecha: requiere la etiqueta v0.1.0."
+  "open_notes_for_f1_close": [],
+  "open_notes": [
+    "Los hallazgos menores del arquitecto están en N2.",
+    "canon/delegation.md cita schemas/report.schema.json, que no existe.",
+    "canon/roles.json pide revisión de código del arquitecto al cierre y canon/method.md regla 6 no; candidato R6 de work/retro.json."
   ]
 }
