@@ -203,9 +203,10 @@
       "id": "B6",
       "type": "bug",
       "parent": "S8",
-      "state": "in_progress",
+      "state": "done",
       "priority": 0,
-      "spec": "work/specs/B6.json"
+      "spec": "work/specs/B6.json",
+      "spec_sha256": "c4c562c6e55089e42942b3576b592c43e0df388658ea5fb55489a51afb0270de"
     },
     {
       "id": "N2",

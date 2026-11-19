@@ -2,7 +2,7 @@
 
 Esta página describe lo que hace el código hoy, no lo que promete el plan. Cada afirmación cita el archivo y la función donde está. Cita la prueba que la cubre cuando existe; si no existe, lo dice con «Sin prueba».
 
-Los niveles de evidencia son los de `canon/communication.md`. Aquí todo está `verificado` contra el código el 2026-11-18, salvo lo marcado como `hipótesis` o `desconocido`. Las rutas de código (`cmd/` e `internal/`) son relativas a `tools/`. Las demás rutas (`canon/`, `templates/`, `skill/`, `work/`, `.github/`) son relativas a la raíz del paquete.
+Los niveles de evidencia son los de `canon/communication.md`. Aquí todo está `verificado` contra el código el 2026-11-18, salvo lo marcado como `hipótesis` o `desconocido`. Las secciones sobre el destino dentro del paquete, los argumentos con guion, los enlaces simbólicos, la validación previa de `update` y la skill se volvieron a verificar el 2026-11-19. Las rutas de código (`cmd/` e `internal/`) son relativas a `tools/`. Las demás rutas (`canon/`, `templates/`, `skill/`, `work/`, `.github/`) son relativas a la raíz del paquete.
 
 ## Para qué sirve C1
 
@@ -22,6 +22,8 @@ El directorio actual puede ser cualquiera dentro del paquete. `aquas` sube por l
 
 El subcomando exige exactamente un argumento, la ruta destino. Sin él sale con código 2 (`cmd/aquas/main.go`, función `runInstall`).
 
+`install` y `setup` rechazan cualquier argumento que empiece con `-`. Imprimen «opción desconocida» y el uso, y salen con código 2, sin crear carpetas (`cmd/aquas/main.go`, función `run`). `update` rechaza también las opciones desconocidas, con código 2, en la función `parseUpdateArgs`. Prueba: `TestInstallRejectsFlagAsPath`, que corre `install`, `update` y `setup` con `--help` y comprueba que no se crea ninguna carpeta.
+
 Los pasos de `install` corren en este orden (`internal/install/install.go`, función `Run`):
 
 1. Preflight, que valida los requisitos.
@@ -36,13 +38,15 @@ Prueba del conjunto: `TestInstallSuccess` y `TestIntegrationInstall`, parte (a).
 
 ### Qué valida el preflight
 
-El preflight (la revisión previa) está en `internal/install/preflight.go`, función `Preflight`. Revisa tres cosas, en este orden.
+El preflight (la revisión previa) está en `internal/install/preflight.go`, funciones `Preflight` y `PreflightIn`. `Run` llama a `PreflightIn` con la raíz del paquete. Revisa cuatro cosas, en este orden.
 
-Primero, que `git` esté en el `PATH`. Segundo, que Go sea 1.24 o superior; lo lee con `go env GOVERSION` (`DefaultDeps`) y lo compara en `checkGo`. Prueba: `TestPreflightMissingGit` y `TestPreflightGoVersion`.
+Primero, que el destino no sea la raíz del paquete ni esté dentro de ella (función `checkOutsidePackage`). Si lo es, falla con «el destino no puede ser la raíz del paquete ni estar dentro de ella» antes de crear nada. Resuelve las rutas antes de comparar y, en Windows, ignora mayúsculas. Prueba: `TestPreflightRejectsDestInsidePackage`.
+
+Segundo, que `git` esté en el `PATH`. Tercero, que Go sea 1.24 o superior; lo lee con `go env GOVERSION` (`DefaultDeps`) y lo compara en `checkGo`. Prueba: `TestPreflightMissingGit` y `TestPreflightGoVersion`.
 
 Si faltan `git` y Go, el error lista ambos problemas juntos. Si falta Go, el mensaje agrega el texto en inglés que devuelve el sistema, porque `checkGo` incluye el error original de `exec`.
 
-Tercero, la carpeta destino. Si no existe, la crea junto con las carpetas padre que falten. Si existe, debe estar completamente vacía: un `.gitkeep` o un `.git` vacío ya cuentan como contenido y la rechazan. Si no es una carpeta, la rechaza. Prueba: `TestPreflightRejectsNonEmptyFolder` y `TestPreflightCreatesMissingAndAcceptsEmpty`.
+Cuarto, la carpeta destino. Si no existe, la crea junto con las carpetas padre que falten. Si existe, debe estar completamente vacía: un `.gitkeep` o un `.git` vacío ya cuentan como contenido y la rechazan. Si no es una carpeta, la rechaza. Prueba: `TestPreflightRejectsNonEmptyFolder` y `TestPreflightCreatesMissingAndAcceptsEmpty`.
 
 Si el preflight falla, `install` sale con código 1, imprime un mensaje en español y no deja nada creado. Si el preflight creó la carpeta y falla después, la borra (`Preflight`, bloque `defer`). El código de salida 1 lo mide `TestIntegrationInstall`, parte (b). `TestPreflightMissingGit` mide solo que la ruta no se crea.
 
@@ -114,6 +118,15 @@ El comando es `go run ./cmd/aquas update <instancia>`. Se corre desde el paquete
 
 `update` no hace commit ni recompila `bin/aquas`. Los cambios quedan sin confirmar en el repositorio de la instancia (`internal/update/update.go`, función `Update`: solo escribe y borra archivos).
 
+### Qué rechaza antes de escribir
+
+`update` valida todo antes de escribir el primer archivo (`internal/update/update.go`, función `Update`, comentario de la función). Si una validación falla, no cambia nada y sale con código 1 y el mensaje «no se actualizó nada» (`cmd/aquas/main.go`, función `updateFailure`). Estas son las validaciones:
+
+- Los valores de `--take` son válidos (`Takes.Validate`).
+- `canon/manifest.json` existe y se puede leer.
+- Ninguna ruta que `update` lee, escribe o borra es un enlace simbólico ni pasa por uno (función `refuseSymlinks`). Revisa `canon/manifest.json`, `work/seals.json` y cada carpeta de `mirrored`, y recorre sus archivos. Salta `tools/bin/`. Si encuentra un enlace, el mensaje nombra la ruta y pide reemplazarlo por un archivo o carpeta real (`symlinkError`). Prueba: `TestUpdateRefusesSymlinks`, con cuatro casos: un archivo de `canon/`, la carpeta `templates/`, `work/seals.json` y la subcarpeta `tools/sub`. Comprueba que ni la instancia ni la ubicación externa cambian.
+- Cada archivo planeado se puede escribir (método `op.check`). Falla si una ruta existe pero tiene el tipo equivocado, por ejemplo una carpeta donde va un archivo, o si un archivo existente no se abre para escribir. Falla también si `work/seals.json` no es un objeto JSON válido (`planSeals`). Prueba: `TestUpdateValidatesBeforeWriting`, con una carpeta en lugar de `templates/README.md` y con un `work/seals.json` inválido. Comprueba que el error no es `PartialError` y que la instancia queda igual tras repetir la corrida.
+
 ### Qué reemplaza
 
 `update` deja iguales al paquete estas carpetas: `canon/`, `schemas/`, `tools/`, `.githooks/`, `templates/` y `docs/governance/` (variable `mirrored`). Los archivos nuevos se crean, los distintos se reemplazan y los que el paquete ya no trae se borran. `tools/bin/` se salta.
@@ -151,12 +164,14 @@ Si hay conflictos sin resolver, `update` no escribe nada y falla con un error qu
 ### Códigos de salida
 
 - 0: la actualización terminó. Imprime cuántos archivos cambiaron y cuántos estaban en conflicto.
-- 1: hay conflictos sin resolver, o falló algo más (la instancia no es válida, no se encontró el paquete, un error al escribir). Imprime «no se actualizó nada» seguido del motivo.
+- 1: hay conflictos sin resolver, o falló algo más. Si falló una validación (conflictos, instancia no válida, enlace simbólico), imprime «no se actualizó nada» seguido del motivo. Si falló la escritura a mitad de la copia, imprime «la actualización quedó incompleta» (se explica abajo). Si no se encuentra el paquete, imprime «no se puede actualizar» (`runUpdate`).
 - 2: los argumentos son inválidos. Incluye un valor de `--take` distinto de `ours` o `theirs`, una opción desconocida, un argumento sobrante o la falta de la ruta de la instancia.
 
 Fuente: `runUpdate` y `parseUpdateArgs`. Pruebas: `TestUpdateInvalidTakeExits2` (código 2) y `TestIntegrationInstall`, partes (c) y (c2) (código 1 y 0).
 
-El mensaje «no se actualizó nada» es exacto solo para los conflictos y los errores de lectura. Si ocurre un error de escritura a mitad de la copia, algunos archivos ya se escribieron. Esta lectura es `inferido` del orden de pasos en `Update`; ninguna prueba la cubre.
+El mensaje «no se actualizó nada» solo se imprime cuando falló una validación, antes de escribir. Si falla la escritura de un archivo, `Update` devuelve un `PartialError` (`update.go`) con la ruta del archivo y la causa. En ese caso, `updateFailure` imprime «la actualización quedó incompleta», dice que algunos archivos ya se actualizaron y pide corregir la causa y volver a correr `aquas update`. Pruebas: `TestUpdateWriteFailureIsPartialError`, que simula un fallo en la segunda escritura y comprueba el tipo de error y que conserva la causa, y `TestUpdateFailureMessages`, que comprueba ambos mensajes.
+
+Que repetir `update` termine una actualización incompleta es `inferido` del orden de pasos en `Update`; ninguna prueba repite la corrida tras un `PartialError`. `update` no revierte los archivos ya escritos.
 
 ## `aquas setup` en un clon
 
@@ -179,11 +194,13 @@ Hoy la instancia no trae una carpeta `.githooks/`: el paquete no la tiene. `setu
 
 1. Pedir la carpeta nueva, o la ruta de la instancia.
 2. Revisar `go env GOVERSION` y `git --version`. En Windows exige Git for Windows y que los comandos corran desde Git Bash.
-3. Clonar el paquete en un directorio temporal con `git clone --depth 1 --branch v0.1.0 https://github.com/jliberal-aquas/aquas-light`.
-4. Correr `install` o `update` desde `<temporal>/tools`.
-5. Si `update` sale con código 1, preguntar al humano por cada archivo en conflicto y repetir con `--take`.
-6. Borrar el directorio temporal.
+3. Crear el directorio temporal con `mktemp -d`, anotar la ruta literal que imprime y clonar ahí el paquete con `git clone --depth 1 --branch v0.1.0 https://github.com/jliberal-aquas/aquas-light <temporal>`.
+4. Correr `install` o `update` desde `<temporal>/tools`. La ruta destino debe estar fuera del paquete bajado.
+5. Si `update` sale con código 1, leer la salida. Solo si lista conflictos, preguntar al humano por cada archivo y repetir con `--take`. Si es otro error, explicárselo al humano.
+6. Borrar el directorio temporal con `rm -rf <temporal>`.
 7. Indicar al humano cómo abrir Claude Code en la carpeta nueva.
+
+La skill no usa variables de shell entre comandos. La herramienta de comandos de Claude no las conserva entre llamadas, así que los pasos 3 a 6 escriben la ruta literal del temporal (`skill/SKILL.md`, pasos 3 a 6). Verificado con `grep -n '\$tmp' skill/SKILL.md`, que no muestra resultados. Sin prueba automática.
 
 La skill nunca crea ni sube repositorios a GitHub.
 
@@ -218,13 +235,13 @@ La configuración de integración continua corre `gofmt`, `go vet`, `golangci-li
 
 Todas las pruebas están en `tools/` y corren con `go test ./...`.
 
-- Preflight: `TestPreflightRejectsNonEmptyFolder`, `TestPreflightCreatesMissingAndAcceptsEmpty`, `TestPreflightMissingGit`, `TestPreflightGoVersion` en `internal/install/preflight_test.go`.
+- Preflight: `TestPreflightRejectsNonEmptyFolder`, `TestPreflightCreatesMissingAndAcceptsEmpty`, `TestPreflightMissingGit`, `TestPreflightGoVersion` y `TestPreflightRejectsDestInsidePackage` en `internal/install/preflight_test.go`.
 - Copia y manifiesto: `TestCopyBinaryIdentical`, `TestCopyManifestDeterministicAndConsistent`, `TestCopyStarterFiles`, `TestFindPackageRoot` en `copy_test.go`; `TestManifestHashIgnoresCRLF` y `TestHashOnlyNormalizesLineEndings` en `internal/hashing/hash_test.go`; `TestManifestRecordsVersion`, `TestManifestWithoutVersionIsReadAndFilled` y `TestManifestVersionUnchangedOnConflict` en `internal/update/update_test.go`.
 - Instalación completa, commit y rollback: `TestInstallSuccess`, `TestInstallRollsBackOnFailure`, `TestInstallLintServerError`, `TestInstallLintChecksumMismatch`, `TestInstallRollbackRemovesReadOnlyGit`, `TestInstallWithoutGitIdentity`, `TestInstallIgnoresGlobalHooks` en `install_test.go`.
 - Host: `TestDetectHostWritesHints`, `TestShellAndPathStyle`, `TestUnknownOSKeepsPreviousHost`, `TestNonJSONPreviousIsReplaced`, `TestConcurrentWrites`, `TestBrokenHostsJSON` en `internal/host/detect_test.go`.
-- Actualización: las nueve pruebas `TestUpdate*` de `internal/update/update_test.go`.
+- Actualización: las doce pruebas `TestUpdate*` de `internal/update/update_test.go`.
 - Setup: las cinco pruebas `TestSetup*` de `internal/install/setup_test.go`.
-- Subcomandos y códigos de salida: `TestVersion`, `TestNoArgs`, `TestUnknownSubcommand`, `TestHostSubcommand`, `TestUpdateInvalidTakeExits2`, `TestSetupSubcommandOutsideRepo` en `cmd/aquas/main_test.go`.
+- Subcomandos y códigos de salida: `TestVersion`, `TestNoArgs`, `TestUnknownSubcommand`, `TestHostSubcommand`, `TestUpdateInvalidTakeExits2`, `TestUpdateFailureMessages`, `TestInstallRejectsFlagAsPath`, `TestSetupSubcommandOutsideRepo` en `cmd/aquas/main_test.go`.
 - El ciclo completo de la feature F1 (instalar, rechazar carpeta con archivo, conflicto, `--take`, clon y `setup`): `TestIntegrationInstall` en `cmd/aquas/integration_test.go`.
 
 La prueba de integración usa un servidor local para `golangci-lint`. No toca la red.

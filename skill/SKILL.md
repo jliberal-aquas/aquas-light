@@ -35,8 +35,17 @@ git --version
 Baja el paquete fuera de la carpeta destino, en un directorio temporal:
 
 ```
-tmp="$(mktemp -d)"
-git clone --depth 1 --branch v0.1.0 https://github.com/jliberal-aquas/aquas-light "$tmp"
+mktemp -d
+```
+
+El comando imprime la ruta de la carpeta temporal. Anota esa ruta literal. Llámala `<temporal>`.
+
+La herramienta de comandos no conserva variables de shell entre llamadas. Por eso escribe la ruta literal en cada comando de los pasos siguientes, nunca una variable.
+
+Con esa ruta, baja el paquete:
+
+```
+git clone --depth 1 --branch v0.1.0 https://github.com/jliberal-aquas/aquas-light <temporal>
 ```
 
 Si git dice que la etiqueta `v0.1.0` no existe, díselo al humano con esas palabras y detente. No uses otra rama ni otra versión.
@@ -46,17 +55,21 @@ Si git dice que la etiqueta `v0.1.0` no existe, díselo al humano con esas palab
 Con el directorio actual en `<temporal>/tools`:
 
 ```
-cd "$tmp/tools" && go run ./cmd/aquas install <ruta>
-cd "$tmp/tools" && go run ./cmd/aquas update <instancia>
+cd <temporal>/tools && go run ./cmd/aquas install <ruta>
+cd <temporal>/tools && go run ./cmd/aquas update <instancia>
 ```
 
 Usa el primero para instalar y el segundo para actualizar. `<ruta>` e `<instancia>` son rutas absolutas.
+
+`<ruta>` debe estar fuera del paquete bajado: `install` rechaza un destino igual a `<temporal>` o dentro de él.
 
 `install` crea el repositorio git, copia los archivos, compila, baja `golangci-lint` y hace el commit `Install Aquas Light v0.1.0`. Si algo falla, revierte y deja la carpeta como estaba. Muestra al humano el error tal cual, explicado en una o dos oraciones.
 
 ## Paso 5. Resolver conflictos de update
 
-Si `update` sale con código 1, lista los archivos del canon (`canon/`) que el humano editó en su instancia. Por cada archivo, haz una pregunta con este formato:
+Si `update` sale con código 1, lee primero la salida. El código 1 puede ser un conflicto u otro error, como un enlace simbólico en la instancia o una actualización incompleta. Si el error no es un conflicto, explícalo al humano y no preguntes por conflictos.
+
+Si la salida lista conflictos, lista los archivos del canon (`canon/`) que el humano editó en su instancia. Por cada archivo, haz una pregunta con este formato:
 
 ```
 Qué necesito de ti
@@ -75,7 +88,7 @@ No pidas aceptar nada por referencia: repite el contenido de cada opción. Mira 
 Con las respuestas, vuelve a correr el comando con una opción `--take` por archivo:
 
 ```
-cd "$tmp/tools" && go run ./cmd/aquas update <instancia> --take <ruta-del-archivo>=ours --take <otra-ruta>=theirs
+cd <temporal>/tools && go run ./cmd/aquas update <instancia> --take <ruta-del-archivo>=ours --take <otra-ruta>=theirs
 ```
 
 Si el humano quiere lo mismo para todos, usa `--take ours` o `--take theirs` sin ruta. Si el comando sale con código 2, el valor de `--take` es inválido: corrígelo y repite.
@@ -85,7 +98,7 @@ Si el humano quiere lo mismo para todos, usa `--take ours` o `--take theirs` sin
 Al terminar, con éxito o con error:
 
 ```
-rm -rf "$tmp"
+rm -rf <temporal>
 ```
 
 ## Paso 7. Cerrar con el humano
