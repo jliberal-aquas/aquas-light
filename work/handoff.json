@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-18T22:56-03:00",
+  "for": "Orquestador de un chat nuevo en la aplicación web de Claude, con el modelo Claude Opus 5.5 elegido por el humano.",
+  "read_first": [
+    "canon/constitution.md",
+    "canon/method.md",
+    "canon/communication.md",
+    "canon/delegation.md",
+    "canon/roles.json",
+    "backlog.json",
+    "work/defects.md"
+  ],
+  "state": {
+    "initiative": "I1 in_progress",
+    "feature": "F1 in_progress (instalar y actualizar)",
+    "done": [
+      "S1",
+      "S2",
+      "B1"
+    ],
+    "next_slice": "S3 (precondiciones de la instalación): work/specs/S3.json",
+    "then": [
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S39",
+      "S8"
+    ],
+    "approval": "El humano aprobó I1, el orden de features, los campos item y result del informe, y F1. Cada feature siguiente necesita revisión del arquitecto y aprobación del humano antes de empezar."
+  },
+  "how_to_work_here": {
+    "environment": "Aplicación web de Claude con espacio de trabajo en la nube. No hay ganchos de Claude Code: las reglas de roles son tu palabra hasta F3 y F4.",
+    "delegation": "Usa la herramienta Agent con subagent_type general-purpose y el parámetro model según el rol: architect y auditor con fable; implementer con sonnet; tester y reader con haiku. Tú no escribes código ni corres las pruebas del slice: lo hacen los subagentes. Fable solo revisa planes, escribe casos destructivos y audita cierres de feature.",
+    "prompt_format": "El encargo va en JSON según canon/delegation.md, con tasks[].item; el informe vuelve en JSON con item y result.",
+    "log": "Después de cada delegación agrega una línea a work/delegations.jsonl con date, item, role, model, task, tokens, tool_uses y duration_s, copiados del uso que devuelve la herramienta Agent. Es la evidencia para el humano hasta que F7 lo automatice.",
+    "slice_cycle": "Pon el slice en in_progress y crea work/memory.json; implementador: test rojo guardado en work/reports/<ID>-red.txt, código, verde en work/reports/<ID>-green.txt; tester: verde, rojo sin el código y casos destructivos, informe en work/reports/<ID>-tester.json; luego done con spec_sha256, memoria a archive/memory/<ID>.json, commit con la línea Docs y push; revisa el CI con gh run list.",
+    "commits": "Rama main. Mensaje en inglés que empieza con el ID, línea `Docs: revisé=<ruta|nada>; falsa=<sí|no>; promesa=<sí|no>` y las líneas de atribución de la sesión."
+  },
+  "environment_facts": [
+    "Go local 1.24.7; no se pueden bajar otros toolchains (proxy.golang.org bloqueado); go.mod declara go 1.24.",
+    "golangci-lint local v2.5.0.",
+    "gh funciona y el push a jliberal-aquas/aquas-light funciona.",
+    "El CI corre en ubuntu, macos y windows; .gitattributes fuerza LF."
+  ],
+  "human_preferences": [
+    "No sobrecomplicar.",
+    "Aplicar canon/communication.md en cada mensaje: decir dónde, qué hacer paso a paso y qué escribir; explicar todo ID la primera vez.",
+    "El humano revisa a qué modelo fue cada trabajo: mantén work/delegations.jsonl al día."
+  ],
+  "known_deviation": "En el chat anterior el orquestador corrigió B1 (.gitattributes) él mismo en lugar de delegarlo al implementador."
+}

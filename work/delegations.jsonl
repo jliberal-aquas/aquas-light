@@ -1,0 +1,5 @@
+{"date": "2026-11-18", "item": "I1", "role": "architect", "model": "fable", "task": "Revisar el plan y escribir casos destructivos", "tokens": 144374, "tool_uses": 7, "duration_s": 434}
+{"date": "2026-11-18", "item": "I1", "role": "architect", "model": "fable", "task": "Casos de S39 a S46 y revisión de cambios", "tokens": 122152, "tool_uses": 8, "duration_s": 274}
+{"date": "2026-11-18", "item": "S1", "role": "implementer", "model": "sonnet", "task": "Construir S1 con TDD", "tokens": 69147, "tool_uses": 4, "duration_s": 57}
+{"date": "2026-11-18", "item": "S1", "role": "tester", "model": "haiku", "task": "Verde, rojo sin código y casos destructivos", "tokens": 75496, "tool_uses": 11, "duration_s": 58}
+{"date": "2026-11-18", "item": "S2", "role": "implementer", "model": "sonnet", "task": "Escribir el canon v1", "tokens": 95214, "tool_uses": 6, "duration_s": 80}
