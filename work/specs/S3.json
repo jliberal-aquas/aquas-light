@@ -2,11 +2,11 @@
   "id": "S3",
   "parent": "F1",
   "name": "Precondiciones de la instalación",
-  "what": "`aquas install` comprueba que la carpeta destino está completamente vacía, que Go está en una versión soportada y que `git` existe. Si algo falla, sale con código distinto de 0, un mensaje en español y sin crear nada.",
+  "what": "`aquas install <ruta>` recibe la ruta de la carpeta destino. Si no existe, la crea; si existe, exige que esté completamente vacía. Comprueba además que Go está en una versión soportada y que `git` existe. Si algo falla, sale con código distinto de 0, un mensaje en español y sin crear nada; si creó la carpeta, la borra.",
   "files": [
     "tools/internal/install/preflight.go"
   ],
-  "functional_test": "El humano corre la skill en una carpeta con un `README.md` y ve el motivo del rechazo; la carpeta queda igual.",
+  "functional_test": "El humano pide instalar en una carpeta que trae un `README.md` y ve el motivo del rechazo; la carpeta queda igual.",
   "technical_test": {
     "name": "TestPreflightRejectsNonEmptyFolder",
     "red_before_code": true

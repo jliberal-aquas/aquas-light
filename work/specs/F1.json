@@ -3,7 +3,7 @@
   "parent": "I1",
   "name": "Instalar y actualizar",
   "capability": "C1",
-  "acceptance": "En una carpeta vacía, `aquas install` deja un repo git con el commit `Install Aquas Light vX.Y.Z`, el manifiesto y `work/host.json`, en Linux, macOS y Windows; en una carpeta con cualquier archivo no crea nada; y `aquas update` reemplaza solo lo que el humano no editó.",
+  "acceptance": "Al pedir instalar en una ruta nueva o vacía, `aquas install` crea la carpeta si falta y deja un repo git con el commit `Install Aquas Light vX.Y.Z`, el manifiesto y `work/host.json`, en Linux, macOS y Windows; en una carpeta con cualquier archivo no crea nada; y `aquas update` reemplaza solo lo que el humano no editó.",
   "integration_test": "TestIntegrationInstall: instala en carpeta temporal vacía y comprueba commit, archivos y manifiesto; repite con una carpeta con un archivo y comprueba que quedó igual; edita un archivo del canon, actualiza y comprueba el conflicto; clona el repo y corre `setup`.",
   "slices": [
     "S1",

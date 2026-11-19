@@ -2,11 +2,11 @@
   "id": "S8",
   "parent": "F1",
   "name": "SKILL.md de la skill",
-  "what": "Escribe la skill corta: revisa requisitos, baja la versión fijada del paquete, corre `aquas install` o `aquas update` y le pregunta al humano por cada conflicto con el formato de «Qué necesito de ti».",
+  "what": "Escribe la skill corta: pide el nombre de la carpeta nueva, revisa requisitos, baja la versión fijada del paquete fuera de esa carpeta, corre `aquas install <ruta>` o `aquas update`, pregunta al humano cada conflicto con el formato de «Qué necesito de ti» y al terminar le pide abrir Claude Code en la carpeta nueva.",
   "files": [
     "skill/SKILL.md"
   ],
-  "functional_test": "El humano invoca la skill en una carpeta vacía y termina con el repo instalado sin escribir comandos.",
+  "functional_test": "El humano abre Claude Code en su carpeta de proyectos, pide instalar en `mi-api` y termina con `mi-api` instalada sin escribir comandos.",
   "technical_test": "no aplica (sin código)",
   "destructive_cases": []
 }

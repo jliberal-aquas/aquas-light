@@ -67,7 +67,7 @@ Archivo `work/host.json`, propio de cada máquina y fuera del repo. Dice sistema
 _Avoid_: entorno, env
 
 **Carpeta vacía**:
-Único destino válido de la instalación: una carpeta sin ningún archivo, ni siquiera `.git`. Si trae algo, la skill no crea nada; si está vacía, corre `git init` y crea todo.
+Único destino válido de la instalación: una carpeta que no existe o que no tiene ningún archivo, ni siquiera `.git`. La skill corre fuera de ella, la crea si falta y corre `git init`; si trae algo, no crea nada.
 _Avoid_: repo vacío
 
 **Instancia**:

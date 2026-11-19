@@ -57,6 +57,15 @@
           "answer": "La carpeta debe estar completamente vacía; si no, no se crea nada. Si está vacía, la skill corre git init y crea todo."
         }
       ]
+    },
+    {
+      "round": 5,
+      "items": [
+        {
+          "question": "Dónde instala la skill",
+          "answer": "La skill crea ella misma la carpeta con el nombre que da el humano, instala ahí y pide abrir Claude Code en esa carpeta."
+        }
+      ]
     }
   ],
   "result": [
@@ -83,7 +92,7 @@
       "reader": "claude-haiku-5-5 low: lee y junta evidencia"
     },
     "skill": "Solo instala y actualiza; el comportamiento vive en el canon compilado. SKILL.md corto que revisa requisitos, baja la versión fijada del paquete y corre aquas install o aquas update; pregunta al humano cada conflicto.",
-    "target_folder": "Carpeta completamente vacía, ni siquiera .git. Si trae algo, no se crea nada. Si está vacía, git init y se crea todo. Un remoto se agrega después con git remote add.",
+    "target_folder": "La skill pide el nombre de la carpeta destino y corre fuera de ella. Si la carpeta no existe, la crea; si existe, debe estar completamente vacía, ni siquiera .git; si trae algo, no se crea nada. Al terminar, el humano abre Claude Code en la carpeta nueva. Así Claude Code no ensucia la carpeta antes de instalar.",
     "language": "Go, solo biblioteca estándar en el gobierno. Un binario aquas con subcomandos install, update, setup, verify, compile, hook <evento>, seal, symbols, cost, slice, feature, need, bug, next.",
     "go_version": "go.mod declara la versión soportada más antigua al instalar; cada versión mayor tiene soporte hasta que salen dos más nuevas.",
     "governance_linters": "gofmt, go vet, go test -race y golangci-lint v2 con versión fijada en canon/toolchain.json; el binario se baja en Go según os y arch y se verifica su checksum; no se usa go tool ni install.sh.",
