@@ -95,9 +95,10 @@
       "id": "B1",
       "type": "bug",
       "parent": "S1",
-      "state": "in_progress",
+      "state": "done",
       "priority": 0,
-      "spec": "work/specs/B1.json"
+      "spec": "work/specs/B1.json",
+      "spec_sha256": "726ddb87849acb31b48cce6b1970cced6798918f4cff1118fa736c69a46026a1"
     },
     {
       "id": "S3",

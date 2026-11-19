@@ -1,8 +1,9 @@
 {
   "slice": "B1",
-  "step": "green",
+  "step": "commit",
   "done": [
-    "red"
+    "red",
+    "green"
   ],
   "next": "Agregar .gitattributes, commit y ver CI.",
   "files": [
