@@ -86,9 +86,10 @@
       "id": "S9",
       "type": "slice",
       "parent": "F2",
-      "state": "ready",
+      "state": "done",
       "priority": 1,
-      "spec": "work/specs/S9.json"
+      "spec": "work/specs/S9.json",
+      "spec_sha256": "7b10dce7730db3a3ea08d22c1b98222267ebe0b34a8c8da7a1379be445b5ea1c"
     },
     {
       "id": "S10",

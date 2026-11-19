@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -193,5 +194,122 @@ func TestInstallRejectsFlagAsPath(t *testing.T) {
 				t.Errorf("%s --help: se creó %s", sub, p)
 			}
 		}
+	}
+}
+
+// writeVerifyRepo creates a folder with a valid backlog.json and config.
+func writeVerifyRepo(t *testing.T) string {
+	t.Helper()
+	root := t.TempDir()
+	files := map[string]string{
+		"backlog.json":      `{"schema_version": 1, "next_ids": {"I": 2, "F": 2, "S": 2, "B": 1, "N": 1, "C": 2}, "capabilities": [], "items": []}` + "\n",
+		"canon/config.json": `{"role": "pack", "default_model": "m", "language": "es"}` + "\n",
+	}
+	for rel, content := range files {
+		p := filepath.Join(root, filepath.FromSlash(rel))
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte(content), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return root
+}
+
+func TestVerifyGreenAndFromSubfolder(t *testing.T) {
+	root := writeVerifyRepo(t)
+	sub := filepath.Join(root, "tools", "internal")
+	if err := os.MkdirAll(sub, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for _, dir := range []string{root, sub} {
+		t.Chdir(dir)
+		var out, errb bytes.Buffer
+		if code := run([]string{"verify"}, &out, &errb); code != 0 {
+			t.Fatalf("desde %s: código %d, stdout=%q stderr=%q", dir, code, out.String(), errb.String())
+		}
+	}
+}
+
+func TestVerifyReportsViolations(t *testing.T) {
+	root := writeVerifyRepo(t)
+	t.Chdir(root)
+	bad := strings.Replace(mustRead(t, "backlog.json"), `"items": []`, `"items": [], "color": "rojo"`, 1)
+	if err := os.WriteFile("backlog.json", []byte(bad), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var out, errb bytes.Buffer
+	if code := run([]string{"verify"}, &out, &errb); code != 1 {
+		t.Fatalf("código %d, se esperaba 1; stderr=%q", code, errb.String())
+	}
+	if !strings.Contains(out.String(), "backlog.json") || !strings.Contains(out.String(), "color") {
+		t.Errorf("la salida debe nombrar backlog.json y color: %q", out.String())
+	}
+	noPanic(t, out.String()+errb.String())
+}
+
+func mustRead(t *testing.T, p string) string {
+	t.Helper()
+	b, err := os.ReadFile(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(b)
+}
+
+func TestVerifyWithoutBacklogIsCode3(t *testing.T) {
+	t.Chdir(t.TempDir())
+	var out, errb bytes.Buffer
+	code := run([]string{"verify"}, &out, &errb)
+	if code != 3 {
+		t.Fatalf("código %d, se esperaba 3", code)
+	}
+	if !strings.Contains(errb.String(), "backlog.json") {
+		t.Errorf("el mensaje debe nombrar backlog.json: %q", errb.String())
+	}
+}
+
+func TestVerifyBadArgsIsCode2(t *testing.T) {
+	for _, args := range [][]string{{"verify", "--cualquiera"}, {"verify", "sobra"}, {"verify", "--staged", "--staged2"}} {
+		var out, errb bytes.Buffer
+		if code := run(args, &out, &errb); code != 2 {
+			t.Errorf("%v: código %d, se esperaba 2", args, code)
+		}
+		if out.Len() != 0 {
+			t.Errorf("%v: stdout debe estar vacío: %q", args, out.String())
+		}
+	}
+	var out, errb bytes.Buffer
+	run([]string{"verify", "--cualquiera"}, &out, &errb)
+	if !strings.Contains(errb.String(), "opción desconocida") || !strings.Contains(errb.String(), "Uso:") || !strings.Contains(errb.String(), "verify") {
+		t.Errorf("debe decir «opción desconocida» y mostrar el uso: %q", errb.String())
+	}
+}
+
+func TestVerifyStagedReadsIndex(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git no está instalado")
+	}
+	root := writeVerifyRepo(t)
+	t.Chdir(root)
+	for _, args := range [][]string{{"init", "-q"}, {"add", "."}} {
+		cmd := exec.Command("git", args...)
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("git %v: %v %s", args, err, out)
+		}
+	}
+	// Break the working tree only: the staged copy stays valid.
+	if err := os.WriteFile("backlog.json", []byte("hola"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var out, errb bytes.Buffer
+	if code := run([]string{"verify", "--staged"}, &out, &errb); code != 0 {
+		t.Fatalf("--staged: código %d, stdout=%q stderr=%q", code, out.String(), errb.String())
+	}
+	out.Reset()
+	errb.Reset()
+	if code := run([]string{"verify"}, &out, &errb); code != 1 {
+		t.Fatalf("sin --staged lee el disco y debe fallar: código %d", code)
 	}
 }

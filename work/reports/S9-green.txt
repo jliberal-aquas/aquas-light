@@ -1,0 +1,56 @@
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	1.029s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/hashing	1.011s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/host	1.018s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/install	1.020s [no tests to run]
+=== RUN   TestSchemasMatchTypes
+--- PASS: TestSchemasMatchTypes (0.01s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/schema	1.025s
+?   	github.com/jliberal-aquas/aquas-light/tools/internal/schema/gen	[no test files]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/update	1.016s [no tests to run]
+=== RUN   TestDecodeRejectsUnknownFields
+=== RUN   TestDecodeRejectsUnknownFields/campo_inventado_en_el_tercer_elemento
+=== RUN   TestDecodeRejectsUnknownFields/mayúsculas_en_las_claves
+=== RUN   TestDecodeRejectsUnknownFields/clave_repetida
+=== RUN   TestDecodeRejectsUnknownFields/contenido_después_del_valor
+=== RUN   TestDecodeRejectsUnknownFields/tipos,_null_y_campo_ausente
+=== RUN   TestDecodeRejectsUnknownFields/tres_fallas_en_un_archivo,_orden_y_determinismo
+=== RUN   TestDecodeRejectsUnknownFields/números
+=== RUN   TestDecodeRejectsUnknownFields/listas_cerradas
+=== RUN   TestDecodeRejectsUnknownFields/BOM_y_CRLF
+=== RUN   TestDecodeRejectsUnknownFields/archivo_vacío,_lista,_null_y_ausente
+=== RUN   TestDecodeRejectsUnknownFields/JSON_mal_formado
+=== RUN   TestDecodeRejectsUnknownFields/campo_sobrante_en_spec,_solicitud_y_config
+=== RUN   TestDecodeRejectsUnknownFields/role_y_archivo_de_spec_desconocido
+=== RUN   TestDecodeRejectsUnknownFields/formas_válidas_de_technical_test
+=== RUN   TestDecodeRejectsUnknownFields/solicitud_con_turn_y_campos_nulos
+--- PASS: TestDecodeRejectsUnknownFields (0.02s)
+    --- PASS: TestDecodeRejectsUnknownFields/campo_inventado_en_el_tercer_elemento (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/mayúsculas_en_las_claves (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/clave_repetida (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/contenido_después_del_valor (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/tipos,_null_y_campo_ausente (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/tres_fallas_en_un_archivo,_orden_y_determinismo (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/números (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/listas_cerradas (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/BOM_y_CRLF (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/archivo_vacío,_lista,_null_y_ausente (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/JSON_mal_formado (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/campo_sobrante_en_spec,_solicitud_y_config (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/role_y_archivo_de_spec_desconocido (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/formas_válidas_de_technical_test (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/solicitud_con_turn_y_campos_nulos (0.00s)
+=== RUN   TestRepoFilesDecode
+--- PASS: TestRepoFilesDecode (0.03s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/verify	1.060s

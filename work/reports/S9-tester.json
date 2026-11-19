@@ -1,0 +1,74 @@
+{
+  "item": "S9",
+  "conclusion": "Pasa: la suite completa y schema/verify dan verde con -race; las cinco mutaciones dan rojo en las pruebas que deben; los quince casos destructivos están cubiertos, salvo brechas menores de cobertura (dos expects no se comprueban por completo y uno no se ejecuta); el CLI devuelve 0, 3 y 2 como indica el spec; git status, git diff --stat y el parche completo quedan idénticos al inicio y los archivos mutados se restauraron y comprobaron con cmp.",
+  "findings": [
+    {
+      "what": "El caso de mayúsculas no comprueba que ID se nombre como campo sobrante y id como faltante en el mismo mensaje; busca subcadenas en el texto unido de todos los mensajes. El caso de Items usa el mismo backlog.json en lugar de otro archivo.",
+      "where": "tools/internal/verify/verify_test.go:131-141",
+      "why": "Un mensaje que diga «falta el campo obligatorio ID» pasaría si otro mensaje contiene la palabra sobrante.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El caso de campo sobrante en spec, solicitud y config usa work/specs/S1.json en vez de work/specs/S9.json.",
+      "where": "tools/internal/verify/verify_test.go:280-292",
+      "why": "La lógica es la misma, pero el archivo del expect no es el que se prueba.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El caso de copia del repo en el commit de cierre de S9 no se ejecutó. TestRepoFilesDecode valida el árbol de trabajo actual y exige cero violaciones en los archivos listados del expect, lo que cubre el contenido pero no el commit ni el CLI.",
+      "where": "tools/internal/verify/verify_test.go:343-374",
+      "why": "Hoy no existe ese commit; el resultado en el árbol actual es verde, pero no se demuestra el comportamiento en la copia del commit.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El caso de aquas verify desde tools/internal solo comprueba código 0 y no que la salida sea igual a la de la raíz; además usa un repo temporal y no el repo instalado. A mano, desde tools/internal y desde la raíz el resultado fue el mismo.",
+      "where": "tools/cmd/aquas/main_test.go:220-233",
+      "why": "Una salida distinta con código 0 pasaría la prueba.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El caso de campo agregado a un tipo sin regenerar el esquema no se mutó directamente. La cobertura se infiere del mismo mecanismo Stale que nombró el archivo al cambiar el formato (mutación e).",
+      "where": "tools/internal/schema/schema_test.go:15-22",
+      "why": "Sin prueba directa, el caso de agregar un campo no está demostrado en ejecución.",
+      "certainty": "inferred",
+      "severity": "minor"
+    },
+    {
+      "what": "Las pruebas del paquete schema no detectan las mutaciones a-d del decodificador; esas fallas solo aparecen en las pruebas de verify.",
+      "where": "tools/internal/schema/schema_test.go (sin pruebas de Decode); tools/internal/verify/verify_test.go:109",
+      "why": "Quien corra solo go test ./internal/schema/ no vería un decodificador roto.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "go run <ruta-a-tools>/cmd/aquas verify desde una carpeta vacía falla con texto de la herramienta go (go.mod file not found), con código 1. No es salida de aquas. El binario compilado sí da código 3 con mensaje en español.",
+      "where": "Procedimiento del paso 4; tools/cmd/aquas/main.go (verify)",
+      "why": "Es un detalle del procedimiento de prueba; el criterio del spec se cumple con el binario compilado.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {"file": "tools/internal/schema/decode.go", "line": 445, "quote": "w.addAt(keyOff, path, extraMessage(info, key))"},
+    {"file": "tools/internal/schema/decode.go", "line": 440, "quote": "w.addAt(keyOff, path, fmt.Sprintf(\"clave repetida «%s»\", key))"},
+    {"file": "tools/internal/schema/decode.go", "line": 64, "quote": "if len(trimmed) > 0 {"},
+    {"file": "tools/internal/schema/decode.go", "line": 318, "quote": "if len(f.enum) > 0 && !contains(f.enum, s) {"},
+    {"file": "tools/internal/schema/generate.go", "line": 31, "quote": "enc.SetIndent(\"\", \"  \")"},
+    {"file": "tools/internal/schema/schema_test.go", "line": 21, "quote": "esquema desactualizado o ausente: schemas/%s"},
+    {"file": "tools/internal/verify/verify_test.go", "line": 131, "quote": "mustContain(t, all, \"backlog.json\", \"items[1]\", \"ID\", \"id\")"},
+    {"file": "tools/internal/verify/verify_test.go", "line": 284, "quote": "for file, content := range map[string]string{\"work/specs/S1.json\": spec, ...}"},
+    {"file": "tools/internal/verify/verify_test.go", "line": 343, "quote": "func TestRepoFilesDecode(t *testing.T) {"},
+    {"file": "tools/cmd/aquas/main_test.go", "line": 220, "quote": "func TestVerifyGreenAndFromSubfolder(t *testing.T) {"}
+  ],
+  "output": "1) go test -race -count=1 -v ./internal/schema/ ./internal/verify/: PASS. Incluye TestDecodeRejectsUnknownFields (15 subpruebas), TestRepoFilesDecode, TestSchemasMatchTypes y TestVerify*. go test -race -count=1 ./...: ok en los 8 paquetes con pruebas. 2) Mutaciones, cada una restaurada desde /tmp/s9bak y comprobada con cmp: (a) campo sobrante no reportado: ROJO en verify (TestDecodeRejectsUnknownFields mayúsculas, campo_inventado, campo_sobrante_en_spec); schema verde. (b) clave repetida no reportada: ROJO en verify (clave_repetida). (c) contenido después del valor no reportado: ROJO en verify (contenido_después_del_valor). (d) listas cerradas sin validar: ROJO en verify (listas_cerradas, role_y_archivo_de_spec_desconocido). (e) indentación 4 espacios: ROJO solo TestSchemasMatchTypes, que nombra los 8 esquemas; verify verde. 4) CLI compilado en /tmp/aquas-s9: verify desde tools/, la raíz y tools/internal = 0 con Verificación en verde; carpeta temporal vacía = 3 con no se encontró backlog.json; verify --cualquiera = 2 con opción desconocida y Uso. go run desde carpeta vacía falla por go.mod (herramienta go). 5) git status --short, git diff --stat y git diff completo idénticos al inicio. Este informe es el único archivo nuevo.",
+  "pending": [
+    "Caso destructivo 12 (copia en el commit de cierre): no ejecutable hasta que exista ese commit.",
+    "Caso destructivo 13 (campo agregado sin regenerar): sin mutación directa; cobertura inferida."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

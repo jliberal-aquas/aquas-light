@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "initiative": {
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "capability": {
+            "type": "string"
+          },
+          "closed_at": {
+            "type": "string"
+          },
+          "evidence": {
+            "additionalProperties": false,
+            "properties": {
+              "architect_review": {
+                "type": "string"
+              },
+              "audit": {
+                "type": "string"
+              },
+              "integration_test": {
+                "type": "string"
+              },
+              "pending": {
+                "type": "string"
+              },
+              "tester": {
+                "type": "string"
+              },
+              "wiki": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "integration_test",
+              "wiki"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "type": "string"
+          },
+          "parent": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "priority": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "source": {
+            "type": "string"
+          },
+          "spec": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "spec_sha256": {
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "to_refine",
+              "proposed",
+              "ready",
+              "in_progress",
+              "done"
+            ],
+            "type": "string"
+          },
+          "supersedes": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "initiative",
+              "feature",
+              "slice",
+              "bug",
+              "need"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "parent",
+          "state",
+          "priority",
+          "spec"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "initiative",
+    "items"
+  ],
+  "title": "Archive",
+  "type": "object"
+}

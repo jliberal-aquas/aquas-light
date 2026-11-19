@@ -1,0 +1,125 @@
+=== RUN   TestVerifyGreenAndFromSubfolder
+    main_test.go:230: desde /tmp/TestVerifyGreenAndFromSubfolder2847547771/001: código 2, stdout="" stderr="aquas: subcomando desconocido \"verify\"\n\nUso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  update <ruta> [--take ours|theirs] [--take <ruta>=ours|theirs]...\n                    actualiza el canon y las herramientas de la instancia; los archivos del canon editados a mano son conflicto\n  host              detecta el sistema y escribe work/host.json\n  setup             prepara un clon: compila bin/aquas, baja golangci-lint y escribe work/host.json, sin commits\n  version           imprime la versión de aquas\n"
+--- FAIL: TestVerifyGreenAndFromSubfolder (0.00s)
+=== RUN   TestVerifyReportsViolations
+    main_test.go:244: código 2, se esperaba 1; stderr="aquas: subcomando desconocido \"verify\"\n\nUso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  update <ruta> [--take ours|theirs] [--take <ruta>=ours|theirs]...\n                    actualiza el canon y las herramientas de la instancia; los archivos del canon editados a mano son conflicto\n  host              detecta el sistema y escribe work/host.json\n  setup             prepara un clon: compila bin/aquas, baja golangci-lint y escribe work/host.json, sin commits\n  version           imprime la versión de aquas\n"
+--- FAIL: TestVerifyReportsViolations (0.00s)
+=== RUN   TestVerifyWithoutBacklogIsCode3
+    main_test.go:266: código 2, se esperaba 3
+--- FAIL: TestVerifyWithoutBacklogIsCode3 (0.00s)
+=== RUN   TestVerifyBadArgsIsCode2
+    main_test.go:286: debe decir «opción desconocida» y mostrar el uso: "aquas: subcomando desconocido \"verify\"\n\nUso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  update <ruta> [--take ours|theirs] [--take <ruta>=ours|theirs]...\n                    actualiza el canon y las herramientas de la instancia; los archivos del canon editados a mano son conflicto\n  host              detecta el sistema y escribe work/host.json\n  setup             prepara un clon: compila bin/aquas, baja golangci-lint y escribe work/host.json, sin commits\n  version           imprime la versión de aquas\n"
+--- FAIL: TestVerifyBadArgsIsCode2 (0.00s)
+=== RUN   TestVerifyStagedReadsIndex
+    main_test.go:308: --staged: código 2, stdout="" stderr="aquas: subcomando desconocido \"verify\"\n\nUso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  update <ruta> [--take ours|theirs] [--take <ruta>=ours|theirs]...\n                    actualiza el canon y las herramientas de la instancia; los archivos del canon editados a mano son conflicto\n  host              detecta el sistema y escribe work/host.json\n  setup             prepara un clon: compila bin/aquas, baja golangci-lint y escribe work/host.json, sin commits\n  version           imprime la versión de aquas\n"
+--- FAIL: TestVerifyStagedReadsIndex (0.01s)
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	0.037s
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/hashing	1.012s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/host	1.013s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/install	1.023s [no tests to run]
+=== RUN   TestSchemasMatchTypes
+    schema_test.go:26: falta schemas/backlog.schema.json: open ../../../schemas/backlog.schema.json: no such file or directory
+    schema_test.go:26: falta schemas/archive.schema.json: open ../../../schemas/archive.schema.json: no such file or directory
+    schema_test.go:26: falta schemas/spec-initiative.schema.json: open ../../../schemas/spec-initiative.schema.json: no such file or directory
+    schema_test.go:26: falta schemas/spec-feature.schema.json: open ../../../schemas/spec-feature.schema.json: no such file or directory
+    schema_test.go:26: falta schemas/spec-slice.schema.json: open ../../../schemas/spec-slice.schema.json: no such file or directory
+    schema_test.go:26: falta schemas/spec-bug.schema.json: open ../../../schemas/spec-bug.schema.json: no such file or directory
+    schema_test.go:26: falta schemas/request.schema.json: open ../../../schemas/request.schema.json: no such file or directory
+    schema_test.go:26: falta schemas/config.schema.json: open ../../../schemas/config.schema.json: no such file or directory
+--- FAIL: TestSchemasMatchTypes (0.00s)
+=== RUN   TestSchemaStaleIsDetectedByName
+    schema_test.go:53: debe nombrar config.schema.json: [], <nil>
+    schema_test.go:56: remove /tmp/TestSchemaStaleIsDetectedByName3887356018/001/backlog.schema.json: no such file or directory
+--- FAIL: TestSchemaStaleIsDetectedByName (0.00s)
+=== RUN   TestGenerateChangesWithTypes
+    schema_test.go:67: Generate(Config) = "", <nil>
+--- FAIL: TestGenerateChangesWithTypes (0.00s)
+=== RUN   TestGeneratedSchemaShape
+    schema_test.go:95: no es JSON: unexpected end of JSON input
+--- FAIL: TestGeneratedSchemaShape (0.00s)
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/schema	0.016s
+?   	github.com/jliberal-aquas/aquas-light/tools/internal/schema/gen	[no test files]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/update	1.019s [no tests to run]
+=== RUN   TestDecodeRejectsUnknownFields
+=== RUN   TestDecodeRejectsUnknownFields/campo_inventado_en_el_tercer_elemento
+    verify_test.go:117: código 0, mensajes []
+=== RUN   TestDecodeRejectsUnknownFields/mayúsculas_en_las_claves
+    verify_test.go:127: código 0
+=== RUN   TestDecodeRejectsUnknownFields/clave_repetida
+    verify_test.go:147: código 0, mensajes []
+=== RUN   TestDecodeRejectsUnknownFields/contenido_después_del_valor
+    verify_test.go:156: texto: código 0, mensajes []
+=== RUN   TestDecodeRejectsUnknownFields/tipos,_null_y_campo_ausente
+    verify_test.go:178: priority texto: código 0, mensajes []
+=== RUN   TestDecodeRejectsUnknownFields/tres_fallas_en_un_archivo,_orden_y_determinismo
+    verify_test.go:192: código 0, mensajes []
+=== RUN   TestDecodeRejectsUnknownFields/números
+    verify_test.go:208: priority 1.5: código 0, mensajes []
+=== RUN   TestDecodeRejectsUnknownFields/listas_cerradas
+    verify_test.go:231: Done: código 0, mensajes []
+=== RUN   TestDecodeRejectsUnknownFields/BOM_y_CRLF
+    verify_test.go:240: BOM: código 0, mensajes []
+=== RUN   TestDecodeRejectsUnknownFields/archivo_vacío,_lista,_null_y_ausente
+    verify_test.go:254: vacío: código 0, mensajes []
+=== RUN   TestDecodeRejectsUnknownFields/JSON_mal_formado
+    verify_test.go:272: "{\"schema_version\": 1,": código 0
+=== RUN   TestDecodeRejectsUnknownFields/campo_sobrante_en_spec,_solicitud_y_config
+    verify_test.go:286: work/specs/S1.json: código 0, mensajes []
+=== RUN   TestDecodeRejectsUnknownFields/role_y_archivo_de_spec_desconocido
+    verify_test.go:295: código 0
+=== RUN   TestDecodeRejectsUnknownFields/formas_válidas_de_technical_test
+    verify_test.go:317: technical_test numérico: código 0 []
+=== RUN   TestDecodeRejectsUnknownFields/solicitud_con_turn_y_campos_nulos
+--- FAIL: TestDecodeRejectsUnknownFields (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/campo_inventado_en_el_tercer_elemento (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/mayúsculas_en_las_claves (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/clave_repetida (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/contenido_después_del_valor (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/tipos,_null_y_campo_ausente (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/tres_fallas_en_un_archivo,_orden_y_determinismo (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/números (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/listas_cerradas (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/BOM_y_CRLF (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/archivo_vacío,_lista,_null_y_ausente (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/JSON_mal_formado (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/campo_sobrante_en_spec,_solicitud_y_config (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/role_y_archivo_de_spec_desconocido (0.00s)
+    --- FAIL: TestDecodeRejectsUnknownFields/formas_válidas_de_technical_test (0.00s)
+    --- PASS: TestDecodeRejectsUnknownFields/solicitud_con_turn_y_campos_nulos (0.00s)
+=== RUN   TestRepoFilesDecode
+    verify_test.go:349: no se encontró la raíz del repo: pendiente
+--- FAIL: TestRepoFilesDecode (0.00s)
+=== RUN   TestFindRoot
+    verify_test.go:386: FindRoot: pendiente
+--- FAIL: TestFindRoot (0.00s)
+=== RUN   TestDiskSource
+--- FAIL: TestDiskSource (0.00s)
+panic: runtime error: invalid memory address or nil pointer dereference [recovered]
+	panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0x5edc14]
+
+goroutine 25 [running]:
+testing.tRunner.func1.2({0x62f000, 0x7cef00})
+	/usr/local/go1.24.7/src/testing/testing.go:1734 +0x3eb
+testing.tRunner.func1()
+	/usr/local/go1.24.7/src/testing/testing.go:1737 +0x696
+panic({0x62f000?, 0x7cef00?})
+	/usr/local/go1.24.7/src/runtime/panic.go:792 +0x132
+github.com/jliberal-aquas/aquas-light/tools/internal/verify.TestDiskSource(0xc000097500)
+	/home/claude/aquas-light/tools/internal/verify/verify_test.go:409 +0x474
+testing.tRunner(0xc000097500, 0x669908)
+	/usr/local/go1.24.7/src/testing/testing.go:1792 +0x226
+created by testing.(*T).Run in goroutine 1
+	/usr/local/go1.24.7/src/testing/testing.go:1851 +0x8f3
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/verify	0.024s
+FAIL

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "acceptance": {
+      "type": "string"
+    },
+    "capability": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "integration_test": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "parent": {
+      "type": "string"
+    },
+    "platforms": {
+      "items": {
+        "enum": [
+          "linux",
+          "macos",
+          "windows"
+        ],
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "review": {
+      "additionalProperties": false,
+      "properties": {
+        "by": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "decisions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "by",
+        "date",
+        "decisions"
+      ],
+      "type": "object"
+    },
+    "slices": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "parent",
+    "name",
+    "capability",
+    "acceptance",
+    "integration_test",
+    "slices",
+    "platforms"
+  ],
+  "title": "SpecFeature",
+  "type": "object"
+}

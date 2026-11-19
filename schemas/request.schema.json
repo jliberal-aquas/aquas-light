@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adr": {
+      "items": {
+        "type": "string"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "architect_review": {
+      "additionalProperties": false,
+      "properties": {
+        "applied": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "verdict": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "verdict",
+        "applied"
+      ],
+      "type": "object"
+    },
+    "attachments": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "date": {
+      "type": "string"
+    },
+    "decisions": {},
+    "findings": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "glossary": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "id": {
+      "type": "string"
+    },
+    "raw_file": {
+      "type": "string"
+    },
+    "raw_message": {
+      "type": "string"
+    },
+    "result": {
+      "items": {
+        "type": "string"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "rounds": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "answer": {
+                  "type": "string"
+                },
+                "question": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "question",
+                "answer"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "round": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "round",
+          "items"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "scenario": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_report": {
+      "type": "string"
+    },
+    "turn": {
+      "type": "string"
+    },
+    "type": {
+      "enum": [
+        "need",
+        "error"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "date",
+    "type",
+    "raw_message"
+  ],
+  "title": "Request",
+  "type": "object"
+}

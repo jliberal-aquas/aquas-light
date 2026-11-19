@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "default_model": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "role": {
+      "enum": [
+        "pack",
+        "instance"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "role",
+    "default_model",
+    "language"
+  ],
+  "title": "Config",
+  "type": "object"
+}

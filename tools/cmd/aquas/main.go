@@ -11,6 +11,7 @@ import (
 	"github.com/jliberal-aquas/aquas-light/tools/internal/host"
 	"github.com/jliberal-aquas/aquas-light/tools/internal/install"
 	"github.com/jliberal-aquas/aquas-light/tools/internal/update"
+	"github.com/jliberal-aquas/aquas-light/tools/internal/verify"
 )
 
 const version = "0.1.0"
@@ -41,6 +42,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return runHost(stdout, stderr)
 	case "setup":
 		return runSetup(stdout, stderr)
+	case "verify":
+		return runVerify(args[1:], stdout, stderr)
 	default:
 		_, _ = fmt.Fprintf(stderr, "aquas: subcomando desconocido %q\n\n%s", args[0], usage())
 		return 2
@@ -179,8 +182,56 @@ func runSetup(stdout, stderr io.Writer) int {
 	return 0
 }
 
+// runVerify checks the governed JSON files. Exit codes: 0 green, 1 violations,
+// 2 invalid arguments, 3 the check could not run.
+func runVerify(args []string, stdout, stderr io.Writer) int {
+	staged := false
+	for _, a := range args {
+		switch {
+		case a == "--staged":
+			staged = true
+		case strings.HasPrefix(a, "-"):
+			_, _ = fmt.Fprintf(stderr, "aquas: opción desconocida %q\n\n%s", a, usage())
+			return 2
+		default:
+			_, _ = fmt.Fprintf(stderr, "aquas: sobra el argumento %q; verify solo acepta --staged\n\n%s", a, usage())
+			return 2
+		}
+	}
+	wd, err := os.Getwd()
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se pudo verificar: no se pudo leer el directorio actual: %v\n", err)
+		return 3
+	}
+	root, err := verify.FindRoot(wd)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se pudo verificar: %v\n", err)
+		return 3
+	}
+	src := verify.Disk(root)
+	if staged {
+		if src, err = verify.Index(root); err != nil {
+			_, _ = fmt.Fprintf(stderr, "aquas: no se pudo verificar: %v\n", err)
+			return 3
+		}
+	}
+	vs, err := verify.Run(src)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se pudo verificar: %v\n", err)
+		return 3
+	}
+	if len(vs) == 0 {
+		_, _ = fmt.Fprintln(stdout, "Verificación en verde: no hay violaciones.")
+		return 0
+	}
+	for _, v := range vs {
+		_, _ = fmt.Fprintln(stdout, v.String())
+	}
+	return 1
+}
+
 func usage() string {
-	return "Uso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  update <ruta> [--take ours|theirs] [--take <ruta>=ours|theirs]...\n                    actualiza el canon y las herramientas de la instancia; los archivos del canon editados a mano son conflicto\n  host              detecta el sistema y escribe work/host.json\n  setup             prepara un clon: compila bin/aquas, baja golangci-lint y escribe work/host.json, sin commits\n  version           imprime la versión de aquas\n"
+	return "Uso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  update <ruta> [--take ours|theirs] [--take <ruta>=ours|theirs]...\n                    actualiza el canon y las herramientas de la instancia; los archivos del canon editados a mano son conflicto\n  host              detecta el sistema y escribe work/host.json\n  setup             prepara un clon: compila bin/aquas, baja golangci-lint y escribe work/host.json, sin commits\n  verify [--staged] revisa los JSON gobernados contra sus esquemas; --staged lee el índice de git\n  version           imprime la versión de aquas\n"
 }
 
 func main() {

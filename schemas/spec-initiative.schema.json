@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adr": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "features": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "goal": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "goal",
+    "source",
+    "features",
+    "adr"
+  ],
+  "title": "SpecInitiative",
+  "type": "object"
+}

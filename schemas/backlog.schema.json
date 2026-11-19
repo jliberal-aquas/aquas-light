@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "capabilities": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "page": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "page"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "items": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "capability": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "parent": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "priority": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "source": {
+            "type": "string"
+          },
+          "spec": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "spec_sha256": {
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "to_refine",
+              "proposed",
+              "ready",
+              "in_progress",
+              "done"
+            ],
+            "type": "string"
+          },
+          "supersedes": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "initiative",
+              "feature",
+              "slice",
+              "bug",
+              "need"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "parent",
+          "state",
+          "priority",
+          "spec"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "next_ids": {
+      "additionalProperties": false,
+      "properties": {
+        "B": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "C": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "F": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "I": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "N": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "S": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "I",
+        "F",
+        "S",
+        "B",
+        "N",
+        "C"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema_version",
+    "next_ids",
+    "capabilities",
+    "items"
+  ],
+  "title": "Backlog",
+  "type": "object"
+}
