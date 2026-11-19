@@ -29,3 +29,6 @@
 {"date": "2026-11-19", "item": "B2", "role": "tester", "model": "haiku", "task": "Verde, rojo por mutación y casos destructivos de B2", "tokens": 88833, "tool_uses": 12, "duration_s": 104}
 {"date": "2026-11-19", "item": "F1", "role": "implementer", "model": "sonnet", "task": "Actualizar la página C1 tras B2 (continuación; uso acumulado del agente según la notificación)", "tokens": 138338, "tool_uses": 4, "duration_s": 17}
 {"date": "2026-11-19", "item": "F1", "role": "architect", "model": "fable", "task": "Revisión de código y linters al cierre de F1", "tokens": 133528, "tool_uses": 15, "duration_s": 365}
+{"date": "2026-11-19", "item": "B3", "role": "implementer", "model": "sonnet", "task": "Arreglar B3 con TDD: update rechaza enlaces simbólicos", "tokens": 74834, "tool_uses": 4, "duration_s": 49}
+{"date": "2026-11-19", "item": "B3", "role": "tester", "model": "haiku", "task": "Verde, rojo por mutación y casos destructivos de B3", "tokens": 81864, "tool_uses": 10, "duration_s": 77}
+{"date": "2026-11-19", "item": "B3", "role": "implementer", "model": "sonnet", "task": "Corrección B3: reforzar la prueba con instantánea completa y dos subcasos (continuación del mismo agente)", "tokens": null, "tool_uses": null, "duration_s": null}

@@ -1,0 +1,57 @@
+{
+  "item": "B3",
+  "conclusion": "TestUpdateRefusesSymlinks pasa con el código actual y falla sin la llamada a refuseSymlinks (rojo confirmado). La suite completa pasa. La prueba cubre solo dos casos: enlace hoja canon/method.md y carpeta tope templates. No comprueba que ningún archivo de la instancia cambie en el caso 1 (solo canon/ sin method.md) ni en el caso 2, y no verifica el código de salida del binario.",
+  "findings": [
+    {
+      "what": "El caso 1 no compara toda la instancia: la instantánea cubre solo canon/ y excluye method.md.",
+      "where": "tools/internal/update/update_test.go:335-357",
+      "why": "El destructive_case 1 de B3.json exige que ningún archivo de la instancia cambie; la prueba solo verifica canon/ y no manifest.json, seals.json, templates/ ni tools/.",
+      "certainty": "verified",
+      "severity": "major"
+    },
+    {
+      "what": "El caso 2 (templates enlazado) no comprueba que el resto de la instancia quede intacto; solo comprueba canon/method.md.",
+      "where": "tools/internal/update/update_test.go:386-388",
+      "why": "Sin instantánea de la instancia, un cambio parcial en otros archivos no se detectaría en este caso.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "La prueba verifica err != nil, no el código de salida del proceso.",
+      "where": "tools/internal/update/update_test.go:339-344; tools/cmd/aquas/main.go:115-117",
+      "why": "Los criterios de B3.json piden código distinto de 0. El mapeo de err a código de salida no lo prueba ninguna prueba de cmd/aquas que yo haya visto.",
+      "certainty": "inferred",
+      "severity": "minor"
+    },
+    {
+      "what": "Solo se prueban enlaces hoja (canon/method.md y templates). No hay pruebas de enlace en el manifiesto, en work/seals.json, en un subdirectorio enlazado dentro de un componente montado, ni en schemas, .githooks o docs/governance.",
+      "where": "tools/internal/update/update.go:29,32-33,250-265; tools/internal/update/update_test.go:315-389",
+      "why": "refuseSymlinks y checkComponents tienen ramas que ninguna prueba ejercita. Por lectura parecen correctas, pero no están verificadas. B3.json pide revisar cada componente de la ruta destino.",
+      "certainty": "inferred",
+      "severity": "minor"
+    },
+    {
+      "what": "En el rojo, la prueba se detiene en la primera aserción fallida. Las aserciones de bytes del archivo externo y de la instancia no se evaluaron.",
+      "where": "tools/internal/update/update_test.go:339-341",
+      "why": "Con la guarda quitada, el rojo solo demuestra que Update devolvió nil. No demuestra que el archivo externo cambie, aunque la descripción de B3 lo afirma.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {"file": "tools/internal/update/update.go", "line": 104, "quote": "if err := refuseSymlinks(instance); err != nil {"},
+    {"file": "tools/internal/update/update_test.go", "line": 336, "quote": "delete(before, \"method.md\") // the link itself is checked through Lstat below"},
+    {"file": "tools/internal/update/update_test.go", "line": 355, "quote": "after := snapshot(t, filepath.Join(inst, \"canon\"))"},
+    {"file": "tools/internal/update/update_test.go", "line": 382, "quote": "entries, rerr := os.ReadDir(outside)"},
+    {"file": "tools/internal/update/update.go", "line": 29, "quote": "var mirrored = []string{\"canon\", \"schemas\", \"tools\", \".githooks\", \"templates\", \"docs/governance\"}"},
+    {"file": "tools/cmd/aquas/main.go", "line": 117, "quote": "_, _ = fmt.Fprintf(stderr, \"aquas: no se actualizó nada: %v\\n\", err)"}
+  ],
+  "output": "go test -race -count=1 -run TestUpdateRefusesSymlinks -v ./internal/update/: PASS (ambos subtests). go test -race -count=1 ./...: ok en cmd/aquas, hashing, host, install, update (EXIT 0). Mutación: se comentaron las líneas 104-106 de update.go (llamada a refuseSymlinks), sin tocar nada más. Resultado: FAIL en ambos subtests (update_test.go:340 'se esperaba un error por el enlace simbólico' y update_test.go:374 el mismo mensaje). Exit 1. update.go restaurado desde /tmp/update.go.bak; cmp idéntico. git diff --stat tras la restauración igual que al inicio (4 archivos: tools/internal/update/update.go, tools/internal/update/update_test.go, work/delegations.jsonl, work/memory.json; baseline en /tmp/b3-diffstat-before.txt). Los dos últimos archivos ya estaban modificados antes de esta prueba y no los toqué.",
+  "pending": [
+    "Añadir aserciones de instantánea de toda la instancia en ambos casos (sugerencia para el implementador, no hecho aquí).",
+    "Comprobar el código de salida de aquas update con un enlace (cmd/aquas) y añadir pruebas para manifest, seals, subdirectorio enlazado y carpetas montadas distintas de canon/templates.",
+    "Prueba funcional manual (humano reemplaza canon/method.md por un enlace) no ejecutada: queda fuera del alcance del tester."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

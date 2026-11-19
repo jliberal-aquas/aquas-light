@@ -101,6 +101,10 @@ func Update(pkgRoot, instance, version string, takes Takes) (Result, error) {
 		return res, fmt.Errorf("%s ilegible: %w", manifestRel, err)
 	}
 
+	if err := refuseSymlinks(instance); err != nil {
+		return res, err
+	}
+
 	pkgFiles := map[string]string{} // rel -> abs, for every mirrored folder
 	for _, top := range mirrored {
 		if err := walk(pkgRoot, top, pkgFiles); err != nil {
@@ -213,6 +217,69 @@ func Update(pkgRoot, instance, version string, takes Takes) (Result, error) {
 	}
 	sort.Strings(res.Changed)
 	return res, nil
+}
+
+// symlinkError names the symlink found inside the instance.
+func symlinkError(rel string) error {
+	return fmt.Errorf("%s es un enlace simbólico: update no escribe a través de enlaces; reemplázalo por un archivo o carpeta real y vuelve a intentar", rel)
+}
+
+// checkComponents Lstat-checks every component of rel (slash-separated)
+// under root. A missing component ends the check without error.
+func checkComponents(root, rel string) error {
+	cur := root
+	parts := strings.Split(rel, "/")
+	for i, part := range parts {
+		cur = filepath.Join(cur, part)
+		info, err := os.Lstat(cur)
+		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				return nil
+			}
+			return fmt.Errorf("no se pudo revisar %s: %w", strings.Join(parts[:i+1], "/"), err)
+		}
+		if info.Mode()&fs.ModeSymlink != 0 {
+			return symlinkError(strings.Join(parts[:i+1], "/"))
+		}
+	}
+	return nil
+}
+
+// refuseSymlinks fails if any path update may read, write or delete inside
+// the instance is, or goes through, a symbolic link. It changes nothing.
+func refuseSymlinks(instance string) error {
+	for _, rel := range append([]string{manifestRel, sealsRel}, mirrored...) {
+		if err := checkComponents(instance, rel); err != nil {
+			return err
+		}
+	}
+	for _, top := range mirrored {
+		base := filepath.Join(instance, filepath.FromSlash(top))
+		if info, err := os.Lstat(base); err != nil || !info.IsDir() {
+			continue
+		}
+		err := filepath.WalkDir(base, func(p string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			rel, rerr := filepath.Rel(instance, p)
+			if rerr != nil {
+				return rerr
+			}
+			rel = filepath.ToSlash(rel)
+			if d.IsDir() && rel == "tools/bin" {
+				return filepath.SkipDir
+			}
+			if d.Type()&fs.ModeSymlink != 0 {
+				return symlinkError(rel)
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func hasPrefix(m map[string]string, prefix string) bool {

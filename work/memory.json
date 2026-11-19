@@ -1,5 +1,5 @@
 {
-  "slice": "B3",
+  "slice": "B4",
   "step": "red",
   "done": [
     "plan"
@@ -7,8 +7,9 @@
   "next": "Implementador: prueba roja, código y verde.",
   "files": [
     "tools/internal/update/update.go",
+    "tools/cmd/aquas/main.go",
     "tools/internal/update/update_test.go"
   ],
   "blockers": [],
-  "updated_at": "2026-11-19T00:40:00-03:00"
+  "updated_at": "2026-11-19T00:50:00-03:00"
 }

@@ -1,0 +1,25 @@
+=== RUN   TestIntegrationInstall
+--- PASS: TestIntegrationInstall (1.16s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	2.172s
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/hashing	1.016s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/host	1.009s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/install	1.013s [no tests to run]
+=== RUN   TestUpdateRefusesSymlinks
+=== RUN   TestUpdateRefusesSymlinks/archivo_del_canon_enlazado
+=== RUN   TestUpdateRefusesSymlinks/carpeta_tope_enlazada
+=== RUN   TestUpdateRefusesSymlinks/work/seals.json_enlazado
+=== RUN   TestUpdateRefusesSymlinks/subcarpeta_de_tools_enlazada
+--- PASS: TestUpdateRefusesSymlinks (0.04s)
+    --- PASS: TestUpdateRefusesSymlinks/archivo_del_canon_enlazado (0.01s)
+    --- PASS: TestUpdateRefusesSymlinks/carpeta_tope_enlazada (0.01s)
+    --- PASS: TestUpdateRefusesSymlinks/work/seals.json_enlazado (0.01s)
+    --- PASS: TestUpdateRefusesSymlinks/subcarpeta_de_tools_enlazada (0.01s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/update	1.054s

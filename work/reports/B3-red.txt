@@ -1,0 +1,11 @@
+=== RUN   TestUpdateRefusesSymlinks
+=== RUN   TestUpdateRefusesSymlinks/archivo_del_canon_enlazado
+    update_test.go:340: se esperaba un error por el enlace simbólico
+=== RUN   TestUpdateRefusesSymlinks/carpeta_tope_enlazada
+    update_test.go:374: se esperaba un error por el enlace simbólico
+--- FAIL: TestUpdateRefusesSymlinks (0.01s)
+    --- FAIL: TestUpdateRefusesSymlinks/archivo_del_canon_enlazado (0.00s)
+    --- FAIL: TestUpdateRefusesSymlinks/carpeta_tope_enlazada (0.00s)
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/update	0.019s
+FAIL

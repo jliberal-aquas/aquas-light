@@ -311,3 +311,101 @@ func TestManifestVersionUnchangedOnConflict(t *testing.T) {
 		t.Fatalf("version = %q (presente %v), debe seguir en 0.1.0", v, ok)
 	}
 }
+
+// treeSnapshot records every file, folder and link of root without following
+// links: file content, "dir", or "link -> target".
+func treeSnapshot(t *testing.T, root string) map[string]string {
+	t.Helper()
+	out := map[string]string{}
+	err := filepath.WalkDir(root, func(p string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, _ := filepath.Rel(root, p)
+		rel = filepath.ToSlash(rel)
+		switch {
+		case d.Type()&os.ModeSymlink != 0:
+			target, lerr := os.Readlink(p)
+			out[rel] = "link -> " + target
+			return lerr
+		case d.IsDir():
+			out[rel] = "dir"
+		default:
+			b, rerr := os.ReadFile(p)
+			out[rel] = string(b)
+			return rerr
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return out
+}
+
+func TestUpdateRefusesSymlinks(t *testing.T) {
+	// replaceWithLink swaps inst/rel (file or folder) for a link to target.
+	replaceWithLink := func(t *testing.T, inst, rel, target string) {
+		t.Helper()
+		link := filepath.Join(inst, filepath.FromSlash(rel))
+		if err := os.RemoveAll(link); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Symlink(target, link); err != nil {
+			t.Skipf("no se pueden crear enlaces simbólicos aquí: %v", err)
+		}
+	}
+
+	cases := []struct {
+		name    string
+		rel     string // path of the link inside the instance
+		isDir   bool
+		prepare func(t *testing.T, v2, inst string)
+	}{
+		{name: "archivo del canon enlazado", rel: "canon/method.md"},
+		{name: "carpeta tope enlazada", rel: "templates", isDir: true,
+			prepare: func(t *testing.T, v2, _ string) { write(t, v2, "templates/nuevo.md", "nuevo\n") }},
+		{name: "work/seals.json enlazado", rel: "work/seals.json",
+			prepare: func(t *testing.T, _, inst string) { write(t, inst, "work/seals.json", "{}\n") }},
+		{name: "subcarpeta de tools enlazada", rel: "tools/sub", isDir: true,
+			prepare: func(t *testing.T, v2, inst string) {
+				write(t, inst, "tools/sub/a.go", "package sub\n")
+				write(t, v2, "tools/sub/a.go", "package sub // v2\n")
+			}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			v1, v2 := newPackage(t, "v1"), newPackage(t, "v2")
+			inst := newInstance(t, v1)
+			if c.prepare != nil {
+				c.prepare(t, v2, inst)
+			}
+			external := t.TempDir()
+			target := filepath.Join(external, "externo")
+			if c.isDir {
+				target = external
+				write(t, external, "centinela.txt", "intacto\n")
+			} else if err := os.WriteFile(target, []byte("contenido externo\n"), 0o644); err != nil {
+				t.Fatal(err)
+			}
+			replaceWithLink(t, inst, c.rel, target)
+			instBefore, extBefore := treeSnapshot(t, inst), treeSnapshot(t, external)
+
+			res, err := Update(v2, inst, "0.2.0", Takes{})
+			if err == nil {
+				t.Error("se esperaba un error por el enlace simbólico")
+			} else if !strings.Contains(err.Error(), c.rel) {
+				t.Errorf("el error no nombra %s: %v", c.rel, err)
+			}
+			if len(res.Changed) != 0 {
+				t.Errorf("no debía cambiar nada: %v", res.Changed)
+			}
+			if after := treeSnapshot(t, external); !equalSnap(extBefore, after) {
+				t.Errorf("la ubicación externa cambió: antes %v, después %v", extBefore, after)
+			}
+			if after := treeSnapshot(t, inst); !equalSnap(instBefore, after) {
+				t.Errorf("la instancia cambió: antes %v, después %v", instBefore, after)
+			}
+		})
+	}
+}

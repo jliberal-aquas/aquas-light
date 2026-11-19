@@ -1,0 +1,17 @@
+{
+  "slice": "B3",
+  "step": "commit",
+  "done": [
+    "plan",
+    "red",
+    "green",
+    "tester"
+  ],
+  "next": "Commit, push y CI.",
+  "files": [
+    "tools/internal/update/update.go",
+    "tools/internal/update/update_test.go"
+  ],
+  "blockers": [],
+  "updated_at": "2026-11-19T00:50:00-03:00"
+}
