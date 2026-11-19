@@ -1,0 +1,29 @@
+{
+  "item": "S39",
+  "conclusion": "pass: la suite queda en verde (exit 0), el rojo sin código falla por aserción, los cinco destructive_cases se cumplen tal como están escritos y setup.go y setup_test.go son idénticos al original (sha256 verificado).",
+  "findings": [
+    {
+      "what": "Observación sin fallo: si falla la descarga de golangci-lint, el bin/aquas ya construido en el paso anterior no se borra.",
+      "where": "tools/internal/install/setup.go:27-32",
+      "why": "Setup llama a cleanBin solo cuando falla buildAquas; el error de downloadLint hace return sin limpiar. El encargo no lo exige y el repo no queda alterado por ello. No verificado en ejecución.",
+      "certainty": "inferred",
+      "severity": "low"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "tools/internal/install/setup.go",
+      "line": "27-32",
+      "quote": "if err := buildAquas(abs); err != nil { cleanBin(abs, \"aquas\"); return err } if err := downloadLint(abs, opts); err != nil { return err }"
+    },
+    {
+      "file": "tools/internal/install/setup.go",
+      "line": "1-6 (sha256)",
+      "quote": "cb22df8d81e5c75477f1bf8004d2a365ad26fec36b8e2f7f32f3bb940338c5e6 setup.go; 68467927a20e85a5f46ddbdb20020753c6234a31a98e0e7a5ee2e5a4fc4846b0 setup_test.go (idénticos antes y después del stub)"
+    }
+  ],
+  "output": "1) Verde inicial: `go test -count=1 -race ./...` exit 0 (cmd/aquas, hashing, host, install, update ok). 2) Rojo: Setup como stub `return nil`; `TestSetupPreparesClone` exit 1 con 'falta bin/aquas', 'falta bin/golangci-lint', 'falta work/host.json'. Original restaurado, sha256 coincide, verde exit 0. 3) Caso 1 (binario real, `aquas install` a una carpeta temporal y `git clone`): setup 1 exit 0, setup 2 exit 0; HEAD 528466f5e8d83e27081291a262a7af310a4ac902 antes y después; `git diff --quiet HEAD` exit 0 en ambas; host.json os=linux arch=amd64; bin/aquas y bin/golangci-lint presentes. Caso 2 (httptest 500, test temporal): exit distinto de 0, mensaje 'la descarga de golangci-lint desde ... respondió 500 Internal Server Error', HEAD sin cambios. Caso 3 (huella distinta): error nombra esperada c77313a7...4902 y recibida 09038bdf...7d83; no quedan bin/golangci-lint ni .tmp. Caso 4 (GIT_CONFIG_GLOBAL con core.hooksPath=/tmp/otra-carpeta-tester): setup exit 0; `git config --local core.hooksPath` = .githooks; archivo global sin cambios. Caso 5 (copia sin .git): exit 1 con 'no es un repositorio git (falta .git)...'; .git no creado. Temporales borrados. Sin commits; HEAD del repo d2757f7 sin cambios. backlog.json, work/memory.json y canon/ no tocados por el tester.",
+  "pending": "Ninguno. zz_tester_test.go borrado; temporales en /tmp eliminados al cerrar.",
+  "certainty": "verified",
+  "result": "pass"
+}

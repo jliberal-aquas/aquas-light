@@ -1,0 +1,14 @@
+--- FAIL: TestSetupPreparesClone (0.62s)
+    setup_test.go:55: falta bin/aquas: stat /tmp/TestSetupPreparesClone1472286177/003/clon/bin/aquas: no such file or directory
+    setup_test.go:55: falta bin/golangci-lint: stat /tmp/TestSetupPreparesClone1472286177/003/clon/bin/golangci-lint: no such file or directory
+--- FAIL: TestSetupLintServerError (0.63s)
+    setup_test.go:84: error = <nil>, se esperaba mención de golangci-lint
+--- FAIL: TestSetupChecksumMismatch (0.59s)
+    setup_test.go:104: se esperaba error por huella distinta
+--- FAIL: TestSetupSetsLocalHooksPath (0.59s)
+    setup_test.go:122: git [config --local core.hooksPath]: exit status 1
+--- FAIL: TestSetupRequiresGit (0.00s)
+    setup_test.go:133: se esperaba error sin .git
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/install	2.423s
+FAIL

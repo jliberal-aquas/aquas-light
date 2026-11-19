@@ -1,0 +1,5 @@
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	1.026s
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/hashing	1.012s
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/host	1.031s
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/install	9.850s
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/update	1.106s

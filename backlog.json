@@ -149,9 +149,10 @@
       "id": "S39",
       "type": "slice",
       "parent": "F1",
-      "state": "ready",
+      "state": "done",
       "priority": 8,
-      "spec": "work/specs/S39.json"
+      "spec": "work/specs/S39.json",
+      "spec_sha256": "60a29cc0190110f4149cbf26e56135145f8e42fe88c0b6e70f904fac749cd32c"
     },
     {
       "id": "S8",

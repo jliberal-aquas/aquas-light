@@ -29,6 +29,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return runUpdate(args[1:], stdout, stderr)
 	case "host":
 		return runHost(stdout, stderr)
+	case "setup":
+		return runSetup(stdout, stderr)
 	default:
 		_, _ = fmt.Fprintf(stderr, "aquas: subcomando desconocido %q\n\n%s", args[0], usage())
 		return 2
@@ -138,8 +140,27 @@ func runHost(stdout, stderr io.Writer) int {
 	return 0
 }
 
+func runSetup(stdout, stderr io.Writer) int {
+	wd, err := os.Getwd()
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se pudo leer el directorio actual: %v\n", err)
+		return 1
+	}
+	root, err := install.FindPackageRoot(wd)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se puede preparar el clon: %v\n", err)
+		return 1
+	}
+	if err := install.Setup(root, install.Options{Version: version}); err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se puede preparar el clon:\n%v\n", err)
+		return 1
+	}
+	_, _ = fmt.Fprintln(stdout, "Clon preparado: bin/aquas, golangci-lint y work/host.json listos, sin crear commits.")
+	return 0
+}
+
 func usage() string {
-	return "Uso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  update <ruta> [--take ours|theirs] [--take <ruta>=ours|theirs]...\n                    actualiza el canon y las herramientas de la instancia; los archivos del canon editados a mano son conflicto\n  host              detecta el sistema y escribe work/host.json\n  version           imprime la versión de aquas\n"
+	return "Uso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  update <ruta> [--take ours|theirs] [--take <ruta>=ours|theirs]...\n                    actualiza el canon y las herramientas de la instancia; los archivos del canon editados a mano son conflicto\n  host              detecta el sistema y escribe work/host.json\n  setup             prepara un clon: compila bin/aquas, baja golangci-lint y escribe work/host.json, sin commits\n  version           imprime la versión de aquas\n"
 }
 
 func main() {

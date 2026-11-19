@@ -132,3 +132,17 @@ func TestUpdateInvalidTakeExits2(t *testing.T) {
 		t.Fatalf("código %d", code)
 	}
 }
+
+func TestSetupSubcommandOutsideRepo(t *testing.T) {
+	t.Chdir(t.TempDir())
+	var out, errb bytes.Buffer
+	if code := run([]string{"setup"}, &out, &errb); code != 1 {
+		t.Fatalf("código %d, se esperaba 1", code)
+	}
+	if !strings.Contains(errb.String(), "aquas:") {
+		t.Errorf("stderr sin mensaje: %q", errb.String())
+	}
+	if !strings.Contains(usage(), "setup") {
+		t.Errorf("usage no menciona setup")
+	}
+}

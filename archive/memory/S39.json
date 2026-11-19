@@ -1,0 +1,19 @@
+{
+  "slice": "S39",
+  "step": "commit",
+  "done": [
+    "plan",
+    "red",
+    "green",
+    "tester"
+  ],
+  "next": "Commit de S39; luego S8.",
+  "files": [
+    "tools/internal/install/setup.go",
+    "tools/internal/install/lintdownload.go",
+    "tools/cmd/aquas/main.go",
+    "templates/gitignore"
+  ],
+  "blockers": [],
+  "updated_at": "2026-11-18T23:41:21-03:00"
+}

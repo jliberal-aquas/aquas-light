@@ -88,7 +88,13 @@ func downloadLint(dest string, opts Options) error {
 	if err := os.MkdirAll(filepath.Dir(out), 0o755); err != nil {
 		return fmt.Errorf("no se pudo crear bin/: %v", err)
 	}
-	if err := os.WriteFile(out, bin, 0o755); err != nil {
+	tmp := out + ".tmp"
+	if err := os.WriteFile(tmp, bin, 0o755); err != nil {
+		_ = os.Remove(tmp)
+		return fmt.Errorf("no se pudo escribir bin/%s: %v", name, err)
+	}
+	if err := os.Rename(tmp, out); err != nil {
+		_ = os.Remove(tmp)
 		return fmt.Errorf("no se pudo escribir bin/%s: %v", name, err)
 	}
 	return nil
