@@ -3,8 +3,8 @@
   "parent": "I1",
   "name": "Verificar",
   "capability": "C2",
-  "acceptance": "`aquas verify` rechaza con código distinto de 0 y un mensaje en español cada violación de los esquemas y de las reglas del backlog, y da verde en un repo recién instalado.",
-  "integration_test": "TestIntegrationVerify: instala en una carpeta temporal, rompe una regla por caso (tabla de casos) y comprueba el código y el mensaje.",
+  "acceptance": "`aquas verify` sale con código 1 y un mensaje en español que nombra el archivo y el campo o el ID por cada violación de las reglas numeradas de C2 (los `what` de S9, S10 y S11), sale con código 0 en un repo recién instalado y en este repo, y `aquas install` no deja nada si el verificador no da verde.",
+  "integration_test": "TestIntegrationVerify: instala en una carpeta temporal y comprueba código 0; después, una fila por regla: campo sobrante, clave con mayúsculas, contador atrasado, ID repetido, padre inexistente, padre de tipo incorrecto, dos slices `in_progress`, necesidad sin `source`, `supersedes` inválido, spec `done` alterada, capacidad cerrada sin página, feature sin capacidad declarada. Cada fila comprueba código 1 y el archivo y el campo o ID en el mensaje. Una fila final instala con una plantilla rota y comprueba que no queda nada. La escribe el implementador en S12; la página `docs/governance/C2-verify.md` se escribe al cierre de F2.",
   "slices": [
     "S9",
     "S10",
@@ -15,5 +15,15 @@
     "linux",
     "macos",
     "windows"
-  ]
+  ],
+  "review": {
+    "by": "architect",
+    "date": "2026-11-19",
+    "decisions": [
+      "S9 no valida techos de longitud; cada techo nace en el slice que trae un valor con origen (aprobado por el humano).",
+      "S11 exige página solo a las capacidades con al menos una feature archivada (aprobado por el humano).",
+      "El esquema de `work/requests/<N>.json` acepta los campos que N1 y N2 ya traen y `turn` es opcional (aprobado por el humano).",
+      "Código 3 para «no se pudo verificar»; un bug `in_progress` cuenta para el límite de un solo slice; una necesidad tiene padre `null` o cualquier ID existente; `role` vale `pack` o `instance` (decisiones del orquestador según la revisión)."
+    ]
+  }
 }

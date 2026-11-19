@@ -2,35 +2,79 @@
   "id": "S11",
   "parent": "F2",
   "name": "Capacidades con página",
-  "what": "Comprueba que cada capacidad de `backlog.json` tenga su página y que cada feature apunte a una capacidad declarada.",
+  "what": "(1) Cada feature, en `backlog.json` o archivada, apunta con `capability` a una capacidad declarada en `capabilities`. (2) Ningún ID ni `page` de capacidad se repite. (3) Cada capacidad con al menos una feature archivada tiene su página: un archivo real, no vacío y no enlace simbólico, en `docs/governance/` o `docs/product/`, con nombre `<ID>-<nombre>.md`, ruta guardada con `/`, dentro del repo y con mayúsculas exactas en cada tramo. La existencia se comprueba listando cada carpeta y comparando el nombre, no con `os.Stat`. Las capacidades sin feature archivada no exigen página.",
   "files": [
     "tools/internal/verify/capabilities.go"
   ],
-  "functional_test": "El humano declara una capacidad sin página y el verificador lo rechaza.",
+  "functional_test": "El humano borra `docs/governance/C1-install-and-update.md`, corre `bin/aquas verify` y lee `C1` y la ruta que falta.",
   "technical_test": {
     "name": "TestVerifyCapabilityPages",
     "red_before_code": true
   },
   "destructive_cases": [
     {
-      "case": "Capacidad cuyo `page` apunta a un directorio existente.",
-      "expect": "Rechazo que nombra la capacidad."
+      "case": "Capacidad `C1`, con F1 archivada, cuyo archivo `page` no existe.",
+      "expect": "Código 1; el mensaje nombra `C1` y la ruta declarada."
     },
     {
-      "case": "Capacidad con `page: ../fuera.md` y otra con una ruta absoluta.",
-      "expect": "Dos rechazos: la página debe estar dentro del repo."
+      "case": "Capacidad cuyo `page` apunta a un directorio existente; y otra cuyo `page` es un archivo de 0 bytes.",
+      "expect": "Dos rechazos que nombran la capacidad."
     },
     {
-      "case": "Feature con `capability: C99` y otra feature sin el campo `capability`.",
-      "expect": "Dos rechazos, cada uno nombra su feature."
+      "case": "`page: ../fuera.md`; `page: /etc/hosts`; `page: C:\\\\docs\\\\C1.md`; `page: docs/governance/../../backlog.json`.",
+      "expect": "Cuatro rechazos; ningún archivo de fuera se abre."
     },
     {
-      "case": "Dos capacidades con el mismo ID `C1`.",
+      "case": "`page: docs\\\\governance\\\\C1-install-and-update.md`, con barras invertidas, y el archivo existe.",
+      "expect": "Rechazo en los tres sistemas."
+    },
+    {
+      "case": "`page: README.md` y `page: docs/C1-x.md`, los dos archivos existen.",
+      "expect": "Dos rechazos."
+    },
+    {
+      "case": "Capacidad `C1` con `page: docs/governance/C2-verify.md`, archivo que existe.",
       "expect": "Rechazo que nombra `C1`."
     },
     {
       "case": "En disco existe `docs/governance/c1-install-and-update.md` y la capacidad declara `docs/governance/C1-install-and-update.md`.",
-      "expect": "Rechazo en Linux, macOS y Windows: el nombre se compara con mayúsculas exactas."
+      "expect": "Rechazo en Linux, macOS y Windows; la corrida de CI de los tres sistemas se cita antes de cerrar el slice."
+    },
+    {
+      "case": "En disco existe `docs/Governance/C1-install-and-update.md` y la capacidad declara `docs/governance/...`.",
+      "expect": "Rechazo en los tres sistemas."
+    },
+    {
+      "case": "La página es un enlace simbólico a un archivo fuera del repo. En Windows la prueba se salta con `t.Skip` solo si `os.Symlink` falla.",
+      "expect": "Rechazo que nombra la capacidad."
+    },
+    {
+      "case": "Feature con `capability: C99`; feature sin el campo `capability`; feature con `capability: c1`.",
+      "expect": "Tres rechazos; cada uno nombra su feature."
+    },
+    {
+      "case": "Feature archivada en `archive/I1.json` con `capability: C99`.",
+      "expect": "Rechazo que nombra la feature y `archive/I1.json`."
+    },
+    {
+      "case": "Dos capacidades con el ID `C1`; y dos capacidades distintas con el mismo `page`.",
+      "expect": "Dos rechazos."
+    },
+    {
+      "case": "`aquas verify --staged`: la página de C1 existe en disco y no se agregó con `git add`.",
+      "expect": "Código 1 y mensaje que nombra `C1`; `aquas verify` sin opción sale con código 0."
+    },
+    {
+      "case": "`capabilities: []` e `items: []`, como en la plantilla.",
+      "expect": "Código 0."
+    },
+    {
+      "case": "Capacidad `C3` declarada, sin página y sin features archivadas.",
+      "expect": "Código 0."
+    },
+    {
+      "case": "Correr `aquas verify` sobre este repo en el commit que cierra S11.",
+      "expect": "Código 0."
     }
   ]
 }

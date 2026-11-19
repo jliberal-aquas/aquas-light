@@ -2,7 +2,7 @@
   "id": "S10",
   "parent": "F2",
   "name": "Reglas del backlog",
-  "what": "Comprueba formato de IDs y contadores globales, que cada padre exista en `backlog.json` o en `archive/` y sea del tipo correcto, un solo slice en `in_progress`, que cada necesidad `to_refine` tenga `source`, que `supersedes` apunte a un slice `done` (también archivado) y que la especificación de un slice `done` coincida con la huella `spec_sha256` guardada al cerrarlo.",
+  "what": "Reglas del backlog: (1) los IDs cumplen `^[IFSBNC][1-9][0-9]*$` y su letra coincide con el tipo; (2) ningún ID se repite entre `backlog.json` y `archive/*.json`; (3) cada contador de `next_ids` es mayor que todo ID de su tipo en `backlog.json`, en `capabilities` y en `archive/*.json`; (4) padres: iniciativa, `null`; feature, una iniciativa; slice, una feature; bug, un slice `done`; necesidad, `null` o cualquier ID existente; el padre puede estar archivado; (5) a lo más un elemento de tipo slice o bug en `in_progress`; (6) cada necesidad `to_refine` tiene `source` hacia un archivo existente de `work/requests/`; (7) `supersedes` es un campo opcional de la entrada de un slice, con un solo ID de un slice `done`, también archivado; (8) todo slice o bug `done`, en `backlog.json` o archivado, lleva `spec_sha256` y coincide con `hashing.Sum` de su spec (finales normalizados a LF); un elemento que no está `done` no lo lleva; las features no llevan huella. `aquas verify` lee el disco; `aquas verify --staged` lee el índice de git, respeta `GIT_INDEX_FILE` e ignora `GIT_DIR` y `GIT_WORK_TREE` heredados.",
   "files": [
     "tools/internal/verify/backlog.go"
   ],
@@ -13,28 +13,80 @@
   },
   "destructive_cases": [
     {
-      "case": "`next_ids.S` vale 5 y existe el slice `S38`.",
-      "expect": "Rechazo que nombra el contador `S` y el ID `S38`."
+      "case": "`next_ids.S` vale 5 y existe el slice `S38` en `backlog.json`.",
+      "expect": "Rechazo que nombra el contador `S`, su valor 5 y el ID `S38`."
     },
     {
-      "case": "Dos elementos con el mismo ID `S3`.",
-      "expect": "Rechazo que nombra `S3`."
+      "case": "`next_ids.B` vale 3, `backlog.json` no tiene bugs y `archive/I1.json` tiene `B6`.",
+      "expect": "Rechazo que nombra el contador `B` y `B6`."
     },
     {
-      "case": "Slice con `parent: I1` y otro slice con `parent: F99`, que no existe.",
-      "expect": "Dos rechazos: uno dice que el padre de un slice debe ser una feature; el otro nombra `F99`."
+      "case": "`next_ids.S` vale 47 y el slice de número más alto es `S47`.",
+      "expect": "Rechazo. Con `next_ids.S` en 48, código 0."
     },
     {
-      "case": "Slice con `supersedes` hacia sí mismo, otro hacia un slice `proposed` y otro hacia `S999`.",
-      "expect": "Tres rechazos, cada uno nombra el slice que declara y el apuntado."
+      "case": "IDs `s3`, `S03`, `S0`, `S-1`, `X1`, `S` y `S99999999999999999999`, uno por corrida.",
+      "expect": "Siete rechazos que nombran el ID; ninguno termina en pánico."
     },
     {
-      "case": "Especificación de un slice `done` cambiada en un byte y agregada al índice con `git add`; después se restaura solo en el árbol de trabajo.",
-      "expect": "Rechazo que nombra el slice: se compara lo que entraría al commit, no solo el archivo en disco."
+      "case": "Elemento con `id: F3` y `type: slice`.",
+      "expect": "Rechazo que nombra `F3`."
     },
     {
-      "case": "Una necesidad en estado `to_refine` sin campo `source`.",
-      "expect": "`aquas verify` sale con código distinto de 0 y el mensaje nombra la necesidad."
+      "case": "Dos elementos con el ID `S3` en `backlog.json`; y, aparte, `S3` en `backlog.json` y también en `archive/I1.json`.",
+      "expect": "Dos rechazos que nombran `S3`; el segundo nombra los dos archivos."
+    },
+    {
+      "case": "Slice con `parent: I1`; slice con `parent: F99`; feature con `parent: F2`; bug con padre en un slice `proposed`; iniciativa con `parent: F1`; slice con `parent: null`.",
+      "expect": "Seis rechazos; cada uno nombra el elemento, el padre y el tipo de padre esperado."
+    },
+    {
+      "case": "Slice con padre `F1`, que solo existe en `archive/I1.json`; y la necesidad `N2` con padre `F1`.",
+      "expect": "Código 0."
+    },
+    {
+      "case": "`archive/I1.json` reemplazado por el texto `{`.",
+      "expect": "Código distinto de 0 y mensaje que nombra `archive/I1.json`; no se reporta «el padre F1 no existe» por cada hijo."
+    },
+    {
+      "case": "Dos slices en `in_progress`; aparte, un slice y un bug en `in_progress`; aparte, un slice y la iniciativa `I1` en `in_progress`.",
+      "expect": "Primero: rechazo que nombra los dos slices. Segundo: rechazo que nombra el slice y el bug. Tercero: código 0."
+    },
+    {
+      "case": "Slice con `supersedes` hacia sí mismo; otro hacia un slice `proposed`; otro hacia `S999`; otro hacia la feature `F1`.",
+      "expect": "Cuatro rechazos; cada uno nombra el slice que declara y el apuntado."
+    },
+    {
+      "case": "Slice con `supersedes: S7`, que está `done` solo en `archive/I1.json`.",
+      "expect": "Código 0."
+    },
+    {
+      "case": "`aquas verify` sobre el disco con un espacio agregado al final de `work/specs/S7.json`.",
+      "expect": "Código 1; el mensaje nombra `S7`, `work/specs/S7.json` y `spec_sha256`."
+    },
+    {
+      "case": "`work/specs/S7.json` cambiado en un byte y agregado con `git add`; después restaurado solo en el disco.",
+      "expect": "`aquas verify --staged` sale con código 1 y nombra `S7`; `aquas verify` sin opción sale con código 0."
+    },
+    {
+      "case": "`work/specs/S7.json` reescrito con finales CRLF y sin otro cambio.",
+      "expect": "Código 0."
+    },
+    {
+      "case": "Slice `done` sin `spec_sha256`; slice `done` cuyo archivo de spec no existe; slice `proposed` con `spec_sha256`; `spec_sha256` con valor `abc`.",
+      "expect": "Cuatro rechazos; cada uno nombra el slice y el campo."
+    },
+    {
+      "case": "Necesidad `to_refine` sin `source`; otra con `source: work/requests/N99.json`, que no existe; otra con `source: ../fuera.json`.",
+      "expect": "Tres rechazos con código 1; cada mensaje nombra la necesidad."
+    },
+    {
+      "case": "`aquas verify --staged` con la variable `GIT_DIR` apuntando a otro repositorio válido.",
+      "expect": "El resultado es el del repo donde se corre: con una violación puesta solo en el índice local, código 1."
+    },
+    {
+      "case": "`aquas verify --staged` en una carpeta instalada a la que se le borró `.git`.",
+      "expect": "Código 3 y mensaje en español que dice que no es un repositorio git."
     }
   ]
 }

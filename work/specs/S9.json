@@ -2,36 +2,82 @@
   "id": "S9",
   "parent": "F2",
   "name": "Esquemas tipados",
-  "what": "Define en Go los tipos de backlog, especificación, solicitud y configuración; los decodifica rechazando campos sobrantes y valida techos de longitud. Publica sus esquemas en `schemas/`. Cada otro esquema nace en el slice que lo usa.",
+  "what": "Crea el subcomando `aquas verify [--staged]` y los tipos de Go de: `backlog.json`; `archive/<iniciativa>.json`; spec de iniciativa, de feature, de slice y de bug; `work/requests/<N>.json`; `canon/config.json`. (1) Busca la raíz subiendo desde el directorio actual hasta la carpeta que tiene `backlog.json`. (2) Decodifica cada archivo con un recorrido propio de claves, no con el emparejamiento de `encoding/json`: compara claves exactas y rechaza campos sobrantes, claves repetidas, campos obligatorios ausentes o `null`, tipos incorrectos, valores fuera de las listas cerradas, BOM y contenido después del valor. Ningún mensaje al humano incluye texto en inglés de la biblioteca. (3) Los tipos nacen de los archivos que existen hoy: `technical_test` admite el objeto `{name, red_before_code}` o un texto, y en un bug es opcional; los bugs admiten `repro` y `platforms_note`; las solicitudes admiten los campos que N1 y N2 ya traen, con `turn` opcional; `role` vale `pack` o `instance`. (4) Junta todas las violaciones, las ordena por archivo y posición e imprime una por línea: `<archivo>: <posición>: <mensaje>`. Códigos: 0 verde; 1 hay violaciones; 2 argumentos inválidos; 3 no se pudo verificar. (5) Las reglas leen archivos por una interfaz con origen disco o índice de git (`--staged`). (6) Publica un JSON Schema por tipo en `schemas/<nombre>.schema.json`, generado desde los tipos de Go con código propio. S9 no valida techos de longitud. Las reglas que dependen del tipo del elemento o de otro archivo son de S10 y S11.",
   "files": [
+    "tools/cmd/aquas/main.go",
+    "tools/internal/verify/verify.go",
     "tools/internal/schema/",
     "schemas/"
   ],
-  "functional_test": "El humano agrega un campo inventado a `backlog.json` y el verificador lo rechaza nombrando el campo.",
+  "functional_test": "El humano agrega el campo `color` a `backlog.json`, corre `bin/aquas verify` y lee un mensaje que nombra `backlog.json` y `color`.",
   "technical_test": {
     "name": "TestDecodeRejectsUnknownFields",
-    "red_before_code": true
+    "red_before_code": true,
+    "also": [
+      "TestRepoFilesDecode",
+      "TestSchemasMatchTypes"
+    ]
   },
   "destructive_cases": [
     {
       "case": "`backlog.json` con un campo inventado `color` dentro del tercer elemento de `items`.",
-      "expect": "Rechazo; el mensaje nombra `color` y la posición del elemento."
+      "expect": "Código 1; un solo mensaje que contiene `backlog.json`, `items[2]` y `color`."
     },
     {
-      "case": "`backlog.json` donde un elemento trae la clave `ID` en mayúsculas en lugar de `id`.",
-      "expect": "Rechazo que nombra `ID`: las claves no se aceptan sin distinguir mayúsculas."
+      "case": "`backlog.json` donde un elemento trae la clave `ID` en lugar de `id`, y otro archivo donde la raíz trae `Items` en lugar de `items`.",
+      "expect": "Código 1 en los dos; el mensaje nombra `ID` e `Items` como campos sobrantes y `id` e `items` como faltantes."
     },
     {
-      "case": "Archivo JSON válido seguido de más contenido: `{...}{...}` o texto suelto después de la llave final.",
-      "expect": "Rechazo que nombra el contenido sobrante."
+      "case": "Un elemento con la clave `state` dos veces: `\"state\": \"done\", \"state\": \"proposed\"`.",
+      "expect": "Código 1; el mensaje nombra `state` como clave repetida y la posición del elemento."
     },
     {
-      "case": "Campo de texto con techo N: probar N caracteres, N+1 caracteres y N letras «ñ».",
-      "expect": "N caracteres pasa; N+1 se rechaza nombrando el campo y el techo; N «ñ» pasa, porque se cuentan caracteres y no bytes."
+      "case": "Tres archivos: `backlog.json` válido seguido de `{}`; seguido del texto `hola`; y seguido solo de espacios y un salto de línea.",
+      "expect": "Los dos primeros: código 1 y mensaje que dice que hay contenido después del final. El tercero: código 0."
     },
     {
-      "case": "Elemento con `priority: \"1\"` (texto), otro con `id: null` y otro sin el campo `type`.",
-      "expect": "Tres rechazos, cada uno nombra su campo; ninguno termina en pánico."
+      "case": "Tres corridas, una por archivo: un elemento con `priority: \"1\"`; otro con `id: null`; otro sin el campo `type`.",
+      "expect": "Código 1 en las tres; cada mensaje nombra su campo y la posición del elemento; la salida no contiene `panic`, `json:` ni `cannot unmarshal`."
+    },
+    {
+      "case": "Un solo `backlog.json` con las tres fallas anteriores en tres elementos distintos.",
+      "expect": "Código 1 y exactamente tres mensajes, ordenados por posición; dos corridas seguidas dan la misma salida byte a byte."
+    },
+    {
+      "case": "`priority` con los valores `1.5`, `-1` y `1e2`; `next_ids.S` con `0` y con `\"47\"`.",
+      "expect": "Cinco rechazos, cada uno nombra el campo y el valor recibido."
+    },
+    {
+      "case": "`state: \"Done\"`, `state: \"finished\"` y `type: \"epic\"`.",
+      "expect": "Tres rechazos; cada mensaje lista los valores válidos de esa lista cerrada."
+    },
+    {
+      "case": "`backlog.json` guardado con BOM de UTF-8 al inicio, y otro guardado con finales CRLF.",
+      "expect": "Con BOM: código 1 y mensaje en español que nombra el BOM. Con CRLF: código 0."
+    },
+    {
+      "case": "`backlog.json` de 0 bytes; con el contenido `[]`; con el contenido `null`; y sin el archivo.",
+      "expect": "Cuatro rechazos con código distinto de 0 que nombran `backlog.json`; ninguno da verde."
+    },
+    {
+      "case": "Campo sobrante `color` en `work/specs/S9.json`, en `work/requests/N2.json` y en `canon/config.json`, una corrida por archivo.",
+      "expect": "Código 1 en las tres; cada mensaje nombra el archivo y `color`."
+    },
+    {
+      "case": "Correr `aquas verify` sobre una copia de este repo en el commit donde se cierra S9, sin tocar nada.",
+      "expect": "Ningún mensaje de esquema sobre `work/specs/S2.json`, `S8.json`, `B1.json`, `B3.json`, `B6.json`, `work/requests/N1.json`, `N2.json` ni `archive/I1.json`."
+    },
+    {
+      "case": "Agregar un campo a un tipo de Go sin regenerar su archivo de `schemas/`.",
+      "expect": "`TestSchemasMatchTypes` falla y nombra el archivo de esquema desactualizado."
+    },
+    {
+      "case": "`aquas verify` corrido desde `tools/internal/` dentro de un repo instalado, y corrido desde una carpeta temporal vacía.",
+      "expect": "En el primero revisa la raíz del repo y da el mismo resultado que desde la raíz. En el segundo: código 3 y mensaje que dice que no encontró `backlog.json`."
+    },
+    {
+      "case": "`aquas verify --cualquiera`.",
+      "expect": "Código 2 y el mensaje «opción desconocida» con el uso."
     }
   ]
 }

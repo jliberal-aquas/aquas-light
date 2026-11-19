@@ -2,9 +2,11 @@
   "id": "S12",
   "parent": "F2",
   "name": "La instalación exige verde",
-  "what": "`aquas install` corre `aquas verify` antes del commit de instalación y deshace todo si no da verde.",
+  "what": "`aquas install` llama al verificador en proceso, en modo disco, sobre la carpeta destino, después de escribir `work/host.json` y antes de `git add`. Si devuelve violaciones o un error de ejecución, deshace todo y sale con código 1 mostrando el mensaje del verificador: la carpeta destino no existe si la creó la instalación, o queda con 0 entradas si ya existía. `Options` trae un verificador inyectable, como `AfterGitInit`. `setup` y `update` no lo llaman. Este slice escribe también `TestIntegrationVerify` de F2.",
   "files": [
-    "tools/internal/install/install.go"
+    "tools/internal/install/install.go",
+    "tools/cmd/aquas/main.go",
+    "tools/cmd/aquas/integration_test.go"
   ],
   "functional_test": "El humano ve que la instalación termina con la salida verde del verificador.",
   "technical_test": {
@@ -13,20 +15,44 @@
   },
   "destructive_cases": [
     {
-      "case": "Plantilla de `backlog.json` con un campo sobrante inyectado.",
-      "expect": "`aquas install` sale con código distinto de 0; la salida incluye el mensaje del verificador; la carpeta destino queda con 0 entradas."
+      "case": "Paquete de prueba cuya plantilla `templates/backlog.json` trae el campo sobrante `color`; instalar en una ruta que no existe.",
+      "expect": "Código 1; la salida contiene «se revirtió todo lo creado», `backlog.json` y `color`; la ruta destino no existe."
     },
     {
-      "case": "Verificador inyectado que anota si existe `HEAD` en el momento en que lo llaman.",
-      "expect": "Anota que `HEAD` no existe: el verificador corre antes del commit de instalación."
+      "case": "La misma plantilla rota; instalar en una carpeta vacía que ya existía.",
+      "expect": "Código 1; la carpeta sigue existiendo y tiene 0 entradas, sin `.git`."
     },
     {
-      "case": "Verificador inyectado que falla por error de ejecución (código 2, sin lista de violaciones).",
-      "expect": "La instalación se deshace igual: código distinto de 0 y carpeta con 0 entradas."
+      "case": "Verificador inyectado que anota si `git rev-parse --verify HEAD` da error y si existen `bin/aquas` y `work/host.json` cuando lo llaman.",
+      "expect": "Anota que `HEAD` no existe y que los dos archivos sí."
     },
     {
-      "case": "Instalación correcta y después `aquas verify` sobre el repo instalado.",
-      "expect": "Código 0 y `git rev-list --count HEAD` devuelve 1."
+      "case": "Verificador inyectado que devuelve un error de ejecución sin lista de violaciones.",
+      "expect": "Código 1; la salida contiene el texto del error; la carpeta destino no existe o queda con 0 entradas, según existiera antes."
+    },
+    {
+      "case": "Verificador inyectado que cuenta sus llamadas, en una instalación correcta.",
+      "expect": "Exactamente 1 llamada, con la carpeta destino como raíz."
+    },
+    {
+      "case": "Paquete cuyo `backlog.json` de la raíz es inválido y cuya `templates/backlog.json` es válida.",
+      "expect": "Instalación correcta con código 0."
+    },
+    {
+      "case": "Instalación correcta y después `bin/aquas verify` dentro del repo instalado (`bin\\\\aquas.exe` en Windows).",
+      "expect": "Código 0; `git rev-list --count HEAD` devuelve 1; `git status --porcelain` no imprime nada."
+    },
+    {
+      "case": "Instalar en una ruta con un espacio y una «ñ», por ejemplo `mi año/api`.",
+      "expect": "Código 0 y `aquas verify` dentro da código 0, en Linux, macOS y Windows."
+    },
+    {
+      "case": "Instalación correcta; leer la salida de `aquas install`.",
+      "expect": "La salida contiene la línea verde del verificador una sola vez, en español."
+    },
+    {
+      "case": "`aquas setup` en un clon del repo instalado, y después `aquas verify`.",
+      "expect": "`setup` no llama al verificador; `aquas verify` sale con código 0 y el árbol sigue limpio."
     }
   ]
 }
