@@ -8,3 +8,5 @@
 {"date": "2026-11-18", "item": "S4", "role": "implementer", "model": "sonnet", "task": "Construir S4 con TDD: copia, plantillas y manifiesto", "tokens": 79209, "tool_uses": 7, "duration_s": 68}
 {"date": "2026-11-18", "item": "S4", "role": "implementer", "model": "sonnet", "task": "Corrección S4: plantillas a templates/ (continuación del mismo agente)", "tokens": null, "tool_uses": null, "duration_s": null}
 {"date": "2026-11-18", "item": "S4", "role": "tester", "model": "haiku", "task": "Verde, rojo sin código y casos destructivos de S4", "tokens": 86296, "tool_uses": 13, "duration_s": 80}
+{"date": "2026-11-18", "item": "S5", "role": "implementer", "model": "sonnet", "task": "Construir S5 con TDD: git, build, descarga verificada, commit y rollback", "tokens": 90501, "tool_uses": 9, "duration_s": 220}
+{"date": "2026-11-18", "item": "S5", "role": "tester", "model": "haiku", "task": "Verde, rojo sin código y casos destructivos de S5", "tokens": 112992, "tool_uses": 14, "duration_s": 169}

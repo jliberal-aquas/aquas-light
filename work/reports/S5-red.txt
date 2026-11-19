@@ -1,0 +1,5 @@
+--- FAIL: TestInstallRollsBackOnFailure (0.00s)
+    install_test.go:17: se esperaba un error por el fallo inyectado
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/install	0.002s
+FAIL

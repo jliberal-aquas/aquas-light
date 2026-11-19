@@ -1,0 +1,19 @@
+{
+  "slice": "S5",
+  "step": "commit",
+  "done": [
+    "plan",
+    "red",
+    "green",
+    "tester"
+  ],
+  "next": "Commit de S5; luego S6.",
+  "files": [
+    "tools/internal/install/install.go",
+    "tools/internal/install/git.go",
+    "tools/internal/install/lintdownload.go",
+    "tools/internal/install/rollback.go"
+  ],
+  "blockers": [],
+  "updated_at": "2026-11-18T23:19:11-03:00"
+}

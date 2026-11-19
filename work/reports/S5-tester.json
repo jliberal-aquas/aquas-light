@@ -1,0 +1,113 @@
+{
+  "item": "S5",
+  "conclusion": "S5 pasa. El verde con -race da 0. La prueba roja se confirmó: con rollback stubbed, TestInstallRollsBackOnFailure falla por aserción (install_test.go:106) y con rollback.go restaurado (sha256 idéntico al original) vuelve a pasar. Los cinco destructive_cases cumplen su expect con dos matices. Primero, en los casos de error el destino no existe (la instalación lo creó y lo borró), en vez de existir con 0 entradas; la spec dice 'queda con 0 entradas'. Segundo, el caso de identidad salió por la rama de error que nombra user.name, porque git no pudo autodetectar el correo en este host. No se probó Windows ni macOS. Solo se corrió en Linux, como root y como uid 65534.",
+  "findings": [
+    {
+      "what": "La prueba técnica TestInstallRollsBackOnFailure falla si la reversión es un stub, y pasa con el código real.",
+      "where": "tools/internal/install/install_test.go:105-106; tools/internal/install/rollback.go:44",
+      "why": "Sin reversión la carpeta creada por la instalación queda en disco, y la aserción lo detecta.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "Caso 1 (HTTP 500 en la descarga): código distinto de 0 y el destino no existe, sin .git.",
+      "where": "tools/internal/install/install.go:70; tools/internal/install/rollback.go:44-47",
+      "why": "La reversión borra la carpeta porque la creó la instalación, así que 0 entradas se cumple como ausencia y no como carpeta vacía.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "Caso 2 (huella distinta): el error nombra la huella esperada y la recibida, no queda binario en disco y el destino no existe.",
+      "where": "tools/internal/install/lintdownload.go:76",
+      "why": "El mensaje incluye ambas huellas; el binario se escribe solo después de verificar, y la reversión borra el destino.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "Caso 3 (fallo tras git init con archivos de solo lectura en .git/objects): código distinto de 0, destino sin entradas, sin .git. Pasa como root y como uid 65534.",
+      "where": "tools/internal/install/install.go:77-81; tools/internal/install/rollback.go:21-22",
+      "why": "removeAll quita los bits de solo lectura antes de borrar. Como root el bit no bloquea el borrado, así que la corrida con uid 65534 es la que prueba el caso. No se probó en Windows.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "Caso 4 (sin user.name ni user.email): salió por la rama de error, y el mensaje nombra user.name. El destino no existe.",
+      "where": "tools/internal/install/git.go:38-43",
+      "why": "git no pudo autodetectar el correo (got 'root@vm.(none)'), así que el commit no se creó. La rama de éxito no se ejecutó.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "En un host donde git sí autodetecta la identidad, el caso 4 podría terminar con un commit de identidad generada en vez de error.",
+      "where": "tools/internal/install/git.go:36-37",
+      "why": "El commit no fija user.useConfigOnly ni valida la identidad antes de commitear. La spec admite ambas salidas, así que no es incumplimiento, pero no lo probé.",
+      "certainty": "inferred",
+      "severity": "minor"
+    },
+    {
+      "what": "Caso 5 (pre-commit global que sale 1): la instalación sale con código 0, rev-list --count HEAD da 1 y el asunto cumple la expresión. El gancho global no se ejecutó.",
+      "where": "tools/internal/install/git.go:36-37",
+      "why": "El -c core.hooksPath vacío sobreescribe el gancho global en el commit de instalación.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "La spec dice 'la carpeta destino queda con 0 entradas', pero la implementación borra la carpeta cuando la creó la instalación. Hace falta decidir cuál es la norma.",
+      "where": "work/specs/S5.json:20; tools/internal/install/rollback.go:46",
+      "why": "La spec en 'what' pide borrar la carpeta creada, y en destructive_cases pide 0 entradas. Ambas lecturas caben, pero solo la de ausencia pasa en el código actual.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "tools/internal/install/install_test.go",
+      "line": "105",
+      "quote": "if _, e := os.Stat(dest); e == nil {"
+    },
+    {
+      "file": "tools/internal/install/rollback.go",
+      "line": "44-47",
+      "quote": "func rollback(abs, top string, existed bool) {"
+    },
+    {
+      "file": "tools/internal/install/install.go",
+      "line": "70",
+      "quote": "rollback(abs, top, existed)"
+    },
+    {
+      "file": "tools/internal/install/git.go",
+      "line": "36",
+      "quote": "out, err := git(dest, \"-c\", \"core.hooksPath=\"+hooks, \"-c\", \"commit.gpgsign=false\","
+    },
+    {
+      "file": "tools/internal/install/git.go",
+      "line": "39",
+      "quote": "name, _ := git(dest, \"config\", \"user.name\")"
+    },
+    {
+      "file": "tools/internal/install/lintdownload.go",
+      "line": "76",
+      "quote": "return fmt.Errorf(\"la huella SHA-256 de golangci-lint no coincide: esperada %s, recibida %s\", want, got)"
+    },
+    {
+      "file": "tools/internal/install/rollback.go",
+      "line": "21-22",
+      "quote": "// removeAll deletes path, clearing read-only bits first (Windows refuses to delete read-only files such as those in .git/objects)."
+    },
+    {
+      "file": "work/specs/S5.json",
+      "line": "20",
+      "quote": "\"expect\": \"Código distinto de 0; la carpeta destino queda con 0 entradas, sin `.git`.\""
+    }
+  ],
+  "output": "$ go test -count=1 -race ./...   (verde)\nok  github.com/jliberal-aquas/aquas-light/tools/cmd/aquas 1.015s\nok  github.com/jliberal-aquas/aquas-light/tools/internal/hashing 1.013s\nok  github.com/jliberal-aquas/aquas-light/tools/internal/install 4.477s\nEXIT=0\n\n$ go test -count=1 ./internal/install/ -run TestInstallRollsBackOnFailure  (rollback stub)\n    install_test.go:106: la carpeta creada por la instalación debía borrarse\n--- FAIL: TestInstallRollsBackOnFailure (0.01s)\nFAIL\nEXIT=1\n\nsha256 rollback.go original = db338e4e142f71f301d812a0a48576221c76d97f39a3f3f76620ecfef834be29; tras restaurar = db338e4e142f71f301d812a0a48576221c76d97f39a3f3f76620ecfef834be29\n\nCaso 1 (500): err=la descarga de golangci-lint ... respondió 500 Internal Server Error; destino existe=false\nCaso 2 (huella): err=la huella SHA-256 ... esperada c77313a77e19b06123962c411d9943cc0d092bbec76b956104d18964e274902e, recibida d995dd4c76e75f46d6307b37b12e511189b02bf74f7c00fc56d9f268d7aa08ce; destino existe=false; sin binario\nCaso 3 (euid 0 y 65534): err=fallo inyectado tras git init; ro-object modo=-r--r--r--; destino existe=false; PASS\nCaso 4: err=git no tiene user.name ni user.email configurados...; git: fatal: unable to auto-detect email address (got 'root@vm.(none)'); rama B; destino existe=false\nCaso 5: sin error; rev-list --count HEAD=1; asunto cumple ^Install Aquas Light v\\d+\\.\\d+\\.\\d+$; gancho global NO se ejecutó; PASS\n\nVerde final tras borrar zz_tester_test.go: EXIT=0",
+  "pending": [
+    "No se probó en Windows ni macOS; el caso 3 pide las tres plataformas.",
+    "Decidir si 'queda con 0 entradas' acepta la carpeta ausente (como hace la implementación) o exige que la carpeta exista vacía.",
+    "No se hizo commit. El estado de git muestra backlog.json, work/delegations.jsonl y work/memory.json modificados o sin rastrear; no los toqué.",
+    "Temporales borrados: zz_tester_test.go y el binario de prueba. Solo queda el informe work/reports/S5-tester.json."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

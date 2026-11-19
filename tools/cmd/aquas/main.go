@@ -33,10 +33,6 @@ func runInstall(args []string, stdout, stderr io.Writer) int {
 		_, _ = fmt.Fprint(stderr, "aquas: falta la ruta de la carpeta destino\n\n"+usage())
 		return 2
 	}
-	if err := install.Preflight(args[0], install.DefaultDeps()); err != nil {
-		_, _ = fmt.Fprintf(stderr, "aquas: no se puede instalar:\n%v\n", err)
-		return 1
-	}
 	wd, err := os.Getwd()
 	if err != nil {
 		_, _ = fmt.Fprintf(stderr, "aquas: no se pudo leer el directorio actual: %v\n", err)
@@ -47,16 +43,16 @@ func runInstall(args []string, stdout, stderr io.Writer) int {
 		_, _ = fmt.Fprintf(stderr, "aquas: no se puede instalar: %v\n", err)
 		return 1
 	}
-	if err := install.Copy(root, args[0]); err != nil {
-		_, _ = fmt.Fprintf(stderr, "aquas: no se puede instalar: %v\n", err)
+	if err := install.Run(root, args[0], install.Options{Version: version}); err != nil {
+		_, _ = fmt.Fprintf(stderr, "aquas: no se puede instalar (se revirtió todo lo creado):\n%v\n", err)
 		return 1
 	}
-	_, _ = fmt.Fprintf(stdout, "Archivos copiados en %s con su manifiesto. El commit inicial y la reversión ante fallos llegan en S5.\n", args[0])
+	_, _ = fmt.Fprintf(stdout, "Aquas Light v%s instalado en %s: archivos copiados, bin/aquas y golangci-lint listos, y un commit inicial «Install Aquas Light v%s».\n", version, args[0], version)
 	return 0
 }
 
 func usage() string {
-	return "Uso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    copia el paquete en la carpeta destino\n  version           imprime la versión de aquas\n"
+	return "Uso: aquas <subcomando>\n\nSubcomandos:\n  install <ruta>    instala el paquete en la carpeta destino (git, binarios y commit inicial)\n  version           imprime la versión de aquas\n"
 }
 
 func main() {
