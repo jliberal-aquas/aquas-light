@@ -1,0 +1,15 @@
+{
+  "id": "B1",
+  "parent": "S1",
+  "name": "gofmt falla en Windows por CRLF",
+  "what": "En el CI de Windows, git convierte los finales de línea a CRLF al hacer checkout y `gofmt -l .` lista todos los archivos Go. Se agrega `.gitattributes` en la raíz con `* text=auto eol=lf`, como pide la ADR 0002.",
+  "files": [
+    ".gitattributes"
+  ],
+  "repro": {
+    "name": "CI test (windows-latest), paso gofmt",
+    "red": "run 44439732664: gofmt sale con código 1 en windows-latest; ubuntu y macos en verde"
+  },
+  "functional_test": "El humano abre la pestaña Actions y ve los tres trabajos en verde.",
+  "destructive_cases": []
+}

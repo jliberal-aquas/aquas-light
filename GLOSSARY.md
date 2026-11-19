@@ -87,6 +87,10 @@ _Avoid_: hot memory, notas
 **Archivo histórico**:
 Carpeta `archive/` con lo terminado: features cerradas, memorias y registros. No entra al contexto salvo para auditar.
 
+**Caso de desvío**:
+Registro en `work/gate-bypass.jsonl` de un control que dejó pasar un segundo intento o de un commit que saltó los ganchos. Mientras esté abierto bloquea empezar y cerrar slices; se cierra con una razón escrita que lee el auditor.
+_Avoid_: bypass, excepción
+
 ## Documentación
 
 **Referencia narrada**:

@@ -1,0 +1,14 @@
+{
+  "slice": "S2",
+  "step": "commit",
+  "done": [
+    "plan",
+    "green"
+  ],
+  "next": "Commit de S2; luego B1.",
+  "files": [
+    "canon/"
+  ],
+  "blockers": [],
+  "updated_at": "2026-11-18T22:51:37-03:00"
+}

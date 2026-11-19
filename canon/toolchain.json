@@ -1,0 +1,10 @@
+{
+  "golangci_lint_version": "v2.5.0",
+  "go_supported_min": "1.24",
+  "commands": {
+    "fmt": "gofmt -l .",
+    "vet": "go vet ./...",
+    "lint": "golangci-lint run ./...",
+    "test": "go test -race ./..."
+  }
+}

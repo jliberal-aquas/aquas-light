@@ -4,7 +4,7 @@
     "I": 2,
     "F": 10,
     "S": 47,
-    "B": 1,
+    "B": 2,
     "N": 2,
     "C": 10
   },
@@ -86,9 +86,18 @@
       "id": "S2",
       "type": "slice",
       "parent": "F1",
-      "state": "ready",
+      "state": "done",
       "priority": 2,
-      "spec": "work/specs/S2.json"
+      "spec": "work/specs/S2.json",
+      "spec_sha256": "eb4d942ee9440805ff876d4ce4dbe4c447af5f93ea036a5d8b593690dd0dfcd5"
+    },
+    {
+      "id": "B1",
+      "type": "bug",
+      "parent": "S1",
+      "state": "in_progress",
+      "priority": 0,
+      "spec": "work/specs/B1.json"
     },
     {
       "id": "S3",

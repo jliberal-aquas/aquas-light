@@ -1,0 +1,5 @@
+{
+  "role": "pack",
+  "default_model": "claude-opus-5-5",
+  "language": "es-VE"
+}

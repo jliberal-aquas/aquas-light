@@ -1,0 +1,30 @@
+{
+  "linux": {
+    "hints": [
+      "Las rutas usan / y son relativas a la raíz del repo.",
+      "El shell es bash; usa comillas simples para texto literal.",
+      "Los temporales van en /tmp, fuera del repo.",
+      "El fin de línea es LF.",
+      "Los ejecutables llevan permiso de ejecución."
+    ]
+  },
+  "darwin": {
+    "hints": [
+      "Las rutas usan / y son relativas a la raíz del repo.",
+      "El shell es zsh o bash; escribe scripts compatibles con ambos.",
+      "Los temporales van en $TMPDIR, no en /tmp.",
+      "El fin de línea es LF.",
+      "Las herramientas de BSD (sed, date) difieren de las de GNU; evita sus opciones propias."
+    ]
+  },
+  "windows": {
+    "hints": [
+      "Git Bash usa rutas /c/..., por ejemplo /c/Users/nombre/repo.",
+      "Las herramientas de archivos usan rutas C:\\..., por ejemplo C:\\Users\\nombre\\repo.",
+      "No uses /tmp; usa el directorio temporal de la variable TEMP.",
+      "Las rutas guardadas en JSON usan / y son relativas a la raíz.",
+      "El fin de línea del repo es LF; .gitattributes lo fuerza.",
+      "Los comandos se corren en Git Bash, no en cmd."
+    ]
+  }
+}

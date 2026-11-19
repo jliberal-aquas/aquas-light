@@ -1,0 +1,13 @@
+{
+  "slice": "B1",
+  "step": "green",
+  "done": [
+    "red"
+  ],
+  "next": "Agregar .gitattributes, commit y ver CI.",
+  "files": [
+    ".gitattributes"
+  ],
+  "blockers": [],
+  "updated_at": "2026-11-18T22:51:37-03:00"
+}
