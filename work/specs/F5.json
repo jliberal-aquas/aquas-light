@@ -6,8 +6,8 @@
   "acceptance": "En una instancia, un commit que rompe los linters o las pruebas de su lado, que no trae la línea `Docs:` o que toca `tools/` fuera de una actualización se rechaza con el motivo en español, y un commit hecho con `--no-verify` se detecta en la siguiente sesión.",
   "integration_test": "TestIntegrationCommitHooks: en un repo instalado, intenta cuatro commits inválidos y uno válido, y comprueba qué entra.",
   "slices": [
-    "S13",
     "S40",
+    "S13",
     "S14",
     "S15",
     "S41"

@@ -1,6 +1,27 @@
 {
   "id": "S44",
-  "destructive_cases": [],
+  "destructive_cases": [
+    {
+      "case": "Slice `S3` en `in_progress` con su `work/memory.json`; correr `aquas need add` con un turno existente.",
+      "expect": "`backlog.json` gana exactamente un elemento de tipo necesidad, en `to_refine` y con `source`; `next_ids.N` sube en 1; `S3` sigue en `in_progress`; `work/memory.json` queda idéntico byte a byte; `aquas verify` sale con código 0."
+    },
+    {
+      "case": "Turno que no existe en `work/turns.jsonl`.",
+      "expect": "Código distinto de 0; el mensaje nombra el turno; `backlog.json` queda idéntico byte a byte y `work/requests/` no gana ningún archivo."
+    },
+    {
+      "case": "Dos corridas seguidas con dos turnos distintos.",
+      "expect": "Nacen dos necesidades con IDs consecutivos y dos archivos distintos en `work/requests/`; `next_ids.N` sube en 2."
+    },
+    {
+      "case": "Turno cuyo `prompt` trae saltos de línea, comillas dobles y un emoji.",
+      "expect": "`work/requests/<ID>.json` es JSON válido y su campo `turn` vale el ID de ese turno; `work/turns.jsonl` queda idéntico byte a byte."
+    },
+    {
+      "case": "Ya existe en disco el `work/requests/<ID>.json` del ID que tocaría según `next_ids.N`.",
+      "expect": "Código distinto de 0; el archivo previo y `backlog.json` quedan idénticos byte a byte."
+    }
+  ],
   "parent": "F9",
   "name": "Aparcar una necesidad",
   "what": "`aquas need add <turno>` crea una necesidad `to_refine` en el backlog con el siguiente ID `N`, y su `work/requests/<ID>.json` apunta al turno de `work/turns.jsonl`. Funciona con un slice en curso y no lo toca.",

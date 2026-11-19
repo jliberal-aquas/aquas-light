@@ -2,9 +2,10 @@
   "id": "S25",
   "parent": "F4",
   "name": "Ocho puntos del fin de turno",
-  "what": "El gancho `Stop` comprueba los ocho puntos acordados y bloquea con el motivo. Con `stop_hook_active` verdadero no vuelve a bloquear, agrega el caso a `work/gate-bypass.jsonl` y el siguiente turno se lo muestra al humano.",
+  "what": "Define el formato de `work/gate-bypass.jsonl`: cada caso trae `id`, `date`, `hook`, `reason` y `status` (`open` o `closed`), y `aquas bypass close <id> <razón>` lo cierra dejando la razón. El gancho `Stop` comprueba los ocho puntos y bloquea con el motivo; si ya era el segundo intento y sigue incumpliendo, agrega un caso abierto. El auditor lee todas las razones de cierre al cerrar la feature.",
   "files": [
-    "tools/internal/hooks/stop.go"
+    "tools/internal/hooks/stop.go",
+    "tools/internal/work/bypass.go"
   ],
   "functional_test": "El humano ve una respuesta sin «Refinar:» detenida y corregida antes de llegarle.",
   "technical_test": {
@@ -22,11 +23,11 @@
     },
     {
       "case": "Fixture que incumple un punto con `stop_hook_active: true`.",
-      "expect": "No bloquea: código 0 y ninguna decisión `block` en stdout."
+      "expect": "No bloquea: código 0 y ninguna decisión `block` en stdout; `work/gate-bypass.jsonl` gana exactamente una línea de JSON válido."
     },
     {
       "case": "Fixture que cumple los ocho puntos.",
-      "expect": "Código 0 y ninguna decisión `block` en stdout."
+      "expect": "Código 0 y ninguna decisión `block` en stdout; `work/gate-bypass.jsonl` queda idéntico byte a byte."
     },
     {
       "case": "stdin con JSON truncado y otra entrada cuyo `transcript_path` no existe.",

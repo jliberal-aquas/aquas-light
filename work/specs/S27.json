@@ -2,7 +2,7 @@
   "id": "S27",
   "parent": "F9",
   "name": "Cerrar una feature",
-  "what": "`aquas feature close <ID>` exige todos sus slices `done`, la salida verde de la prueba integral y los informes escritos por el gancho del `architect` (code review y linters) y del `auditor`. Muda la feature y sus slices a `archive/<iniciativa>.json` con `closed_at` y `evidence`.",
+  "what": "`aquas feature close <ID>` exige todos sus slices `done`, la salida verde de la prueba integral y `work/reports/<ID>-architect.json` y `work/reports/<ID>-auditor.json` con `result: pass`, escritos por el gancho. Muda la feature y sus slices a `archive/<iniciativa>.json` con `closed_at` y `evidence`.",
   "files": [
     "tools/internal/work/feature.go"
   ],
@@ -17,8 +17,8 @@
       "expect": "Código distinto de 0; el mensaje nombra el slice; `backlog.json` y `archive/` quedan iguales."
     },
     {
-      "case": "Feature con todos sus slices en `done` y solo la auditoría de otra feature presente.",
-      "expect": "Código distinto de 0; el mensaje dice que falta la auditoría de esta feature."
+      "case": "Feature con todos sus slices en `done`; tres intentos, cada uno con un solo requisito incumplido: la prueba integral sale en rojo; falta el informe del `architect`; del `auditor` solo existe el informe de otra feature.",
+      "expect": "Tres rechazos con código distinto de 0, cada uno nombra lo que falta; `backlog.json` y `archive/` quedan iguales."
     },
     {
       "case": "Cerrar `F2` cuando `archive/I1.json` ya contiene a `F1`; después intentar cerrar `F1` otra vez.",

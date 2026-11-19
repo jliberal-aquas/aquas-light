@@ -2,7 +2,7 @@
   "id": "S32",
   "parent": "F6",
   "name": "Reglas del resello",
-  "what": "Un resello vale solo si el documento cambió o si trae `unchanged_reason` de hasta 300 caracteres.",
+  "what": "Un resello vale solo si el documento cambió o si trae `unchanged_reason` de hasta 300 caracteres. El verificador compara `work/seals.json` con el último commit y aplica estas reglas a cada entrada cambiada, aunque se haya editado a mano.",
   "files": [
     "tools/internal/seal/reseal.go"
   ],

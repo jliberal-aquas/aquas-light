@@ -1,6 +1,27 @@
 {
   "id": "S45",
-  "destructive_cases": [],
+  "destructive_cases": [
+    {
+      "case": "Bug cuyo padre es un slice en `in_progress`, otro con padre en `proposed`, otro con padre `S999` y otro con padre `F1`.",
+      "expect": "Cuatro rechazos con código distinto de 0; `backlog.json` queda idéntico byte a byte."
+    },
+    {
+      "case": "Padre `done` y prueba que pasa en verde.",
+      "expect": "Código distinto de 0; no nace ningún bug y `next_ids.B` no cambia."
+    },
+    {
+      "case": "Padre `done` y nombre de prueba que no existe en el código (el corredor sale con 0 y «no tests to run»).",
+      "expect": "Código distinto de 0; el mensaje nombra la prueba; `backlog.json` queda idéntico byte a byte."
+    },
+    {
+      "case": "Padre `done` y prueba que falla.",
+      "expect": "`backlog.json` gana exactamente un elemento de tipo bug cuyo `parent` es ese slice; `next_ids.B` sube en 1; el slice sigue en `done` y su especificación queda idéntica byte a byte."
+    },
+    {
+      "case": "Padre `done` cuya feature ya está archivada en `archive/I1.json`, con prueba que falla.",
+      "expect": "El bug nace con ese padre y `aquas verify` sale con código 0."
+    }
+  ],
   "parent": "F9",
   "name": "Registrar un bug",
   "what": "`aquas bug add <slice> <test>` crea un bug con el siguiente ID `B` cuyo padre es un slice `done`, y exige que la prueba que reproduce la falla exista y falle.",

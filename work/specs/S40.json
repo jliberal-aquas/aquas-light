@@ -1,9 +1,30 @@
 {
   "id": "S40",
-  "destructive_cases": [],
+  "destructive_cases": [
+    {
+      "case": "Instalar y leer `git ls-files -s .githooks/pre-commit .githooks/commit-msg`, en Linux, macOS y Windows.",
+      "expect": "Las dos líneas empiezan con el modo `100755` en los tres sistemas."
+    },
+    {
+      "case": "Configuración global de git con `core.hooksPath` apuntando a otra carpeta; instalar.",
+      "expect": "`git config --local core.hooksPath` devuelve `.githooks`."
+    },
+    {
+      "case": "Leer los bytes de `.githooks/pre-commit` y `.githooks/commit-msg` generados en los tres sistemas.",
+      "expect": "La primera línea de cada uno es `#!/bin/sh`; ninguno contiene `\\r`, `\\`, letra de unidad ni la ruta de la carpeta temporal; son idénticos byte a byte en los tres sistemas."
+    },
+    {
+      "case": "Correr `.githooks/pre-commit` y `.githooks/commit-msg` cuando `bin/aquas` (`aquas.exe` en Windows) no existe.",
+      "expect": "Los dos salen con código distinto de 0 y un mensaje en español que nombra `setup`."
+    },
+    {
+      "case": "Repo instalado en una ruta con un espacio y una «ñ»; desde una subcarpeta, `git commit` de un archivo Go mal formateado.",
+      "expect": "El commit se rechaza nombrando el archivo; la salida no contiene un error de archivo no encontrado para `bin/aquas`; `git rev-list --count HEAD` no cambia."
+    }
+  ],
   "parent": "F5",
   "name": "Instalar los ganchos de git",
-  "what": "Crea `.githooks/` con envoltorios `sh` que llaman a `bin/aquas`, los registra en git con el bit ejecutable (`git update-index --chmod=+x`) para que funcionen al cruzar de Windows a Linux o macOS, y activa `core.hooksPath`. La instalación y `setup` lo llaman.",
+  "what": "Crea `.githooks/` con envoltorios `sh` que llaman a `bin/aquas` y rechazan el commit con la indicación de correr `setup` si `bin/aquas` no existe. Los registra en git con el bit ejecutable (`git update-index --chmod=+x`) y activa `core.hooksPath`. La instalación y `setup` lo llaman.",
   "files": [
     ".githooks/pre-commit",
     ".githooks/commit-msg",

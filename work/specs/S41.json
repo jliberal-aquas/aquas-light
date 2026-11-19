@@ -1,9 +1,30 @@
 {
   "id": "S41",
-  "destructive_cases": [],
+  "destructive_cases": [
+    {
+      "case": "Después de `work/verified_head` hay dos commits: uno válido hecho con los ganchos y otro hecho con `--no-verify` sin la línea `Docs:`.",
+      "expect": "La salida lista exactamente un commit, el del `--no-verify`, con su SHA y un motivo que nombra `Docs:`; el SHA del commit válido no aparece."
+    },
+    {
+      "case": "Instancia; commit hecho con `--no-verify` que modifica `tools/x.go`.",
+      "expect": "La salida lista ese commit con un motivo que nombra `tools/x.go`."
+    },
+    {
+      "case": "Repo recién instalado, sin commits posteriores al de instalación.",
+      "expect": "Código 0 y 0 commits listados: el commit de instalación no aparece aunque no trae la línea `Docs:`."
+    },
+    {
+      "case": "`work/verified_head` con un SHA que no existe en el repo, y otra corrida con el texto `hola`.",
+      "expect": "En las dos, la salida nombra `work/verified_head` y no hay pánico; ninguna sale con código 0 y lista vacía."
+    },
+    {
+      "case": "Tres commits con `--no-verify` seguidos después de `work/verified_head`: el primero y el tercero sin la línea `Docs:`, el segundo con la línea válida.",
+      "expect": "La salida lista exactamente el primero y el tercero: se revisa cada commit, no solo el último."
+    }
+  ],
   "parent": "F5",
   "name": "Detectar commits que saltaron los ganchos",
-  "what": "`aquas verify --since-last` corre las reglas del commit sobre cada commit posterior a `work/verified_head` y lista los que no las cumplen. El gancho de inicio de sesión lo llama y le muestra el resultado al humano.",
+  "what": "`aquas verify --since-last` corre las reglas del commit sobre cada commit posterior a `work/verified_head`, que es local de cada máquina y no se sube. Cada commit que falla se agrega como caso abierto a `work/gate-bypass.jsonl`, y `work/verified_head` avanza al último commit revisado. Si falta o no es un SHA válido, revisa desde el commit raíz.",
   "files": [
     "tools/internal/verify/since.go"
   ],

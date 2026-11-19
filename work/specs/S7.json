@@ -2,7 +2,7 @@
   "id": "S7",
   "parent": "F1",
   "name": "Actualizar el canon",
-  "what": "`aquas update` reemplaza lo que trae el paquete: `canon/`, `schemas/`, `tools/`, `.githooks/`, `templates/` y `docs/governance/` con sus sellos, y luego recompila `.claude/`. En `canon/`, si un archivo cambió respecto de su huella del manifiesto, se detiene, lo lista y solo sigue con `--take ours` o `--take theirs` por archivo. Nunca toca `backlog.json`, `work/`, `docs/product/` ni `product/`. Escribe en el manifiesto la versión nueva y las huellas de `tools/`.",
+  "what": "`aquas update` reemplaza lo que trae el paquete: `canon/`, `schemas/`, `tools/`, `.githooks/`, `templates/`, `docs/governance/` y, en `work/seals.json`, solo las entradas de `docs/governance/`. En `canon/`, si un archivo cambió respecto de su huella del manifiesto, se detiene, lo lista y solo sigue con `--take ours` o `--take theirs` por archivo. Nunca toca `backlog.json`, `docs/product/`, `product/` ni el resto de `work/`. Escribe en el manifiesto la versión nueva y las huellas de `tools/`. La recompilación la agrega S42.",
   "files": [
     "tools/internal/update/update.go"
   ],
@@ -25,8 +25,8 @@
       "expect": "Código distinto de 0; el mensaje nombra los valores válidos `ours` y `theirs`; ningún archivo cambia."
     },
     {
-      "case": "Paquete nuevo que trae versiones distintas de `backlog.json`, `work/x.json`, `docs/x.md` y `product/x.txt`.",
-      "expect": "Tras actualizar, esos cuatro archivos de la instancia quedan idénticos byte a byte."
+      "case": "Paquete nuevo que trae versiones distintas de `backlog.json`, `work/x.json`, `docs/product/x.md` y `product/x.txt`, y una versión nueva de `docs/governance/x.md`.",
+      "expect": "Tras actualizar, los cuatro primeros archivos de la instancia quedan idénticos byte a byte y `docs/governance/x.md` es idéntico al del paquete."
     },
     {
       "case": "Correr `aquas update` dos veces seguidas con el mismo paquete.",

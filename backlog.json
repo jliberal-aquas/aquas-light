@@ -196,20 +196,20 @@
       "spec": "work/specs/F5.json"
     },
     {
-      "id": "S13",
-      "type": "slice",
-      "parent": "F5",
-      "state": "proposed",
-      "priority": 1,
-      "spec": "work/specs/S13.json"
-    },
-    {
       "id": "S40",
       "type": "slice",
       "parent": "F5",
       "state": "proposed",
-      "priority": 2,
+      "priority": 1,
       "spec": "work/specs/S40.json"
+    },
+    {
+      "id": "S13",
+      "type": "slice",
+      "parent": "F5",
+      "state": "proposed",
+      "priority": 2,
+      "spec": "work/specs/S13.json"
     },
     {
       "id": "S14",
@@ -277,20 +277,20 @@
       "spec": "work/specs/S19.json"
     },
     {
-      "id": "S20",
-      "type": "slice",
-      "parent": "F3",
-      "state": "proposed",
-      "priority": 5,
-      "spec": "work/specs/S20.json"
-    },
-    {
       "id": "S42",
       "type": "slice",
       "parent": "F3",
       "state": "proposed",
-      "priority": 6,
+      "priority": 5,
       "spec": "work/specs/S42.json"
+    },
+    {
+      "id": "S20",
+      "type": "slice",
+      "parent": "F3",
+      "state": "proposed",
+      "priority": 6,
+      "spec": "work/specs/S20.json"
     },
     {
       "id": "F4",

@@ -2,7 +2,7 @@
   "id": "S24",
   "parent": "F4",
   "name": "Validar informes",
-  "what": "Define el esquema del informe. El gancho `SubagentStop` valida `last_assistant_message` contra ese esquema; si cumple, el propio gancho escribe `work/reports/<agent_id>.json` con `agent_type`; si no cumple, bloquea el cierre. Con `stop_hook_active` verdadero no vuelve a bloquear: no escribe informe y agrega el caso a `work/gate-bypass.jsonl`.",
+  "what": "Define el esquema del informe, que agrega a los seis campos `item` (el ID del slice o feature) y `result` (`pass`, `fail` o `n/a`). El gancho `SubagentStop` valida `last_assistant_message` contra ese esquema; si cumple, escribe `work/reports/<item>-<agent_type>.json`, aunque `stop_hook_active` sea verdadero. Si no cumple, bloquea el cierre; si ya era el segundo intento, no escribe informe y agrega un caso abierto a `work/gate-bypass.jsonl`.",
   "files": [
     "tools/internal/hooks/subagentstop.go"
   ],
@@ -26,11 +26,11 @@
     },
     {
       "case": "Informe inválido con `stop_hook_active: true`.",
-      "expect": "No bloquea (código 0) y no escribe ningún archivo en `work/reports/`."
+      "expect": "No bloquea (código 0); no escribe ningún archivo en `work/reports/`; `work/gate-bypass.jsonl` gana exactamente una línea de JSON válido."
     },
     {
       "case": "Dos subagentes terminan al mismo tiempo con informes válidos distintos.",
-      "expect": "`work/reports/` gana dos archivos distintos, cada uno idéntico a su informe."
+      "expect": "`work/reports/` gana dos archivos, cada uno con el `agent_id` de su subagente en el nombre, su `agent_type` y el contenido de su propio informe."
     }
   ]
 }

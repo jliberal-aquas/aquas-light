@@ -7,7 +7,7 @@
     "tools/internal/compile/commands.go",
     "canon/commands/retrospective.md"
   ],
-  "functional_test": "El humano escribe `/retrospectiva` y recibe propuestas, sin cambios aplicados.",
+  "functional_test": "El humano escribe `/retrospective` y recibe propuestas, sin cambios aplicados.",
   "technical_test": {
     "name": "TestCompileRetroCommand",
     "red_before_code": true
@@ -18,7 +18,7 @@
       "expect": "Las huellas son idénticas: compilar el comando no cambia el canon."
     },
     {
-      "case": "Compilar cuando falta `canon/commands/retrospectiva.md`.",
+      "case": "Compilar cuando falta `canon/commands/retrospective.md`.",
       "expect": "Error que nombra el archivo; `.claude/commands/` queda como estaba."
     },
     {
@@ -26,7 +26,7 @@
       "expect": "Su archivo desaparece de `.claude/commands/`."
     },
     {
-      "case": "Editar `.claude/commands/retrospectiva.md` a mano y correr `aquas verify`.",
+      "case": "Editar `.claude/commands/retrospective.md` a mano y correr `aquas verify`.",
       "expect": "Rechazo que nombra el archivo."
     }
   ]

@@ -2,7 +2,7 @@
   "id": "S15",
   "parent": "F5",
   "name": "tools/ bloqueado en una instancia",
-  "what": "Lee el rol del repo de `canon/config.json` en el último commit, no del índice. En una instancia, rechaza todo commit que toque `tools/`, salvo uno que sube la versión del manifiesto y cuyos archivos de `tools/` coinciden con las huellas nuevas del manifiesto. Cambiar el rol solo se acepta en ese mismo tipo de commit.",
+  "what": "Lee el rol del repo de `canon/config.json` en el último commit, no del índice; sin último commit, como en el commit raíz de instalación, no aplica el candado. En una instancia, rechaza todo commit que toque `tools/`, salvo uno que sube la versión del manifiesto y cuyos archivos de `tools/` coinciden con las huellas nuevas del manifiesto. Cambiar el rol solo se acepta en ese mismo tipo de commit. Límite conocido: quien recalcule las huellas a mano pasa el candado; el control frena el desvío, no el fraude.",
   "files": [
     "tools/internal/githooks/toolslock.go"
   ],

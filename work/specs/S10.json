@@ -31,6 +31,10 @@
     {
       "case": "Especificación de un slice `done` cambiada en un byte y agregada al índice con `git add`; después se restaura solo en el árbol de trabajo.",
       "expect": "Rechazo que nombra el slice: se compara lo que entraría al commit, no solo el archivo en disco."
+    },
+    {
+      "case": "Una necesidad en estado `to_refine` sin campo `source`.",
+      "expect": "`aquas verify` sale con código distinto de 0 y el mensaje nombra la necesidad."
     }
   ]
 }

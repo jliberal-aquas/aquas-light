@@ -1,9 +1,30 @@
 {
   "id": "S43",
-  "destructive_cases": [],
+  "destructive_cases": [
+    {
+      "case": "Empezar `S4` cuando `S3` ya está en `in_progress`.",
+      "expect": "Código distinto de 0; el mensaje nombra `S3`; `backlog.json` y `work/memory.json` quedan idénticos byte a byte; no existe `work/reports/S4-red.txt`."
+    },
+    {
+      "case": "Slice cuya prueba técnica pasa en verde, y otro cuyo nombre de prueba declarado no existe en el código (el corredor sale con 0 y «no tests to run»).",
+      "expect": "Dos rechazos con código distinto de 0, el segundo nombra la prueba; ninguno de los dos slices queda en `in_progress`; no se crea `work/memory.json` ni ningún `-red.txt`."
+    },
+    {
+      "case": "Empezar un slice ya `done`, el ID `S999` y el ID `F1`.",
+      "expect": "Tres rechazos con código distinto de 0; `backlog.json` queda idéntico byte a byte."
+    },
+    {
+      "case": "`work/gate-bypass.jsonl` con un caso abierto y ningún slice en `in_progress`.",
+      "expect": "Código distinto de 0; el mensaje nombra `work/gate-bypass.jsonl`; `backlog.json` queda idéntico byte a byte."
+    },
+    {
+      "case": "Prueba técnica en rojo y fallo inyectado al crear `work/memory.json`.",
+      "expect": "Código distinto de 0; el slice no queda en `in_progress`: `backlog.json` queda idéntico byte a byte."
+    }
+  ],
   "parent": "F9",
   "name": "Empezar un slice",
-  "what": "`aquas slice start <ID>` exige que no haya otro slice en `in_progress` ni casos abiertos en `work/gate-bypass.jsonl`, corre la prueba técnica y exige que exista y falle, guarda esa salida roja en `work/reports/<ID>-red.txt`, pone el slice en `in_progress` y crea `work/memory.json`. Define el esquema de la memoria.",
+  "what": "`aquas slice start <ID>` exige que el slice esté en `ready` y que no haya otro en `in_progress` ni casos abiertos en `work/gate-bypass.jsonl`. Si el slice tiene prueba técnica, la corre, exige que exista y falle y guarda esa salida en `work/reports/<ID>-red.txt`. Pone el slice en `in_progress` y crea `work/memory.json`. Define el esquema de la memoria.",
   "files": [
     "tools/internal/work/start.go",
     "tools/internal/schema/memory.go"

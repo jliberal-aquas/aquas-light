@@ -169,7 +169,8 @@
         "context": "≤1200 caracteres",
         "tasks[].agent": "un rol distinto de orchestrator",
         "tasks[].task": "≤2000 caracteres; qué hacer, qué archivos, qué no hacer y una oración que empieza con «Terminas cuando»",
-        "tasks[].solutionSpace": "≤300 caracteres"
+        "tasks[].solutionSpace": "≤300 caracteres",
+        "tasks[].item": "ID del slice o feature"
       },
       "forbidden": [
         "model",
@@ -181,7 +182,9 @@
         "evidence": "≤20 objetos file, line, quote ≤300",
         "output": "≤2000, opcional",
         "pending": "lista",
-        "certainty": "verified|inferred|hypothesis|unknown"
+        "certainty": "verified|inferred|hypothesis|unknown",
+        "item": "ID del slice o feature",
+        "result": "pass|fail|n/a"
       },
       "severity": [
         "blocker",
@@ -229,7 +232,9 @@
       "F6",
       "F7",
       "F8"
-    ]
+    ],
+    "gate_bypass": "work/gate-bypass.jsonl: casos con id, date, hook, reason y status; se cierran con aquas bypass close <id> <razón>; un caso abierto bloquea empezar y cerrar slices; el auditor lee las razones al cerrar la feature.",
+    "plan_review": "El arquitecto revisa el plan de cada feature justo antes de empezarla; el humano aprueba I1 ahora y cada feature al empezar."
   },
   "architect_review": {
     "date": "2026-11-18",

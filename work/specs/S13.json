@@ -2,7 +2,7 @@
   "id": "S13",
   "parent": "F5",
   "name": "pre-commit por lado",
-  "what": "Clasifica los archivos del índice en gobierno o producto; corre las herramientas de `canon/toolchain.json` o las del componente en `product/toolchain.json`. Rechaza código de producto si su componente no tiene comandos. Si `bin/aquas` no existe, rechaza el commit y dice que corras `setup`.",
+  "what": "Clasifica los archivos del índice en gobierno o producto; corre las herramientas de `canon/toolchain.json` o las del componente en `product/toolchain.json`. Rechaza código de producto si su componente no tiene comandos.",
   "files": [
     "tools/internal/githooks/precommit.go"
   ],
@@ -30,7 +30,7 @@
     },
     {
       "case": "Correr `.githooks/pre-commit` cuando `bin/aquas` no existe.",
-      "expect": "Código distinto de 0 y mensaje en español que dice cómo compilar el binario; el commit no entra."
+      "expect": "Código distinto de 0 y mensaje en español que nombra `setup`; el commit no entra."
     }
   ]
 }

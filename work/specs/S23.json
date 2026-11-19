@@ -2,7 +2,7 @@
   "id": "S23",
   "parent": "F4",
   "name": "Validar encargos",
-  "what": "Define el esquema del encargo. El gancho `PreToolUse` sobre `Agent` valida el encargo contra ese esquema y lo niega si trae `model` o `effort`. Si la entrada no se puede leer, niega con código 2.",
+  "what": "Define el esquema del encargo, con el campo obligatorio `tasks[].item` (el ID del slice o feature). El gancho `PreToolUse` sobre `Agent` valida el encargo contra ese esquema y lo niega si trae `model` o `effort`. Si la entrada no se puede leer, niega con código 2.",
   "files": [
     "tools/internal/hooks/pretooluse.go"
   ],

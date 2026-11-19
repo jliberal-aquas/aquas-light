@@ -2,7 +2,7 @@
   "id": "S14",
   "parent": "F5",
   "name": "commit-msg con línea Docs",
-  "what": "Exige en todo commit, salvo los de instalación y actualización, la línea `Docs: revisé=<ruta existente|nada>; falsa=<sí|no>; promesa=<sí|no>`. El registro se lee de `git log`; no se copia a ningún archivo.",
+  "what": "Exige en todo commit la línea `Docs: revisé=<ruta existente|nada>; falsa=<sí|no>; promesa=<sí|no>`, salvo en el commit raíz de instalación y en un commit de actualización, que se reconoce por la misma regla de S15. El registro se lee de `git log`; no se copia a ningún archivo.",
   "files": [
     "tools/internal/githooks/commitmsg.go"
   ],
@@ -26,11 +26,11 @@
     },
     {
       "case": "Mensaje válido guardado con finales CRLF.",
-      "expect": "Se acepta; `work/log.md` recibe exactamente una línea nueva, sin `\\r`."
+      "expect": "Se acepta con código 0; `git log -1 --format=%B` muestra la línea `Docs:`; no se crea ni se modifica `work/log.md`."
     },
     {
       "case": "Mensaje sin la línea `Docs:`.",
-      "expect": "Rechazo; `work/log.md` queda idéntico byte a byte."
+      "expect": "Rechazo con código distinto de 0 que muestra el formato esperado; `git rev-list --count HEAD` no cambia."
     }
   ]
 }

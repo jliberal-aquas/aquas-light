@@ -2,7 +2,7 @@
   "id": "S22",
   "parent": "F4",
   "name": "Inyectar el host",
-  "what": "El gancho `SessionStart` regenera `work/host.json`, corre `aquas verify --since-last` y devuelve `additionalContext` con el host, el resultado y las rutas del backlog y la memoria. El gancho `SubagentStart` solo inyecta el `work/host.json` existente.",
+  "what": "El gancho `SessionStart` regenera `work/host.json`, corre `aquas verify --since-last` y devuelve `additionalContext` con el host, los casos abiertos de `work/gate-bypass.jsonl` y las rutas del backlog y la memoria. El gancho `SubagentStart` inyecta `work/host.json`; si falta o no es válido, lo regenera primero.",
   "files": [
     "tools/internal/hooks/sessionstart.go"
   ],
@@ -13,23 +13,23 @@
   },
   "destructive_cases": [
     {
-      "case": "Entrada de `SubagentStart`.",
-      "expect": "stdout es un único JSON válido; `hookSpecificOutput.hookEventName` vale `SubagentStart`; `additionalContext` contiene el sistema y la ruta del backlog."
+      "case": "Entrada de `SubagentStart` con un `work/host.json` existente.",
+      "expect": "stdout es un único JSON válido; `hookSpecificOutput.hookEventName` vale `SubagentStart`; `additionalContext` contiene el `os` de `work/host.json`; `work/host.json` queda idéntico byte a byte."
     },
     {
       "case": "Entrada de `SessionStart` con `source: compact`.",
       "expect": "También devuelve `additionalContext` con el host."
     },
     {
-      "case": "`work/host.json` previo que dice `os: windows`, corriendo en Linux.",
+      "case": "`work/host.json` previo que dice `os: windows`, corriendo en Linux; entrada de `SessionStart`.",
       "expect": "Tras el gancho dice `os: linux` y el `additionalContext` también."
     },
     {
       "case": "Diez entradas de `SubagentStart` al mismo tiempo.",
-      "expect": "Las diez salidas son JSON válido y `work/host.json` termina válido y completo."
+      "expect": "Las diez salidas son JSON válido y `work/host.json` queda idéntico byte a byte: `SubagentStart` no lo regenera."
     },
     {
-      "case": "Backlog sin ningún slice `in_progress`, sin archivo de memoria.",
+      "case": "Entrada de `SessionStart` con backlog sin ningún slice `in_progress` y sin archivo de memoria.",
       "expect": "`additionalContext` no nombra ninguna ruta de memoria que no exista en disco."
     }
   ]

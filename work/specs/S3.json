@@ -25,12 +25,12 @@
       "expect": "Código distinto de 0: no está completamente vacía; el listado antes y después es idéntico."
     },
     {
-      "case": "Carpeta destino vacía y `PATH` apuntando a un directorio temporal sin `git`.",
-      "expect": "Código distinto de 0; el mensaje nombra `git`; la carpeta sigue con 0 entradas."
+      "case": "`PATH` apuntando a un directorio temporal sin `git`, en dos corridas: una con una ruta destino que no existe y otra con una carpeta destino vacía que ya existía.",
+      "expect": "Las dos salen con código distinto de 0 y el mensaje nombra `git`; tras la primera, la ruta sigue sin existir; tras la segunda, la carpeta sigue existiendo con 0 entradas."
     },
     {
-      "case": "Carpeta destino vacía y versión de Go inyectada `go1.10`.",
-      "expect": "Código distinto de 0; el mensaje nombra la versión encontrada y la mínima soportada; la carpeta sigue con 0 entradas."
+      "case": "Ruta destino que no existe y versión de Go inyectada `go1.10`.",
+      "expect": "Código distinto de 0; el mensaje nombra la versión encontrada y la mínima soportada; la ruta sigue sin existir."
     }
   ]
 }

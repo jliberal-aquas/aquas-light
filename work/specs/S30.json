@@ -2,7 +2,7 @@
   "id": "S30",
   "parent": "F6",
   "name": "Sellar",
-  "what": "Define el esquema de los sellos. `aquas seal <doc>` guarda en `work/seals.json` la huella del documento y de lo que cubre, con finales de línea normalizados y rutas con `/`. El verificador compara `work/seals.json` con el último commit y aplica las reglas del resello a cada entrada cambiada, aunque se haya editado a mano.",
+  "what": "Define el esquema de los sellos. `aquas seal <doc>` guarda en `work/seals.json` la huella del documento y de lo que cubre, con finales de línea normalizados y rutas con `/`.",
   "files": [
     "tools/internal/seal/seal.go"
   ],

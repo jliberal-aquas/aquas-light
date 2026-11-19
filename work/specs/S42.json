@@ -1,11 +1,33 @@
 {
   "id": "S42",
-  "destructive_cases": [],
+  "destructive_cases": [
+    {
+      "case": "Instalar en una carpeta temporal vacía y listar el resultado.",
+      "expect": "Existen `CLAUDE.md`, `.claude/settings.json` y un archivo en `.claude/agents/` por cada rol de `canon/roles.json`; `git status --porcelain` no lista ninguno de ellos; `git rev-list --count HEAD` devuelve 1."
+    },
+    {
+      "case": "Verificador inyectado que anota si existe `.claude/settings.json` en el momento en que lo llaman.",
+      "expect": "Anota que existe: la compilación corre antes del verificador."
+    },
+    {
+      "case": "Instalar desde un paquete cuyo `canon/roles.json` tiene JSON roto.",
+      "expect": "Código distinto de 0; el mensaje nombra `canon/roles.json`; la carpeta destino queda con 0 entradas."
+    },
+    {
+      "case": "Instalar y después correr `aquas compile` y `aquas verify`.",
+      "expect": "Los dos salen con código 0 y `git status --porcelain` queda vacío: lo instalado ya era lo compilado."
+    },
+    {
+      "case": "Actualizar con un paquete que cambia las instrucciones del rol `tester` en `canon/roles.json`.",
+      "expect": "Tras `aquas update`, `.claude/agents/tester.md` contiene el texto nuevo y `aquas verify` sale con código 0."
+    }
+  ],
   "parent": "F3",
   "name": "La instalación compila",
-  "what": "`aquas install` y `aquas update` corren `aquas compile` antes del verificador, así la instancia nace con `.claude/` y `CLAUDE.md`.",
+  "what": "`aquas install` y `aquas update` corren `aquas compile` antes del verificador, así la instancia nace con `.claude/` y `CLAUDE.md` y una actualización los regenera.",
   "files": [
-    "tools/internal/install/install.go"
+    "tools/internal/install/install.go",
+    "tools/internal/update/update.go"
   ],
   "functional_test": "El humano instala y abre Claude Code: la sesión ya tiene agentes, ganchos y el modelo del orquestador.",
   "technical_test": {

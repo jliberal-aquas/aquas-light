@@ -1,6 +1,27 @@
 {
   "id": "S46",
-  "destructive_cases": [],
+  "destructive_cases": [
+    {
+      "case": "Feature en curso con un bug abierto sobre uno de sus slices `done` y un slice `ready` de prioridad 1.",
+      "expect": "Lo primero que propone la salida es el ID del bug; el slice aparece después."
+    },
+    {
+      "case": "Slice `ready` de la feature en curso y un bug abierto sobre un slice de otra feature.",
+      "expect": "Lo primero que propone la salida es el slice `ready`."
+    },
+    {
+      "case": "Tres slices `ready` escritos en el backlog en el orden de prioridad 3, 1, 2, y un slice `proposed`.",
+      "expect": "La salida los propone en el orden 1, 2, 3; el slice `proposed` no aparece."
+    },
+    {
+      "case": "Backlog sin bugs abiertos ni slices `ready`.",
+      "expect": "Código 0; la salida dice que no hay nada listo; sin pánico."
+    },
+    {
+      "case": "Feature recién archivada y dos necesidades `to_refine` en el backlog; correr `aquas next` dos veces.",
+      "expect": "Cada salida nombra los IDs de las dos necesidades; `backlog.json` queda idéntico byte a byte tras las dos corridas."
+    }
+  ],
   "parent": "F9",
   "name": "Barrido",
   "what": "`aquas next` dice qué sigue: primero los bugs de la feature en curso, después los slices `ready` por prioridad. Al cerrar una feature, lista las necesidades `to_refine` para refinarlas en la sesión siguiente.",

@@ -2,7 +2,7 @@
   "id": "S21",
   "parent": "F4",
   "name": "Guardar el mensaje crudo",
-  "what": "El gancho `UserPromptSubmit` agrega el campo `prompt` a `work/turns.jsonl` con fecha e ID de turno antes de que el modelo lo lea.",
+  "what": "El gancho `UserPromptSubmit` agrega el campo `prompt` a `work/turns.jsonl` con fecha e ID de turno antes de que el modelo lo lea. Si hay casos abiertos en `work/gate-bypass.jsonl`, devuelve `additionalContext` con su lista para que el orquestador se los muestre al humano.",
   "files": [
     "tools/internal/hooks/userprompt.go"
   ],

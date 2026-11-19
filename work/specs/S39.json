@@ -1,13 +1,34 @@
 {
   "id": "S39",
-  "destructive_cases": [],
+  "destructive_cases": [
+    {
+      "case": "Correr `setup` dos veces seguidas en un clon recién hecho.",
+      "expect": "Las dos corridas salen con código 0; `git rev-parse HEAD` devuelve lo mismo antes y después; `git diff --quiet HEAD` sale con 0; `work/host.json` existe y su `os` es el del sistema actual."
+    },
+    {
+      "case": "Servidor `httptest` que responde 500 a la descarga de `golangci-lint`.",
+      "expect": "Código distinto de 0; el mensaje en español nombra `golangci-lint`; `git rev-parse HEAD` devuelve lo mismo que antes."
+    },
+    {
+      "case": "Servidor `httptest` que entrega un archivo cuyo SHA-256 no coincide con el fijado.",
+      "expect": "Código distinto de 0; el mensaje nombra la huella esperada y la recibida; el binario bajado no queda en disco."
+    },
+    {
+      "case": "Configuración global de git con `core.hooksPath` apuntando a otra carpeta.",
+      "expect": "Tras `setup`, `git config --local core.hooksPath` devuelve `.githooks`."
+    },
+    {
+      "case": "Correr `setup` en una carpeta con los archivos del paquete pero sin `.git`.",
+      "expect": "Código distinto de 0 y mensaje en español; no se crea `.git`."
+    }
+  ],
   "parent": "F1",
   "name": "Preparar un clon",
-  "what": "`go run ./tools/cmd/aquas setup` prepara un clon en otra máquina: compila `bin/aquas`, baja `golangci-lint`, activa `core.hooksPath` y escribe `work/host.json`, sin crear commits.",
+  "what": "`go run ./tools/cmd/aquas setup` prepara un clon en otra máquina: compila `bin/aquas`, baja `golangci-lint` y escribe `work/host.json`, sin crear commits. Desde S40 también activa los ganchos de git.",
   "files": [
     "tools/internal/install/setup.go"
   ],
-  "functional_test": "El humano clona el repo en otra máquina, corre el comando y la sesión siguiente tiene todos los ganchos activos.",
+  "functional_test": "El humano clona el repo en otra máquina, corre el comando y encuentra `bin/aquas` y `work/host.json` creados.",
   "technical_test": {
     "name": "TestSetupPreparesClone",
     "red_before_code": true
