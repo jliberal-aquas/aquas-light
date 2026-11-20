@@ -45,3 +45,4 @@
 {"date": "2026-11-19", "item": "S11", "role": "implementer", "model": "sonnet", "task": "Construir S11 con TDD: capacidades con página en verify", "tokens": 104358, "tool_uses": 13, "duration_s": 205}
 {"date": "2026-11-19", "item": "S11", "role": "tester", "model": "haiku", "task": "Verde, rojo sin el código y casos destructivos de S11", "tokens": 127928, "tool_uses": 20, "duration_s": 193}
 {"date": "2026-11-20", "item": "S12", "role": "implementer", "model": "sonnet", "task": "Construir S12 con TDD: install exige verde y TestIntegrationVerify", "tokens": 120882, "tool_uses": 13, "duration_s": 194}
+{"date": "2026-11-20", "item": "S12", "role": "tester", "model": "haiku", "task": "Verde, rojo sin el código, casos destructivos y prueba funcional de S12", "tokens": 112876, "tool_uses": 21, "duration_s": 186}

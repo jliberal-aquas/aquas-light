@@ -113,9 +113,10 @@
       "id": "S12",
       "type": "slice",
       "parent": "F2",
-      "state": "in_progress",
+      "state": "done",
       "priority": 4,
-      "spec": "work/specs/S12.json"
+      "spec": "work/specs/S12.json",
+      "spec_sha256": "2983fe2a7ebd1522e5c1cc85af822e990768fd55e75afbda4bae30d53bc61d8a"
     },
     {
       "id": "F5",

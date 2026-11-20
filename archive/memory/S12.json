@@ -7,7 +7,7 @@
     "green",
     "tester"
   ],
-  "next": "Ver el CI de los tres sistemas; si está verde, S12 a done con spec_sha256.",
+  "next": "Cerrado: CI verde en los tres sistemas, corrida 44778308410.",
   "files": [
     "tools/internal/install/install.go",
     "tools/internal/install/verify_test.go",
@@ -16,5 +16,5 @@
     "tools/cmd/aquas/integration_test.go"
   ],
   "blockers": [],
-  "updated_at": "2026-11-20T14:25:00-03:00"
+  "updated_at": "2026-11-20T14:35:00-03:00"
 }
