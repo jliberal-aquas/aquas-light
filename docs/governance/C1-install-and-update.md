@@ -2,7 +2,7 @@
 
 Esta página describe lo que hace el código hoy, no lo que promete el plan. Cada afirmación cita el archivo y la función donde está. Cita la prueba que la cubre cuando existe; si no existe, lo dice con «Sin prueba».
 
-Los niveles de evidencia son los de `canon/communication.md`. Aquí todo está `verificado` contra el código el 2026-11-18, salvo lo marcado como `hipótesis` o `desconocido`. Las secciones sobre el destino dentro del paquete, los argumentos con guion, los enlaces simbólicos, la validación previa de `update` y la skill se volvieron a verificar el 2026-11-19. Las rutas de código (`cmd/` e `internal/`) son relativas a `tools/`. Las demás rutas (`canon/`, `templates/`, `skill/`, `work/`, `.github/`) son relativas a la raíz del paquete.
+Los niveles de evidencia son los de `canon/communication.md`. Aquí todo está `verificado` contra el código el 2026-11-18, salvo lo marcado como `hipótesis` o `desconocido`. Las secciones sobre el destino dentro del paquete, los argumentos con guion, los enlaces simbólicos, la validación previa de `update` y la skill se volvieron a verificar el 2026-11-19. La lista de pasos de `install` y la copia de `schemas/` se volvieron a verificar el 2026-11-20. Las rutas de código (`cmd/` e `internal/`) son relativas a `tools/`. Las demás rutas (`canon/`, `templates/`, `skill/`, `work/`, `.github/`) son relativas a la raíz del paquete.
 
 ## Para qué sirve C1
 
@@ -32,7 +32,10 @@ Los pasos de `install` corren en este orden (`internal/install/install.go`, func
 4. Compilación de `bin/aquas`.
 5. Descarga de `golangci-lint`.
 6. Escritura de `work/host.json`.
-7. Commit de instalación.
+7. Verificación de lo instalado con `aquas verify` (C2).
+8. Commit de instalación.
+
+El paso 7 falla la instalación si el verificador da violaciones, y entonces `install` revierte todo. Se describe en `docs/governance/C2-verify.md`. Prueba: `TestInstallRunsVerify`.
 
 Prueba del conjunto: `TestInstallSuccess` y `TestIntegrationInstall`, parte (a).
 
@@ -55,7 +58,7 @@ Si el preflight falla, `install` sale con código 1, imprime un mensaje en espa�
 La copia está en `internal/install/copy.go`, función `Copy`. Prueba: `TestCopyManifestDeterministicAndConsistent`.
 
 - Copia `canon/` y `tools/` completas, byte por byte, sin la carpeta `tools/bin`.
-- Copia `schemas/` solo si existe en el paquete. Hoy el paquete no tiene `schemas/`, así que no se copia.
+- Copia `schemas/` solo si existe en el paquete. Hoy el paquete la tiene, con ocho esquemas JSON, y se copia con las demás carpetas.
 - Copia los archivos de `templates/` a la raíz de la instancia: `backlog.json`, `README.md`, `.gitignore` y `.gitattributes`. Las dos últimas se guardan en el paquete sin el punto inicial y `dotNames` les pone el nombre final. Prueba: `TestCopyStarterFiles`.
 - Crea las carpetas `work/`, `archive/`, `product/` y `docs/`, cada una con un `.gitkeep` vacío (función `writeStarter`).
 - Escribe `canon/manifest.json`.
@@ -237,7 +240,7 @@ Todas las pruebas están en `tools/` y corren con `go test ./...`.
 
 - Preflight: `TestPreflightRejectsNonEmptyFolder`, `TestPreflightCreatesMissingAndAcceptsEmpty`, `TestPreflightMissingGit`, `TestPreflightGoVersion` y `TestPreflightRejectsDestInsidePackage` en `internal/install/preflight_test.go`.
 - Copia y manifiesto: `TestCopyBinaryIdentical`, `TestCopyManifestDeterministicAndConsistent`, `TestCopyStarterFiles`, `TestFindPackageRoot` en `copy_test.go`; `TestManifestHashIgnoresCRLF` y `TestHashOnlyNormalizesLineEndings` en `internal/hashing/hash_test.go`; `TestManifestRecordsVersion`, `TestManifestWithoutVersionIsReadAndFilled` y `TestManifestVersionUnchangedOnConflict` en `internal/update/update_test.go`.
-- Instalación completa, commit y rollback: `TestInstallSuccess`, `TestInstallRollsBackOnFailure`, `TestInstallLintServerError`, `TestInstallLintChecksumMismatch`, `TestInstallRollbackRemovesReadOnlyGit`, `TestInstallWithoutGitIdentity`, `TestInstallIgnoresGlobalHooks` en `install_test.go`.
+- Instalación completa, commit y rollback: `TestInstallSuccess`, `TestInstallRollsBackOnFailure`, `TestInstallLintServerError`, `TestInstallLintChecksumMismatch`, `TestInstallRollbackRemovesReadOnlyGit`, `TestInstallWithoutGitIdentity`, `TestInstallIgnoresGlobalHooks` en `install_test.go`. `TestInstallRunsVerify` en `verify_test.go`, para el paso de verificación y su rollback.
 - Host: `TestDetectHostWritesHints`, `TestShellAndPathStyle`, `TestUnknownOSKeepsPreviousHost`, `TestNonJSONPreviousIsReplaced`, `TestConcurrentWrites`, `TestBrokenHostsJSON` en `internal/host/detect_test.go`.
 - Actualización: las doce pruebas `TestUpdate*` de `internal/update/update_test.go`.
 - Setup: las cinco pruebas `TestSetup*` de `internal/install/setup_test.go`.

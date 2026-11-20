@@ -46,3 +46,5 @@
 {"date": "2026-11-19", "item": "S11", "role": "tester", "model": "haiku", "task": "Verde, rojo sin el código y casos destructivos de S11", "tokens": 127928, "tool_uses": 20, "duration_s": 193}
 {"date": "2026-11-20", "item": "S12", "role": "implementer", "model": "sonnet", "task": "Construir S12 con TDD: install exige verde y TestIntegrationVerify", "tokens": 120882, "tool_uses": 13, "duration_s": 194}
 {"date": "2026-11-20", "item": "S12", "role": "tester", "model": "haiku", "task": "Verde, rojo sin el código, casos destructivos y prueba funcional de S12", "tokens": 112876, "tool_uses": 21, "duration_s": 186}
+{"date": "2026-11-20", "item": "F2", "role": "implementer", "model": "sonnet", "task": "Escribir la página docs/governance/C2-verify.md (el uso llegó en una sola notificación y puede incluir la corrección)", "tokens": 163248, "tool_uses": 18, "duration_s": 250}
+{"date": "2026-11-20", "item": "F2", "role": "implementer", "model": "sonnet", "task": "Corrección por SendMessage: CI verificado en C2 y página C1 al día tras S12", "tokens": null, "tool_uses": null, "duration_s": null}
