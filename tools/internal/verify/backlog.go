@@ -39,6 +39,7 @@ type entry struct {
 	source     *string
 	specSHA    *string
 	supersedes *string
+	capability *string
 	valid      bool // the ID is well formed and its letter matches the type
 }
 
@@ -56,7 +57,7 @@ func fromBacklog(items []schema.BacklogItem) []entry {
 	var out []entry
 	for i, b := range items {
 		out = append(out, entry{file: RootMarker, index: i, id: b.ID, typ: b.Type, parent: b.Parent, state: b.State,
-			spec: b.Spec, source: b.Source, specSHA: b.SpecSHA256, supersedes: b.Supersedes})
+			spec: b.Spec, source: b.Source, specSHA: b.SpecSHA256, supersedes: b.Supersedes, capability: b.Capability})
 	}
 	return out
 }
@@ -65,7 +66,7 @@ func fromArchive(file string, items []schema.ArchiveItem) []entry {
 	var out []entry
 	for i, b := range items {
 		out = append(out, entry{file: file, index: i, id: b.ID, typ: b.Type, parent: b.Parent, state: b.State,
-			spec: b.Spec, source: b.Source, specSHA: b.SpecSHA256, supersedes: b.Supersedes})
+			spec: b.Spec, source: b.Source, specSHA: b.SpecSHA256, supersedes: b.Supersedes, capability: b.Capability})
 	}
 	return out
 }
@@ -332,5 +333,9 @@ func backlogRules(src Source, bk *schema.Backlog, archives map[string]*schema.Ar
 			add(e.file, e.pos("spec_sha256"), "el spec_sha256 de %s (%s) no coincide con la huella actual de %s (%s); la spec cambió después de cerrarse", e.id, *e.specSHA, *e.spec, got)
 		}
 	}
-	return out, nil
+	capOut, err := capabilityRules(src, bk, entries)
+	if err != nil {
+		return nil, err
+	}
+	return append(out, capOut...), nil
 }

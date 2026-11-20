@@ -34,6 +34,33 @@ func (m memSource) List(dir string) ([]string, error) {
 	return out, nil
 }
 
+func (m memSource) Entries(dir string) ([]Entry, error) {
+	prefix := ""
+	if dir != "" {
+		prefix = dir + "/"
+	}
+	seen := map[string]bool{}
+	var out []Entry
+	for p := range m {
+		rest, ok := strings.CutPrefix(p, prefix)
+		if !ok {
+			continue
+		}
+		name, _, nested := strings.Cut(rest, "/")
+		if seen[name] {
+			continue
+		}
+		seen[name] = true
+		k := KindFile
+		if nested {
+			k = KindDir
+		}
+		out = append(out, Entry{name, k})
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
+	return out, nil
+}
+
 const itemI1 = `{"id": "I1", "type": "initiative", "parent": null, "state": "in_progress", "priority": 1, "spec": "work/specs/I1.json"}`
 const itemF1 = `{"id": "F1", "type": "feature", "parent": "I1", "state": "in_progress", "priority": 1, "capability": "C1", "spec": "work/specs/F1.json"}`
 const itemS1 = `{"id": "S1", "type": "slice", "parent": "F1", "state": "proposed", "priority": 1, "spec": "work/specs/S1.json"}`
@@ -49,7 +76,7 @@ func backlog(items ...string) string {
 
 func backlogWith(nextIDs string, items ...string) string {
 	return "{\n  \"schema_version\": 1,\n  \"next_ids\": " + nextIDs + ",\n" +
-		"  \"capabilities\": [{\"id\": \"C1\", \"name\": \"Instalar\", \"page\": \"docs/governance/C1.md\"}],\n" +
+		"  \"capabilities\": [{\"id\": \"C1\", \"name\": \"Instalar\", \"page\": \"docs/governance/C1-install.md\"}],\n" +
 		"  \"items\": [\n    " + strings.Join(items, ",\n    ") + "\n  ]\n}\n"
 }
 

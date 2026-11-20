@@ -189,7 +189,7 @@ func TestVerifyBacklogRules(t *testing.T) {
 	})
 
 	t.Run("padre archivado", func(t *testing.T) {
-		m := memSource{"archive/I1.json": arch(it("F1", "feature", "I1", "done"))}
+		m := memSource{"archive/I1.json": arch(it("F1", "feature", "I1", "done")), "docs/governance/C1-install.md": "# C1\n"}
 		items := []string{itemI1, it("S2", "slice", "F1", "proposed"), it("N2", "need", "F1", "proposed")}
 		expect(t, world(bigNext, items, m))
 	})

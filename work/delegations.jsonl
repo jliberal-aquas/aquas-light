@@ -42,3 +42,5 @@
 {"date": "2026-11-19", "item": "S9", "role": "tester", "model": "haiku", "task": "Verde, rojo por mutación y casos destructivos de S9", "tokens": 125778, "tool_uses": 15, "duration_s": 148}
 {"date": "2026-11-19", "item": "S10", "role": "implementer", "model": "sonnet", "task": "Construir S10 con TDD: reglas del backlog en verify", "tokens": 120494, "tool_uses": 9, "duration_s": 270}
 {"date": "2026-11-19", "item": "S10", "role": "tester", "model": "haiku", "task": "Verde, rojo sin el código y casos destructivos de S10", "tokens": 125103, "tool_uses": 19, "duration_s": 225}
+{"date": "2026-11-19", "item": "S11", "role": "implementer", "model": "sonnet", "task": "Construir S11 con TDD: capacidades con página en verify", "tokens": 104358, "tool_uses": 13, "duration_s": 205}
+{"date": "2026-11-19", "item": "S11", "role": "tester", "model": "haiku", "task": "Verde, rojo sin el código y casos destructivos de S11", "tokens": 127928, "tool_uses": 20, "duration_s": 193}

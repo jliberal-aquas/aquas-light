@@ -1,0 +1,31 @@
+--- FAIL: TestVerifyCapabilityPages (0.02s)
+    --- FAIL: TestVerifyCapabilityPages/página_ausente (0.00s)
+        capabilities_test.go:54: se esperaba código 1 y salió 0
+    --- FAIL: TestVerifyCapabilityPages/directorio_y_archivo_vacío (0.00s)
+        capabilities_test.go:63: se esperaba código 1 y salió 0
+    --- FAIL: TestVerifyCapabilityPages/rutas_que_escapan_o_no_son_relativas (0.00s)
+        capabilities_test.go:69: se esperaba código 1 y salió 0
+    --- FAIL: TestVerifyCapabilityPages/barras_invertidas_aunque_el_archivo_exista (0.00s)
+        capabilities_test.go:75: se esperaba código 1 y salió 0
+    --- FAIL: TestVerifyCapabilityPages/fuera_de_docs/governance_y_docs/product (0.00s)
+        capabilities_test.go:80: se esperaba código 1 y salió 0
+    --- FAIL: TestVerifyCapabilityPages/página_de_otra_capacidad (0.00s)
+        capabilities_test.go:92: se esperaba código 1 y salió 0
+    --- FAIL: TestVerifyCapabilityPages/mayúsculas_distintas_en_disco (0.00s)
+        --- FAIL: TestVerifyCapabilityPages/mayúsculas_distintas_en_disco/archivo (0.00s)
+            capabilities_test.go:108: se esperaba código 1 y salió 0
+        --- FAIL: TestVerifyCapabilityPages/mayúsculas_distintas_en_disco/carpeta (0.00s)
+            capabilities_test.go:108: se esperaba código 1 y salió 0
+    --- FAIL: TestVerifyCapabilityPages/enlace_simbólico_a_un_archivo_de_fuera (0.00s)
+        capabilities_test.go:130: se esperaba código 1 y salió 0
+    --- FAIL: TestVerifyCapabilityPages/features_con_capacidad_inválida (0.00s)
+        capabilities_test.go:139: se esperaba código 1 y salió 0
+    --- FAIL: TestVerifyCapabilityPages/feature_archivada_con_capacidad_inexistente (0.00s)
+        capabilities_test.go:145: se esperaba código 1 y salió 0
+    --- FAIL: TestVerifyCapabilityPages/ID_y_página_repetidos (0.00s)
+        capabilities_test.go:153: se esperaba código 1 y salió 0
+    --- FAIL: TestVerifyCapabilityPages/staged:_la_página_está_en_disco_y_no_en_el_índice (0.02s)
+        capabilities_test.go:184: se esperaba código 1 y salió 0
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/verify	0.026s
+FAIL

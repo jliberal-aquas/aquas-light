@@ -104,7 +104,7 @@
       "id": "S11",
       "type": "slice",
       "parent": "F2",
-      "state": "ready",
+      "state": "in_progress",
       "priority": 3,
       "spec": "work/specs/S11.json"
     },

@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"syscall"
 
 	"github.com/jliberal-aquas/aquas-light/tools/internal/schema"
 )
@@ -20,10 +21,31 @@ import (
 // git index. Paths use forward slashes and are relative to the repo root.
 // Read returns an error wrapping fs.ErrNotExist for a missing file; List
 // returns the sorted names of the .json files directly inside dir and an
-// empty list when dir does not exist.
+// empty list when dir does not exist. Entries returns everything directly
+// inside dir, with the exact stored name and the kind of each one, without
+// following links; the root is the empty string and a missing dir lists empty.
 type Source interface {
 	Read(path string) ([]byte, error)
 	List(dir string) ([]string, error)
+	Entries(dir string) ([]Entry, error)
+}
+
+// Kind tells what an entry of a folder is.
+type Kind int
+
+// The kinds of entry. Anything that is not a regular file, a folder or a
+// symbolic link (a junction, a submodule, a socket) is KindOther.
+const (
+	KindFile Kind = iota
+	KindDir
+	KindLink
+	KindOther
+)
+
+// Entry is one name inside a folder.
+type Entry struct {
+	Name string
+	Kind Kind
 }
 
 // Violation is one problem in one file.
@@ -85,10 +107,35 @@ func (d diskSource) List(dir string) ([]string, error) {
 	return names, nil
 }
 
+func (d diskSource) Entries(dir string) ([]Entry, error) {
+	entries, err := os.ReadDir(filepath.Join(d.root, filepath.FromSlash(dir)))
+	if errors.Is(err, fs.ErrNotExist) || errors.Is(err, syscall.ENOTDIR) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	var out []Entry
+	for _, e := range entries {
+		k := KindOther
+		switch t := e.Type(); {
+		case t.IsRegular():
+			k = KindFile
+		case t.IsDir():
+			k = KindDir
+		case t&fs.ModeSymlink != 0:
+			k = KindLink
+		}
+		out = append(out, Entry{e.Name(), k})
+	}
+	return out, nil
+}
+
 type indexSource struct {
 	root  string
 	env   []string
 	files map[string]bool
+	modes map[string]string
 }
 
 // Index reads files from the git index of the repo at root. It honors
@@ -106,15 +153,19 @@ func Index(root string) (Source, error) {
 	if strings.TrimSpace(string(prefix)) != "" {
 		return nil, fmt.Errorf("%s no es un repositorio git propio: está dentro de otro repositorio y no tiene su propio .git", root)
 	}
-	out, err := s.git("ls-files", "-z")
+	out, err := s.git("ls-files", "-z", "-s")
 	if err != nil {
 		return nil, err
 	}
 	s.files = map[string]bool{}
-	for _, name := range strings.Split(string(out), "\x00") {
-		if name != "" {
-			s.files[name] = true
+	s.modes = map[string]string{}
+	for _, rec := range strings.Split(string(out), "\x00") {
+		meta, name, ok := strings.Cut(rec, "\t")
+		if !ok || name == "" {
+			continue
 		}
+		s.files[name] = true
+		s.modes[name], _, _ = strings.Cut(meta, " ")
 	}
 	return s, nil
 }
@@ -181,6 +232,40 @@ func (s *indexSource) List(dir string) ([]string, error) {
 	}
 	sort.Strings(names)
 	return names, nil
+}
+
+func (s *indexSource) Entries(dir string) ([]Entry, error) {
+	prefix := ""
+	if dir != "" {
+		prefix = dir + "/"
+	}
+	seen := map[string]bool{}
+	var out []Entry
+	for p := range s.files {
+		rest, ok := strings.CutPrefix(p, prefix)
+		if !ok {
+			continue
+		}
+		name, _, nested := strings.Cut(rest, "/")
+		if seen[name] {
+			continue
+		}
+		seen[name] = true
+		k := KindDir
+		if !nested {
+			switch s.modes[p] {
+			case "100644", "100755":
+				k = KindFile
+			case "120000":
+				k = KindLink
+			default:
+				k = KindOther
+			}
+		}
+		out = append(out, Entry{name, k})
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
+	return out, nil
 }
 
 // typedFile is one file to check and the Go type that describes it.

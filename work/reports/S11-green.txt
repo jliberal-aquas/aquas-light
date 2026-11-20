@@ -1,0 +1,54 @@
+$ go test ./...
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	3.239s
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/hashing	(cached)
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/host	(cached)
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/install	16.256s
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/schema	(cached)
+?   	github.com/jliberal-aquas/aquas-light/tools/internal/schema/gen	[no test files]
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/update	(cached)
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/verify	0.351s
+codigo: 0
+$ golangci-lint run ./...
+0 issues.
+codigo: 0
+$ go test ./internal/verify/ -run TestVerifyCapabilityPages -v
+=== RUN   TestVerifyCapabilityPages
+=== RUN   TestVerifyCapabilityPages/la_página_existe
+=== RUN   TestVerifyCapabilityPages/página_ausente
+=== RUN   TestVerifyCapabilityPages/directorio_y_archivo_vacío
+=== RUN   TestVerifyCapabilityPages/rutas_que_escapan_o_no_son_relativas
+=== RUN   TestVerifyCapabilityPages/barras_invertidas_aunque_el_archivo_exista
+=== RUN   TestVerifyCapabilityPages/fuera_de_docs/governance_y_docs/product
+=== RUN   TestVerifyCapabilityPages/docs/product_es_válido
+=== RUN   TestVerifyCapabilityPages/página_de_otra_capacidad
+=== RUN   TestVerifyCapabilityPages/mayúsculas_distintas_en_disco
+=== RUN   TestVerifyCapabilityPages/mayúsculas_distintas_en_disco/archivo
+=== RUN   TestVerifyCapabilityPages/mayúsculas_distintas_en_disco/carpeta
+=== RUN   TestVerifyCapabilityPages/enlace_simbólico_a_un_archivo_de_fuera
+=== RUN   TestVerifyCapabilityPages/features_con_capacidad_inválida
+=== RUN   TestVerifyCapabilityPages/feature_archivada_con_capacidad_inexistente
+=== RUN   TestVerifyCapabilityPages/ID_y_página_repetidos
+=== RUN   TestVerifyCapabilityPages/plantilla_vacía
+=== RUN   TestVerifyCapabilityPages/capacidad_sin_features_archivadas_no_exige_página
+=== RUN   TestVerifyCapabilityPages/staged:_la_página_está_en_disco_y_no_en_el_índice
+--- PASS: TestVerifyCapabilityPages (0.06s)
+    --- PASS: TestVerifyCapabilityPages/la_página_existe (0.00s)
+    --- PASS: TestVerifyCapabilityPages/página_ausente (0.00s)
+    --- PASS: TestVerifyCapabilityPages/directorio_y_archivo_vacío (0.00s)
+    --- PASS: TestVerifyCapabilityPages/rutas_que_escapan_o_no_son_relativas (0.00s)
+    --- PASS: TestVerifyCapabilityPages/barras_invertidas_aunque_el_archivo_exista (0.00s)
+    --- PASS: TestVerifyCapabilityPages/fuera_de_docs/governance_y_docs/product (0.00s)
+    --- PASS: TestVerifyCapabilityPages/docs/product_es_válido (0.00s)
+    --- PASS: TestVerifyCapabilityPages/página_de_otra_capacidad (0.00s)
+    --- PASS: TestVerifyCapabilityPages/mayúsculas_distintas_en_disco (0.01s)
+        --- PASS: TestVerifyCapabilityPages/mayúsculas_distintas_en_disco/archivo (0.01s)
+        --- PASS: TestVerifyCapabilityPages/mayúsculas_distintas_en_disco/carpeta (0.01s)
+    --- PASS: TestVerifyCapabilityPages/enlace_simbólico_a_un_archivo_de_fuera (0.00s)
+    --- PASS: TestVerifyCapabilityPages/features_con_capacidad_inválida (0.00s)
+    --- PASS: TestVerifyCapabilityPages/feature_archivada_con_capacidad_inexistente (0.00s)
+    --- PASS: TestVerifyCapabilityPages/ID_y_página_repetidos (0.00s)
+    --- PASS: TestVerifyCapabilityPages/plantilla_vacía (0.00s)
+    --- PASS: TestVerifyCapabilityPages/capacidad_sin_features_archivadas_no_exige_página (0.00s)
+    --- PASS: TestVerifyCapabilityPages/staged:_la_página_está_en_disco_y_no_en_el_índice (0.04s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/verify	0.065s

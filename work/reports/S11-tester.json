@@ -1,0 +1,38 @@
+{
+  "item": "S11",
+  "conclusion": "Pasa. go test ./... -race y golangci-lint run ./... salen con 0 (lint: 0 issues); GOOS=windows y GOOS=darwin go vet ./... salen con 0. Sin capabilityRules (anulada en una copia en /tmp) fallan TestVerifyCapabilityPages y 14 subpruebas. Los 16 casos destructivos tienen una subprueba que los cubre y comprueba código de salida y nombres del expect. Los casos de disco y CLI (página inexistente, --staged sin git add, verify sobre el repo real) se verificaron con el binario en una copia en /tmp, con los resultados esperados. Quedan dos hallazgos menores y pruebas pendientes de CI en macOS y Windows. El repo real quedó como al inicio: sumas sha256 y git status idénticos.",
+  "findings": [
+    {
+      "what": "Cuando la página está en disco pero no en el índice, --staged dice «no existe la carpeta \"governance\"» y no aclara que el archivo falta en el índice de git (falta git add).",
+      "where": "tools/internal/verify/capabilities.go:119",
+      "why": "Quien corre verify --staged ve que la carpeta no existe, aunque el archivo esté en disco; la causa real no aparece en el mensaje. El mensaje sí nombra C1 y la ruta declarada, así que el expect de la spec se cumple.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "Ninguna prueba fija que los casos de rutas que escapan del repo no abran archivos de fuera; la garantía «ningún archivo de fuera se abre» depende solo de la revisión del código.",
+      "where": "tools/internal/verify/capabilities_test.go:66-71",
+      "why": "memSource no registra lecturas. Si pageProblem llamara a src.Read antes de validar la ruta, el rechazo seguiría siendo el mismo y la prueba seguiría en verde.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {"file": "tools/internal/verify/capabilities.go", "line": 119, "quote": "return fmt.Sprintf(\"no existe la carpeta %q\", seg), nil"},
+    {"file": "tools/internal/verify/capabilities.go", "line": 129, "quote": "data, err := src.Read(page)"},
+    {"file": "tools/internal/verify/capabilities.go", "line": 98, "quote": "entries, err := src.Entries(dir)"},
+    {"file": "tools/internal/verify/capabilities_test.go", "line": 67, "quote": "for _, p := range []string{\"../fuera.md\", \"/etc/hosts\", `C:\\docs\\C1.md`, \"docs/governance/../../backlog.json\"} {"},
+    {"file": "tools/internal/verify/capabilities_test.go", "line": 128, "quote": "t.Skip(\"no se pueden crear enlaces simbólicos aquí: \", err)"},
+    {"file": "tools/internal/verify/backlog.go", "line": 336, "quote": "capOut, err := capabilityRules(src, bk, entries)"},
+    {"file": "tools/internal/verify/verify.go", "line": 89, "quote": "return os.ReadFile(filepath.Join(d.root, filepath.FromSlash(p)))"}
+  ],
+  "output": "1) Desde tools/: go test ./... -race -count=1 sale 0 (verify 1.5 s, install 16 s, resto ok); golangci-lint run ./... sale 0 con 0 issues; GOOS=windows go vet ./... y GOOS=darwin go vet ./... salen 0. 2) Rojo: copia de tools/ en /tmp/s11/red-tools con capabilityRules que devuelve nil al inicio; go test -run TestVerifyCapabilityPages falla con 14 subpruebas (página ausente, directorio y archivo vacío, rutas que escapan, barras invertidas, fuera de docs/governance, página de otra capacidad, mayúsculas en archivo y carpeta, enlace simbólico, features con capacidad inválida, feature archivada con capacidad inexistente, ID y página repetidos, staged). 3) Cobertura de los 16 casos: (1) página ausente: subprueba «página ausente», expect backlog.json, capabilities[0].page, C1 y la ruta. (2) directorio y archivo de 0 bytes: «directorio y archivo vacío», expect C1 con «directorio» y C2 con «vacío». (3) cuatro rutas de escape: «rutas que escapan o no son relativas», un expect por ruta con C1. (4) barras invertidas con el archivo existente: «barras invertidas aunque el archivo exista», expect C1 y «barras»; solo es comprobación de texto, sin depender del SO. (5) README.md y docs/C1-x.md: «fuera de docs/governance y docs/product», dos expects con C1 y la ruta. (6) página de C2 en C1: «página de otra capacidad», expect C1. (7) c1- en disco: «mayúsculas distintas en disco/archivo», expect C1 y la ruta; solo corrió en Linux. (8) Docs/Governance en disco: «mayúsculas distintas en disco/carpeta», igual; solo corrió en Linux. (9) enlace simbólico: «enlace simbólico a un archivo de fuera», expect C1 y «enlace»; se salta solo si os.Symlink falla. (10) features con C99, sin capability y con c1: «features con capacidad inválida», tres expects con backlog.json, la feature y el valor. (11) feature archivada con C99: «feature archivada con capacidad inexistente», expect archive/I1.json, F5 y C99. (12) ID repetido y página repetida: «ID y página repetidos», dos expects. (13) --staged con página en disco y sin git add: subprueba «staged: la página está en disco y no en el índice», y con binario: código 1 y mensaje con C1 y la ruta. (14) capabilities vacío e items vacío: «plantilla vacía», código 0. (15) C3 sin página y sin archivadas: «capacidad sin features archivadas no exige página», código 0. (16) verify sobre el repo real: código 0 con el árbol actual (ver punto 5). 4) Binario en /tmp/aquas (go build desde tools/), en copia /tmp/s11/repo: a) sin cambios: verify código 0. b) docs/governance/C1-install-and-update.md borrado: verify código 1; mensaje «backlog.json: capabilities[0].page: la capacidad C1 tiene la feature archivada F1 y su página \"docs/governance/C1-install-and-update.md\" no es válida: el archivo no existe». c) página sin git add (git rm --cached en la copia, archivo en disco): verify código 0; verify --staged código 1 con «la capacidad C1 ... no es válida: no existe la carpeta \"governance\"». Ver hallazgo 1. 5) Repo real (/home/claude/aquas-light, sin commit): aquas verify código 0, «Verificación en verde: no hay violaciones.»; aquas verify --staged código 0, mismo mensaje. 6) «Ningún archivo de fuera se abre»: capabilities.go solo usa src.Entries y src.Read; Read se llama en la línea 129, después de validar el texto de la ruta (sin \\, sin ., .., ni :, relativa, dentro de docs/governance o docs/product) y de listar cada tramo; los tramos se listan sin seguir enlaces (KindLink). No hay os.Open ni os.Stat en el código de la regla. 7) Integridad: sumas sha256 y git status de los archivos del repo real idénticas antes y después de las pruebas. Este informe es el único archivo nuevo en el repo.",
+  "pending": [
+    "CI de macOS y Windows (lo revisa el orquestador tras el push): go test -race de TestVerifyCapabilityPages en los tres sistemas, con los casos 7 y 8 (mayúsculas) y el 4 (barras). Localmente solo se hizo go vet cruzado para Windows y macOS.",
+    "Caso 9 (enlace simbólico) en Windows: si os.Symlink falla, la subprueba se salta. Confirmar en el log de CI que corrió o que el salto es por falta de privilegio, no un SKIP silencioso.",
+    "Caso 16 (verify sobre el commit que cierra S11): no se puede correr aquí porque el árbol está sin commit; la corrida fue sobre el árbol actual, con código 0. Repetirla sobre el commit final.",
+    "Caso 3: que ningún archivo de fuera se abra quedó verificado solo por revisión de código (hallazgo 2)."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}
