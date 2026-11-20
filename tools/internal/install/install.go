@@ -7,8 +7,10 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/jliberal-aquas/aquas-light/tools/internal/host"
+	"github.com/jliberal-aquas/aquas-light/tools/internal/verify"
 )
 
 // Options configures Run. The zero value installs with real dependencies.
@@ -25,6 +27,9 @@ type Options struct {
 	GOOS, GOARCH string
 	// AfterGitInit, when set, runs right after git init (fault injection).
 	AfterGitInit func(dest string) error
+	// Verify checks the governed files of the repo at root; nil uses the real
+	// verifier. Run calls it once, in disk mode, before git add.
+	Verify func(root string) ([]verify.Violation, error)
 }
 
 func (o Options) withDefaults() Options {
@@ -51,8 +56,8 @@ func (o Options) withDefaults() Options {
 }
 
 // Run installs the package found at root into dest: preflight, git init, copy,
-// build bin/aquas, download golangci-lint, write work/host.json and make the
-// root commit. On any failure it removes everything it created.
+// build bin/aquas, download golangci-lint, write work/host.json, verify the
+// result and make the root commit. On any failure it removes everything it created.
 func Run(root, dest string, opts Options) (err error) {
 	opts = opts.withDefaults()
 	abs, err := filepath.Abs(dest)
@@ -92,7 +97,31 @@ func Run(root, dest string, opts Options) (err error) {
 	if err := writeHost(abs); err != nil {
 		return err
 	}
+	if err := runVerify(abs, opts); err != nil {
+		return err
+	}
 	return commitInstall(abs, opts.Version)
+}
+
+// runVerify checks the installed files in disk mode. Violations and run errors
+// both fail the install, with the verifier's own message.
+func runVerify(abs string, opts Options) error {
+	check := opts.Verify
+	if check == nil {
+		check = func(root string) ([]verify.Violation, error) { return verify.Run(verify.Disk(root)) }
+	}
+	vs, err := check(abs)
+	if err != nil {
+		return fmt.Errorf("no se pudo verificar lo instalado: %v", err)
+	}
+	if len(vs) == 0 {
+		return nil
+	}
+	lines := make([]string, len(vs))
+	for i, v := range vs {
+		lines[i] = v.String()
+	}
+	return fmt.Errorf("lo instalado no pasa la verificación:\n%s", strings.Join(lines, "\n"))
 }
 
 func buildAquas(dest string) error {

@@ -59,6 +59,9 @@ type Violation struct {
 // String formats the violation as `<file>: <position>: <message>`.
 func (v Violation) String() string { return v.File + ": " + v.Pos + ": " + v.Msg }
 
+// GreenLine is what the CLI prints when there are no violations.
+const GreenLine = "Verificación en verde: no hay violaciones."
+
 // RootMarker is the file that marks the root of a governed repo.
 const RootMarker = "backlog.json"
 

@@ -1,0 +1,47 @@
+{
+  "item": "S12",
+  "conclusion": "Pasa en Linux. Verde: go test ./... -race -count=1, golangci-lint run ./... (0 issues) y go vet cruzado para Windows y macOS salen con 0. Con la llamada al verificador quitada de install.Run en una copia, fallan TestInstallRunsVerify (5 de 9 subpruebas) y la fila de plantilla rota de TestIntegrationVerify; las otras 12 filas de reglas siguen en verde porque prueban aquas verify, que ya existía. Los 10 casos destructivos tienen subprueba que los cubre con el expect completo, salvo dos matices menores (ver findings). TestIntegrationVerify tiene las 12 reglas de F2, la instalación limpia y la plantilla rota. Con el binario compilado, la instalación en «mi año/api» sale con 0, muestra la línea verde una vez, bin/aquas verify sale con 0, hay 1 commit y el árbol queda limpio. aquas verify en el repo real sale con 0. El árbol del repo real quedó igual que al inicio (sumas sha256 idénticas) más este informe. Pendiente: CI de macOS y Windows, a cargo del orquestador.",
+  "findings": [
+    {
+      "what": "Sin el código de S12, las doce filas de reglas de TestIntegrationVerify siguen pasando; no fallan como pedía el paso 2.",
+      "where": "tools/cmd/aquas/integration_test.go:438-469",
+      "why": "Esas filas comprueban aquas verify sobre un repo instalado, y esa lógica ya existía desde S9 a S11. Solo la fila de plantilla rota (línea 507) depende del cambio de S12. Es propiedad de la spec, no un defecto del código, pero el rojo de S12 se ve solo en TestInstallRunsVerify y en esa fila.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "Los casos 4 y 6 comprueban el error o el nil que devuelve install.Run, no el código de salida de aquas install.",
+      "where": "tools/internal/install/verify_test.go:154-172 y 191-197",
+      "why": "El código 1 sale de main.go al recibir error de Run, y el 0 sale del camino normal. Ninguna subprueba CLI fija el código de salida en estos dos casos. El camino es directo y el expect del caso 6 se cumple en el nivel de Run.",
+      "certainty": "verified",
+      "severity": "minor"
+    },
+    {
+      "what": "El caso 10 prueba la función Setup, no el subcomando aquas setup.",
+      "where": "tools/internal/install/verify_test.go:230",
+      "why": "La subprueba llama Setup(clone, opts) directamente y solo el verify posterior pasa por el binario. El expect pide el comportamiento del subcomando; el despacho de la CLI no queda cubierto por esta prueba.",
+      "certainty": "verified",
+      "severity": "minor"
+    }
+  ],
+  "evidence": [
+    {"file": "tools/internal/install/install.go", "line": 100, "quote": "if err := runVerify(abs, opts); err != nil {"},
+    {"file": "tools/internal/install/install.go", "line": 113, "quote": "vs, err := check(abs)"},
+    {"file": "tools/cmd/aquas/main.go", "line": 77, "quote": "_, _ = fmt.Fprintln(stdout, verify.GreenLine)"},
+    {"file": "tools/cmd/aquas/main.go", "line": 74, "quote": "aquas: no se puede instalar (se revirtió todo lo creado):"},
+    {"file": "tools/cmd/aquas/integration_test.go", "line": 438, "quote": "rows := []vRow{"},
+    {"file": "tools/cmd/aquas/integration_test.go", "line": 507, "quote": "t.Run(\"plantilla rota no deja nada\", func(t *testing.T) {"},
+    {"file": "tools/cmd/aquas/integration_test.go", "line": 538, "quote": "t.Run(\"la salida muestra la línea verde una sola vez\", func(t *testing.T) {"},
+    {"file": "tools/internal/install/verify_test.go", "line": 194, "quote": "if err := Run(pkg, filepath.Join(t.TempDir(), \"x\"), okOptions(url, sums)); err != nil {"},
+    {"file": "tools/internal/install/verify_test.go", "line": 230, "quote": "if err := Setup(clone, opts); err != nil {"}
+  ],
+  "output": "1) En tools/: go test ./... -race -count=1 sale 0 (install 29 s, verify 1.4 s, resto ok). golangci-lint run ./... sale 0 con «0 issues.». GOOS=windows go vet ./... y GOOS=darwin go vet ./... salen 0. Logs en /tmp/s12_tester/. 2) Rojo en copia /tmp/s12_tester/red-repo, con la llamada runVerify(abs, opts) quitada de install.Run: TestInstallRunsVerify falla en «plantilla rota en una ruta que no existe», «plantilla rota en una carpeta vacía existente», «el verificador corre antes del commit...», «error de ejecución del verificador» y «una sola llamada...»; pasan «el backlog.json de la raíz...», «instalación correcta y verify dentro del repo», «ruta con espacio y ñ» y «setup no llama al verificador». TestIntegrationVerify falla solo en «plantilla rota no deja nada»; las 12 reglas y «la salida muestra la línea verde una sola vez» pasan (ver finding 1). Logs: /tmp/s12_tester/red_install.log y red_integ.log. 3) Casos destructivos del spec (10): (1) ruta nueva con color: verify_test «plantilla rota en una ruta que no existe» (backlog.json, color, destino inexistente) e integration «plantilla rota no deja nada» (mensaje «se revirtió todo lo creado»). Expect completo. (2) carpeta vacía existente: verify_test «plantilla rota en una carpeta vacía existente» y la misma fila de integración; 0 entradas, por lo que no hay .git. Completo. (3) HEAD, bin/aquas y work/host.json en el verificador: «el verificador corre antes del commit...». Completo. (4) error de ejecución: «error de ejecución del verificador», texto del error y destino sin o con 0 entradas. Completo salvo finding 2. (5) una llamada, raíz = destino: «una sola llamada con la carpeta destino como raíz». Completo. (6) backlog.json de la raíz inválido: «el backlog.json de la raíz del paquete no cuenta», err nil. Completo salvo finding 2. (7) verify dentro del repo, 1 commit, árbol limpio: «instalación correcta y verify dentro del repo». Completo en Linux; la variante bin\\\\aquas.exe no se ejecutó. (8) espacio y ñ: «ruta con espacio y ñ» y, en la CLI, la instalación de «mi año/api» con el binario. Completo en Linux. (9) línea verde una vez: integration «la salida muestra la línea verde una sola vez» cuenta la aparición exacta. Completo. (10) setup y verify: «setup no llama al verificador», calls 0, verify 0, árbol limpio. Completo salvo finding 3. TestIntegrationVerify: 12 filas (campo sobrante, clave con mayúsculas, contador atrasado, ID repetido, padre inexistente, padre de tipo incorrecto, dos slices in_progress, necesidad sin source, supersedes inválido, spec done alterada, capacidad cerrada sin página, feature sin capacidad declarada) más instalación limpia y plantilla rota. Cada fila exige código 1 (t.Fatalf si no) y busca en la salida (stdout) el archivo y el campo o ID. 4) Binario: go build -o /tmp/aquas ./cmd/aquas. Install sin inyección: el binario bajó golangci-lint por red y salió con 0; no hizo falta cambiar nada. Desde una copia limpia en /tmp/s12_tester/pkg se instaló en «/tmp/s12_tester/mi año/api»: stdout con «Verificación en verde: no hay violaciones.» una vez y la línea de resumen. En esa carpeta: bin/aquas verify código 0 y salida «Verificación en verde: no hay violaciones.»; git rev-list --count HEAD = 1; git status --porcelain vacío. 5) /tmp/aquas verify en /home/claude/aquas-light: código 0, «Verificación en verde: no hay violaciones.». 6) Integridad: find sobre el repo real (sin .git) con sha256sum antes y después de las pruebas: idénticos (204 archivos). git status y HEAD (13) iguales a los iniciales. Ninguna prueba escribió en el repo real.",
+  "pending": [
+    "CI de macOS y Windows (lo revisa el orquestador): TestInstallRunsVerify y TestIntegrationVerify en los tres sistemas. Localmente solo se hizo go vet cruzado para Windows y macOS.",
+    "Caso 7 en Windows: la variante bin\\\\aquas.exe no se ejecutó aquí.",
+    "Caso 8 (espacio y ñ) en macOS y Windows: no se ejecutó fuera de Linux.",
+    "Caso 4 y 6 a nivel CLI: si el orquestador quiere el código de salida fijado en la prueba, falta esa aserción (findings 2)."
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

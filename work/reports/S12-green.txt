@@ -1,0 +1,73 @@
+$ go test ./...
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	9.226s
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/hashing	(cached)
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/host	(cached)
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/install	29.869s
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/schema	(cached)
+?   	github.com/jliberal-aquas/aquas-light/tools/internal/schema/gen	[no test files]
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/update	0.228s
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/verify	0.323s
+exit=0
+$ golangci-lint run ./...
+0 issues.
+exit=0
+$ GOOS=windows go vet ./...
+exit=0
+$ GOOS=darwin go vet ./...
+exit=0
+$ go test ./internal/install/ ./cmd/aquas/ -run 'TestInstallRunsVerify|TestIntegrationVerify' -v
+=== RUN   TestInstallRunsVerify
+=== RUN   TestInstallRunsVerify/plantilla_rota_en_una_ruta_que_no_existe
+=== RUN   TestInstallRunsVerify/plantilla_rota_en_una_carpeta_vacía_existente
+=== RUN   TestInstallRunsVerify/el_verificador_corre_antes_del_commit_y_después_de_bin_y_host
+=== RUN   TestInstallRunsVerify/error_de_ejecución_del_verificador
+=== RUN   TestInstallRunsVerify/una_sola_llamada_con_la_carpeta_destino_como_raíz
+=== RUN   TestInstallRunsVerify/el_backlog.json_de_la_raíz_del_paquete_no_cuenta
+=== RUN   TestInstallRunsVerify/instalación_correcta_y_verify_dentro_del_repo
+=== RUN   TestInstallRunsVerify/ruta_con_espacio_y_ñ
+=== RUN   TestInstallRunsVerify/setup_no_llama_al_verificador
+--- PASS: TestInstallRunsVerify (13.15s)
+    --- PASS: TestInstallRunsVerify/plantilla_rota_en_una_ruta_que_no_existe (1.49s)
+    --- PASS: TestInstallRunsVerify/plantilla_rota_en_una_carpeta_vacía_existente (1.37s)
+    --- PASS: TestInstallRunsVerify/el_verificador_corre_antes_del_commit_y_después_de_bin_y_host (1.38s)
+    --- PASS: TestInstallRunsVerify/error_de_ejecución_del_verificador (2.36s)
+    --- PASS: TestInstallRunsVerify/una_sola_llamada_con_la_carpeta_destino_como_raíz (1.17s)
+    --- PASS: TestInstallRunsVerify/el_backlog.json_de_la_raíz_del_paquete_no_cuenta (1.10s)
+    --- PASS: TestInstallRunsVerify/instalación_correcta_y_verify_dentro_del_repo (0.97s)
+    --- PASS: TestInstallRunsVerify/ruta_con_espacio_y_ñ (1.15s)
+    --- PASS: TestInstallRunsVerify/setup_no_llama_al_verificador (2.17s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/internal/install	13.153s
+=== RUN   TestIntegrationVerify
+=== RUN   TestIntegrationVerify/campo_sobrante
+=== RUN   TestIntegrationVerify/clave_con_mayúsculas
+=== RUN   TestIntegrationVerify/contador_atrasado
+=== RUN   TestIntegrationVerify/ID_repetido
+=== RUN   TestIntegrationVerify/padre_inexistente
+=== RUN   TestIntegrationVerify/padre_de_tipo_incorrecto
+=== RUN   TestIntegrationVerify/dos_slices_in_progress
+=== RUN   TestIntegrationVerify/necesidad_sin_source
+=== RUN   TestIntegrationVerify/supersedes_inválido
+=== RUN   TestIntegrationVerify/spec_done_alterada
+=== RUN   TestIntegrationVerify/capacidad_cerrada_sin_página
+=== RUN   TestIntegrationVerify/feature_sin_capacidad_declarada
+=== RUN   TestIntegrationVerify/plantilla_rota_no_deja_nada
+=== RUN   TestIntegrationVerify/la_salida_muestra_la_línea_verde_una_sola_vez
+--- PASS: TestIntegrationVerify (5.46s)
+    --- PASS: TestIntegrationVerify/campo_sobrante (0.00s)
+    --- PASS: TestIntegrationVerify/clave_con_mayúsculas (0.00s)
+    --- PASS: TestIntegrationVerify/contador_atrasado (0.00s)
+    --- PASS: TestIntegrationVerify/ID_repetido (0.00s)
+    --- PASS: TestIntegrationVerify/padre_inexistente (0.00s)
+    --- PASS: TestIntegrationVerify/padre_de_tipo_incorrecto (0.00s)
+    --- PASS: TestIntegrationVerify/dos_slices_in_progress (0.00s)
+    --- PASS: TestIntegrationVerify/necesidad_sin_source (0.00s)
+    --- PASS: TestIntegrationVerify/supersedes_inválido (0.00s)
+    --- PASS: TestIntegrationVerify/spec_done_alterada (0.00s)
+    --- PASS: TestIntegrationVerify/capacidad_cerrada_sin_página (0.00s)
+    --- PASS: TestIntegrationVerify/feature_sin_capacidad_declarada (0.00s)
+    --- PASS: TestIntegrationVerify/plantilla_rota_no_deja_nada (2.64s)
+    --- PASS: TestIntegrationVerify/la_salida_muestra_la_línea_verde_una_sola_vez (1.31s)
+PASS
+ok  	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	5.462s
+exit=0

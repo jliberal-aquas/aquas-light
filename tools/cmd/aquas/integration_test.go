@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io/fs"
 	"net/http"
 	"net/http/httptest"
@@ -382,4 +383,169 @@ func TestIntegrationInstall(t *testing.T) {
 	if st := itGit(t, clone, "status", "--porcelain"); st != "" {
 		t.Errorf("clone tree not clean: %q", st)
 	}
+}
+
+// vRow is one rule of C2: files to write over the installed repo, and what
+// the verify message must name.
+type vRow struct {
+	name  string
+	files map[string]string
+	want  []string
+}
+
+func vBacklog(caps string, next string, items ...string) string {
+	return "{\n  \"schema_version\": 1,\n  \"next_ids\": " + next + ",\n  \"capabilities\": [" + caps +
+		"],\n  \"items\": [\n    " + strings.Join(items, ",\n    ") + "\n  ]\n}\n"
+}
+
+const (
+	vNext  = `{"I": 100, "F": 100, "S": 100, "B": 100, "N": 100, "C": 100}`
+	vCap   = `{"id": "C1", "name": "n", "page": "docs/governance/C1-x.md"}`
+	vI1    = `{"id": "I1", "type": "initiative", "parent": null, "state": "in_progress", "priority": 1, "spec": null}`
+	vF1    = `{"id": "F1", "type": "feature", "parent": "I1", "state": "ready", "priority": 1, "spec": null, "capability": "C1"}`
+	vSpecS = "{\n  \"id\": \"S1\",\n  \"parent\": \"F1\",\n  \"name\": \"n\",\n  \"what\": \"w\",\n  \"files\": [],\n  \"functional_test\": \"f\",\n  \"technical_test\": \"t\",\n  \"destructive_cases\": []\n}\n"
+)
+
+func vSlice(id, parent, state string, extra ...string) string {
+	s := fmt.Sprintf(`{"id": %q, "type": "slice", "parent": %q, "state": %q, "priority": 1, "spec": "work/specs/%s.json"`, id, parent, state, id)
+	for _, e := range extra {
+		s += ", " + e
+	}
+	return s + "}"
+}
+
+func TestIntegrationVerify(t *testing.T) {
+	itGitEnv(t)
+	pkg, err := install.FindPackageRoot(".")
+	if err != nil {
+		t.Fatal(err)
+	}
+	url, sums := itFakeLint(t)
+	opts := install.Options{Version: version, LintBaseURL: url, LintChecksums: sums}
+
+	// A clean install gives exit code 0 under the verifier.
+	inst := filepath.Join(t.TempDir(), "instancia")
+	if err := install.Run(pkg, inst, opts); err != nil {
+		t.Fatalf("install: %v", err)
+	}
+	t.Chdir(inst)
+	if code, out, errOut := itRun("verify"); code != 0 {
+		t.Fatalf("verify en un repo recién instalado: código %d\n%s%s", code, out, errOut)
+	}
+	original := itRead(t, inst, "backlog.json")
+	wrongSpec := strings.Replace(vSpecS, `"name": "n"`, `"name": "otro"`, 1)
+
+	rows := []vRow{
+		{"campo sobrante", map[string]string{"backlog.json": strings.Replace(original, `"items": []`, `"items": [], "color": "rojo"`, 1)},
+			[]string{"backlog.json", "color"}},
+		{"clave con mayúsculas", map[string]string{"backlog.json": strings.Replace(original, `"items"`, `"Items"`, 1)},
+			[]string{"backlog.json", "Items"}},
+		{"contador atrasado", map[string]string{"backlog.json": vBacklog(vCap, `{"I": 1, "F": 100, "S": 100, "B": 100, "N": 100, "C": 100}`, vI1)},
+			[]string{"backlog.json", "next_ids.I"}},
+		{"ID repetido", map[string]string{"backlog.json": vBacklog(vCap, vNext, vI1, vI1)},
+			[]string{"backlog.json", "I1", "repetido"}},
+		{"padre inexistente", map[string]string{"backlog.json": vBacklog(vCap, vNext, vI1, vF1, vSlice("S1", "F9", "proposed"))},
+			[]string{"backlog.json", "S1", "F9"}},
+		{"padre de tipo incorrecto", map[string]string{"backlog.json": vBacklog(vCap, vNext, vI1, vF1, vSlice("S1", "I1", "proposed"))},
+			[]string{"backlog.json", "S1", "I1"}},
+		{"dos slices in_progress", map[string]string{"backlog.json": vBacklog(vCap, vNext, vI1, vF1, vSlice("S1", "F1", "in_progress"), vSlice("S2", "F1", "in_progress"))},
+			[]string{"backlog.json", "in_progress", "S1", "S2"}},
+		{"necesidad sin source", map[string]string{"backlog.json": vBacklog(vCap, vNext, vI1,
+			`{"id": "N1", "type": "need", "parent": null, "state": "to_refine", "priority": 1, "spec": null}`)},
+			[]string{"backlog.json", "N1", "source"}},
+		{"supersedes inválido", map[string]string{"backlog.json": vBacklog(vCap, vNext, vI1, vF1, vSlice("S2", "F1", "proposed", `"supersedes": "S9"`))},
+			[]string{"backlog.json", "S2", "supersedes"}},
+		{"spec done alterada", map[string]string{
+			"backlog.json":       vBacklog(vCap, vNext, vI1, vF1, vSlice("S1", "F1", "done", `"spec_sha256": "`+hashing.Sum([]byte(vSpecS))+`"`)),
+			"work/specs/S1.json": wrongSpec},
+			[]string{"backlog.json", "S1", "spec_sha256"}},
+		{"capacidad cerrada sin página", map[string]string{
+			"backlog.json":    vBacklog(vCap, vNext, vI1),
+			"archive/I1.json": `{"initiative": "I1", "items": [{"id": "F1", "type": "feature", "parent": "I1", "state": "done", "priority": 1, "spec": null, "capability": "C1"}]}` + "\n"},
+			[]string{"backlog.json", "capabilities[0].page", "C1"}},
+		{"feature sin capacidad declarada", map[string]string{"backlog.json": vBacklog(vCap, vNext, vI1,
+			strings.Replace(vF1, `"capability": "C1"`, `"capability": "C99"`, 1))},
+			[]string{"backlog.json", "F1", "C99"}},
+	}
+	for _, r := range rows {
+		t.Run(r.name, func(t *testing.T) {
+			var created []string
+			for rel, content := range r.files {
+				abs := filepath.Join(inst, filepath.FromSlash(rel))
+				if _, err := os.Stat(abs); err != nil {
+					created = append(created, abs)
+				}
+				if err := os.MkdirAll(filepath.Dir(abs), 0o755); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.WriteFile(abs, []byte(content), 0o644); err != nil {
+					t.Fatal(err)
+				}
+			}
+			defer func() {
+				_ = os.WriteFile(filepath.Join(inst, "backlog.json"), []byte(original), 0o644)
+				for _, p := range created {
+					_ = os.Remove(p)
+				}
+			}()
+			code, out, errOut := itRun("verify")
+			if code != 1 {
+				t.Fatalf("código %d, se esperaba 1\n%s%s", code, out, errOut)
+			}
+			for _, w := range r.want {
+				if !strings.Contains(out, w) {
+					t.Errorf("la salida no contiene %q:\n%s", w, out)
+				}
+			}
+		})
+	}
+	if code, out, errOut := itRun("verify"); code != 0 {
+		t.Fatalf("tras las filas, verify debía volver a dar 0: %d\n%s%s", code, out, errOut)
+	}
+
+	// Final row: a broken template leaves nothing behind.
+	t.Run("plantilla rota no deja nada", func(t *testing.T) {
+		broken := itCopyPackage(t, pkg)
+		if err := os.WriteFile(filepath.Join(broken, "templates", "backlog.json"), []byte(strings.Replace(original, `"items": []`, `"items": [], "color": "rojo"`, 1)), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		missing := filepath.Join(t.TempDir(), "nuevo")
+		existing := t.TempDir()
+		for _, dest := range []string{missing, existing} {
+			t.Chdir(broken)
+			saved := installOptions
+			installOptions = opts
+			t.Cleanup(func() { installOptions = saved })
+			code, _, errOut := itRun("install", dest)
+			if code != 1 {
+				t.Errorf("install en %s: código %d, se esperaba 1", dest, code)
+			}
+			for _, w := range []string{"se revirtió todo lo creado", "backlog.json", "color"} {
+				if !strings.Contains(errOut, w) {
+					t.Errorf("la salida no contiene %q: %s", w, errOut)
+				}
+			}
+		}
+		if _, err := os.Stat(missing); err == nil {
+			t.Error("la carpeta destino no debía existir")
+		}
+		if got := itList(t, existing); len(got) != 0 {
+			t.Errorf("la carpeta existente debía quedar vacía y tiene %v", got)
+		}
+	})
+
+	// A good install through the CLI prints the verifier's green line once.
+	t.Run("la salida muestra la línea verde una sola vez", func(t *testing.T) {
+		t.Chdir(pkg)
+		saved := installOptions
+		installOptions = opts
+		t.Cleanup(func() { installOptions = saved })
+		code, out, errOut := itRun("install", filepath.Join(t.TempDir(), "mi año", "api"))
+		if code != 0 {
+			t.Fatalf("código %d\n%s%s", code, out, errOut)
+		}
+		if n := strings.Count(out, "Verificación en verde: no hay violaciones."); n != 1 {
+			t.Errorf("la línea verde aparece %d veces:\n%s", n, out)
+		}
+	})
 }

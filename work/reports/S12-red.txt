@@ -1,0 +1,32 @@
+--- FAIL: TestInstallRunsVerify (12.87s)
+    --- FAIL: TestInstallRunsVerify/plantilla_rota_en_una_ruta_que_no_existe (1.70s)
+        verify_test.go:110: se esperaba un error
+    --- FAIL: TestInstallRunsVerify/plantilla_rota_en_una_carpeta_vacía_existente (1.52s)
+        verify_test.go:125: se esperaba un error
+    --- FAIL: TestInstallRunsVerify/el_verificador_corre_antes_del_commit_y_después_de_bin_y_host (1.12s)
+        verify_test.go:147: HEAD no debía existir todavía
+        verify_test.go:150: bin/aquas existe=false, work/host.json existe=false; ambos debían existir
+    --- FAIL: TestInstallRunsVerify/error_de_ejecución_del_verificador (1.38s)
+        verify_test.go:160: el error debe contener el texto del verificador: <nil>
+    --- FAIL: TestInstallRunsVerify/una_sola_llamada_con_la_carpeta_destino_como_raíz (1.18s)
+        verify_test.go:187: llamadas = [], se esperaba exactamente ["/tmp/TestInstallRunsVerifyuna_sola_llamada_con_la_carpeta_destino_como_raíz3836044092/001/x"]
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/internal/install	12.874s
+--- FAIL: TestIntegrationVerify (9.03s)
+    --- FAIL: TestIntegrationVerify/plantilla_rota_no_deja_nada (5.09s)
+        integration_test.go:521: install en /tmp/TestIntegrationVerifyplantilla_rota_no_deja_nada3465071610/002/nuevo: código 0, se esperaba 1
+        integration_test.go:525: la salida no contiene "se revirtió todo lo creado": 
+        integration_test.go:525: la salida no contiene "backlog.json": 
+        integration_test.go:525: la salida no contiene "color": 
+        integration_test.go:521: install en /tmp/TestIntegrationVerifyplantilla_rota_no_deja_nada3465071610/003: código 0, se esperaba 1
+        integration_test.go:525: la salida no contiene "se revirtió todo lo creado": 
+        integration_test.go:525: la salida no contiene "backlog.json": 
+        integration_test.go:525: la salida no contiene "color": 
+        integration_test.go:530: la carpeta destino no debía existir
+        integration_test.go:533: la carpeta existente debía quedar vacía y tiene [.git .gitattributes .gitignore README.md archive backlog.json bin canon docs product schemas tools work]
+    --- FAIL: TestIntegrationVerify/la_salida_muestra_la_línea_verde_una_sola_vez (2.38s)
+        integration_test.go:548: la línea verde aparece 0 veces:
+            Aquas Light v0.1.0 instalado en /tmp/TestIntegrationVerifyla_salida_muestra_la_línea_verde_una_sola_vez2721095936/001/mi año/api: archivos copiados, bin/aquas y golangci-lint listos, y un commit inicial «Install Aquas Light v0.1.0».
+FAIL
+FAIL	github.com/jliberal-aquas/aquas-light/tools/cmd/aquas	9.045s
+FAIL

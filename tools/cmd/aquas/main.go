@@ -50,6 +50,9 @@ func run(args []string, stdout, stderr io.Writer) int {
 	}
 }
 
+// installOptions are the base options of `aquas install`; tests replace them.
+var installOptions install.Options
+
 func runInstall(args []string, stdout, stderr io.Writer) int {
 	if len(args) != 1 {
 		_, _ = fmt.Fprint(stderr, "aquas: falta la ruta de la carpeta destino\n\n"+usage())
@@ -65,10 +68,13 @@ func runInstall(args []string, stdout, stderr io.Writer) int {
 		_, _ = fmt.Fprintf(stderr, "aquas: no se puede instalar: %v\n", err)
 		return 1
 	}
-	if err := install.Run(root, args[0], install.Options{Version: version}); err != nil {
+	opts := installOptions
+	opts.Version = version
+	if err := install.Run(root, args[0], opts); err != nil {
 		_, _ = fmt.Fprintf(stderr, "aquas: no se puede instalar (se revirtió todo lo creado):\n%v\n", err)
 		return 1
 	}
+	_, _ = fmt.Fprintln(stdout, verify.GreenLine)
 	_, _ = fmt.Fprintf(stdout, "Aquas Light v%s instalado en %s: archivos copiados, bin/aquas y golangci-lint listos, y un commit inicial «Install Aquas Light v%s».\n", version, args[0], version)
 	return 0
 }
@@ -221,7 +227,7 @@ func runVerify(args []string, stdout, stderr io.Writer) int {
 		return 3
 	}
 	if len(vs) == 0 {
-		_, _ = fmt.Fprintln(stdout, "Verificación en verde: no hay violaciones.")
+		_, _ = fmt.Fprintln(stdout, verify.GreenLine)
 		return 0
 	}
 	for _, v := range vs {
