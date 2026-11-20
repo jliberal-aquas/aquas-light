@@ -1,0 +1,63 @@
+{
+  "item": "F2",
+  "agent": "architect",
+  "conclusion": "Linters, vet en los tres sistemas y pruebas con -race pasan. 0 bloqueantes, 2 mayores y 7 menores. Recomienda 3 bugs con padre S10: GIT_INDEX_FILE relativo, lecturas del modo disco fuera del repo y orden de las violaciones.",
+  "findings": [
+    {
+      "what": "verify --staged desde una subcarpeta con GIT_INDEX_FILE=.git/index (relativo, como lo exporta git commit) resuelve contra el directorio actual y da rojo falso: falta backlog.json y canon/config.json.",
+      "where": "tools/internal/verify/verify.go:185-188",
+      "severity": "major",
+      "bug": "sí, padre S10"
+    },
+    {
+      "what": "El modo disco sigue enlaces simbólicos al leer: una spec done enlazada a un archivo de fuera da verde en disco y rojo en staged. La regla 8 no rechaza barras invertidas ni mayúsculas distintas en spec (inferido para Windows y macOS).",
+      "where": "tools/internal/verify/verify.go:91-105; backlog.go:320-324",
+      "severity": "major",
+      "bug": "sí, padre S10"
+    },
+    {
+      "what": "Las violaciones de reglas llevan offset 0 y salen en orden de regla, no de posición; incumple S9 (4) y la línea 66 de C2-verify.md.",
+      "where": "tools/internal/verify/backlog.go:92-94; capabilities.go:18-20; verify.go:372-377",
+      "severity": "minor",
+      "bug": "sí, padre S10"
+    },
+    {
+      "what": "Los caminos de código 3 muestran texto en inglés de os y git; algunos estados del repo deberían ser violaciones con código 1.",
+      "where": "tools/internal/verify/verify.go:95-102,212-216",
+      "severity": "minor",
+      "bug": "no; puede sumarse al bug de lecturas"
+    },
+    {
+      "what": "Anidamiento profundo en un campo sobrante consume memoria cuadrática y puede matar el proceso.",
+      "where": "tools/internal/schema/decode.go:248-288",
+      "severity": "minor",
+      "bug": "no"
+    },
+    {
+      "what": "GIT_OBJECT_DIRECTORY y GIT_COMMON_DIR heredados siguen activos y dan código 3.",
+      "where": "tools/internal/verify/verify.go:178-193",
+      "severity": "minor",
+      "bug": "no"
+    },
+    {
+      "what": "Una necesidad con parent C1 se rechaza; un elemento con letra y tipo cruzados queda fuera de la regla 2; redacción «un slice S7».",
+      "where": "tools/internal/verify/backlog.go:152,215,321",
+      "severity": "minor",
+      "bug": "no; (a) es decisión del humano"
+    },
+    {
+      "what": "El decodificador acepta UTF-8 inválido; el esquema de decisions acepta null y el decodificador no.",
+      "where": "tools/internal/schema/decode.go:96; generate.go:44-45",
+      "severity": "minor",
+      "bug": "no"
+    },
+    {
+      "what": "Duplicación BacklogItem/ArchiveItem, backlogRules de unas 250 líneas, un proceso git cat-file por archivo.",
+      "where": "tools/internal/schema/types.go:48-81; backlog.go:90-341; verify.go:221-226",
+      "severity": "minor",
+      "bug": "no"
+    }
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

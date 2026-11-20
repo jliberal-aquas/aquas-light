@@ -1,0 +1,28 @@
+{
+  "item": "F2",
+  "agent": "auditor",
+  "conclusion": "La aceptación de F2 se cumple: verify y verify --staged dan código 0 en la raíz, TestIntegrationVerify trae las 12 filas, la instalación limpia y la plantilla rota, y las cuatro corridas de CI son success en los tres sistemas. Sin bloqueadores. Dos frases del what de S9 sin cumplir (texto en inglés en los caminos de código 3 y orden por posición). C2 repite esas dos frases como ciertas y C1 lista los subcomandos sin verify. Anotó 11 candidatos de F2 (R10 a R20) en work/retro.json.",
+  "findings_major": [
+    "updated_at de las memorias S9 a S12 sin origen en el reloj y posterior a su commit",
+    "ocho commits con revisé=nada; falsa=no dejaron falsa la página C1",
+    "pendientes del tester sin respuesta; el CI no muestra si se saltó la subprueba del enlace simbólico en Windows",
+    "ninguna prueba funcional de S9 a S12 tiene registro de que el humano la observó"
+  ],
+  "findings_minor": [
+    "texto en inglés de os y git en los caminos de código 3 (S9)",
+    "violaciones de reglas sin orden por posición (S9)",
+    "C2-verify.md:66 y :68 afirman esas dos frases",
+    "C1-install-and-update.md:13 lista los subcomandos sin verify",
+    "S9 y S10 pasaron a done antes del CI; S11 y S12 después",
+    "rojo y verde entraron en el mismo commit que el código",
+    "informes del tester con line numérico y output de más de 2.000 caracteres; schemas/report.schema.json no existe",
+    "delegations.jsonl usa alias de modelo y tiene una línea con uso null",
+    "TestRepoFilesDecode falla en una instancia",
+    "el campo files de S10 a S12 no declara todos los archivos tocados",
+    "work/handoff.json desactualizado y F2 corrió en dos sesiones",
+    "necesidad con padre C1 rechazada con un mensaje inexacto",
+    "el campo also de TestObject no está documentado"
+  ],
+  "certainty": "verified",
+  "result": "pass"
+}

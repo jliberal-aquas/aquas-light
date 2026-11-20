@@ -64,6 +64,94 @@
       "evidence": "Los 14 commits con línea `Docs:` dicen «revisé=nada; falsa=no; promesa=no». docs/governance/C1-install-and-update.md:3 afirma que cada afirmación cita su prueba, y las líneas 93, 95, 117, 129, 131 y 145 no citan ninguna. La línea 71 dice que sin `user.name` el commit falla; tools/internal/install/install_test.go:233-238 acepta que no falle. La línea 199 habla en primera persona («no lo verifiqué», «corrí») y omite `golangci-lint`, que .github/workflows/ci.yml:32-35 sí corre. Las líneas 81, 87 y 186 citan work/handoff.json como fuente.",
       "proposal": "Exigir que la página traiga una tabla de afirmación, archivo y prueba que una herramienta pueda comprobar, y prohibir como fuente los archivos que el método no define.",
       "severity": "major"
+    },
+    {
+      "id": "R10",
+      "what": "El tester de F2 tampoco comparó el campo `what` con el código, y dos frases del `what` de S9 (el slice que creó el decodificador y el comando) quedaron sin cumplir. Reincide R1.",
+      "evidence": "work/specs/S9.json:5 dice «Ningún mensaje al humano incluye texto en inglés de la biblioteca». Con `canon/config.json` convertido en carpeta, `aquas verify` imprime «no se pudo leer canon/config.json: read ...: is a directory» (tools/internal/verify/verify.go:342); con el índice de git dañado imprime «fatal: .git/index: index file smaller than expected» (verify.go:216); sin directorio actual imprime «getwd: no such file or directory» (tools/cmd/aquas/main.go:209). La misma línea de S9 dice «las ordena por archivo y posición»: las violaciones de reglas nacen sin posición de texto (tools/internal/verify/backlog.go:93) y verify.go:372-377 las deja en orden de regla; una corrida del auditor imprimió `items[0].id`, después `next_ids.S` y después `items[3].spec_sha256`. docs/governance/C2-verify.md:66 y :68 repiten las dos frases como ciertas. Los cuatro informes work/reports/S9-tester.json a S12-tester.json no listan las frases del `what`.",
+      "proposal": "La misma de R1, y además un caso destructivo por cada frase absoluta del `what` («ningún», «todo», «siempre»), que incluya los caminos de error con código 3.",
+      "severity": "major",
+      "feature": "F2"
+    },
+    {
+      "id": "R11",
+      "what": "La línea `Docs:` de los commits de slice dijo «falsa=no» mientras la página C1 (instalar y actualizar) afirmaba algo que ese mismo commit volvió falso. La página C2 la escribió el implementador y nadie la contrastó antes de esta auditoría. Reincide R9 y R6.",
+      "evidence": "Ocho de los nueve commits de F2 dicen «revisé=nada; falsa=no; promesa=no». El commit d899f05 (S9) creó `schemas/` y la página C1 siguió diciendo «Hoy el paquete no tiene `schemas/`, así que no se copia» hasta el commit 70f1324. El commit 9cad40b (S12) agregó el paso de verificación a `install` y la página C1 listaba siete pasos sin él. El commit 70f1324 declara revisada la página C1 con «falsa=no», y docs/governance/C1-install-and-update.md:13 sigue listando los subcomandos sin `verify`, que tools/cmd/aquas/main.go despacha desde S9. work/delegations.jsonl líneas 49 y 50: la página C2 y la corrección de C1 fueron del rol implementador.",
+      "proposal": "Que la línea `Docs:` nombre toda página que cite un archivo tocado por el commit, calculado por una herramienta a partir de las rutas que la página cita, y decidir el rol que escribe y el rol que contrasta las páginas.",
+      "severity": "major",
+      "feature": "F2"
+    },
+    {
+      "id": "R12",
+      "what": "El campo `updated_at` de la memoria de los cuatro slices trae una hora que nadie midió: es posterior al commit que contiene el archivo. El campo `done` nunca registra el paso `docs`.",
+      "evidence": "archive/memory/S9.json dice 11:05 y su commit d899f05 es de las 10:46:07. archive/memory/S10.json dice 13:00 y su commit 60155d7 es de las 12:38:52. archive/memory/S11.json dice 13:55 y su commit a379a0d es de las 13:49:01. archive/memory/S12.json dice 14:35, su commit 980a1ab es de las 14:00:00 y el reloj de la auditoría marcaba 14:08:19 (`date -Iseconds`). Los cuatro archivos traen `done` con `plan`, `red`, `green` y `tester`, sin `docs`. La regla 18 de canon/method.md compara ese campo con la hora de cambio de los archivos; la regla 5 de canon/constitution.md prohíbe valores sin origen. `aquas verify` no decodifica `work/memory.json` ni `archive/memory/*.json` (tools/internal/verify/verify.go:299-329).",
+      "proposal": "Escribir `updated_at` con la salida de un comando y no a mano, y agregar la memoria a los tipos que `aquas verify` decodifica, con la regla de que la hora no supere la del commit.",
+      "severity": "major",
+      "feature": "F2"
+    },
+    {
+      "id": "R13",
+      "what": "Los informes del tester y la bitácora de delegaciones de F2 siguen sin validarse. F2 creó la carpeta `schemas/` y su generador, y el esquema del informe que cita el canon sigue sin existir. Reincide R3.",
+      "evidence": "Los cuatro informes work/reports/S9-tester.json a S12-tester.json traen `line` como número, y canon/delegation.md pide texto. El campo `output` mide 3.475 caracteres en S10, 3.643 en S11 y 3.570 en S12; el techo de canon/delegation.md es 2.000. `schemas/` tiene ocho archivos y ninguno es `report.schema.json`. work/delegations.jsonl línea 50 trae `tokens`, `tool_uses` y `duration_s` en `null`, y la línea 49 dice que su uso «puede incluir la corrección». El campo `model` usa «sonnet», «haiku» y «fable», y canon/roles.json usa los nombres completos.",
+      "proposal": "Agregar el tipo del informe y el de la línea de delegación a `schema.Registry`, y que `aquas verify` decodifique `work/reports/*-tester.json` y `work/delegations.jsonl`.",
+      "severity": "minor",
+      "feature": "F2"
+    },
+    {
+      "id": "R14",
+      "what": "Los pendientes y hallazgos de los informes del tester de S10, S11 y S12 no tienen respuesta escrita, y uno no se puede responder con la integración continua actual. Reincide R5.",
+      "evidence": "work/reports/S11-tester.json pide confirmar en el log de CI que la subprueba del enlace simbólico corrió en Windows o por qué se saltó. .github/workflows/ci.yml:37 corre `go test -race ./...` sin `-v`, y el log de la corrida 44778308410 solo trae las líneas `ok` por paquete: no dice si hubo `t.Skip`. work/reports/S12-tester.json deja sin correr la variante `bin\\aquas.exe` y el caso de la ruta con espacio y «ñ» fuera de Linux. work/reports/S10-tester.json señala que ninguna prueba automática fija el código 3 de `--staged` sin `.git`. work/handoff.json `open_notes` solo recoge los hallazgos de S9; no hay entrada `to_refine` ni descarte escrito para los demás.",
+      "proposal": "La misma de R5, y que el CI imprima las pruebas saltadas por sistema (por ejemplo con `go test -json` filtrado por `skip`) para que la respuesta salga del log.",
+      "severity": "major",
+      "feature": "F2"
+    },
+    {
+      "id": "R15",
+      "what": "El momento en que un slice pasa a `done` cambió a mitad de F2 y el método no lo dice. S9 y S10 pasaron a `done` en el commit del código, antes de la corrida de CI; S11 y S12, en un commit aparte y posterior a ella. Reincide R4 en parte.",
+      "evidence": "El commit d899f05 trae el código de S9 y su `state: done`; la corrida 44536748393 se creó a las 13:46:12Z, después del commit de las 10:46:07-03:00. Igual 60155d7 (S10) y la corrida 44557168312. Los commits a379a0d («S11: close the slice after green CI») y 980a1ab (S12) cambian el estado aparte, y el número de corrida consta solo en el campo `next` de archive/memory/S11.json y S12.json, no en el mensaje del commit. canon/method.md regla 4 sigue igual; el cambio vino de una recomendación del arquitecto anotada en work/handoff.json `decisions_this_chat`.",
+      "proposal": "Escribir en la regla 4 que el cierre va en un commit propio, posterior a la corrida verde en los tres sistemas, y dónde se cita su número.",
+      "severity": "minor",
+      "feature": "F2"
+    },
+    {
+      "id": "R16",
+      "what": "El campo `files` de las specs de S10, S11 y S12 declara menos archivos de los que el commit tocó, y cada slice cambió código de un slice ya `done`. Reincide R8.",
+      "evidence": "work/specs/S10.json declara solo `tools/internal/verify/backlog.go`; el commit 60155d7 cambió además `verify.go` (45 líneas, archivo de S9). work/specs/S11.json declara solo `capabilities.go`; el commit a8eda48 cambió `verify.go` (95 líneas), `backlog.go` (archivo de S10), `verify_test.go` y `backlog_test.go`. work/specs/S12.json no declara `tools/internal/install/verify_test.go` ni `tools/internal/verify/verify.go`, y el commit 9cad40b creó el primero y cambió el segundo. La propuesta de R8 sobre la prueba de integración sí se siguió: S12 la declara y la escribe.",
+      "proposal": "La misma de R8: aclarar en la regla 15 si lo inmutable es la spec o también los archivos, y comparar `files` con `git show --stat` antes de cerrar el slice.",
+      "severity": "minor",
+      "feature": "F2"
+    },
+    {
+      "id": "R17",
+      "what": "Ninguna prueba funcional de S9 a S12 tiene registro de que el humano la observó. Reincide R7.",
+      "evidence": "archive/memory/S9.json a S12.json no nombran la prueba funcional. work/reports/S10-tester.json deja en `pending` que la prueba funcional de S10 «no se ejecutó con el binario». La de S12 la corrió el tester (work/delegations.jsonl línea 48), no el humano. El auditor corrió las de S9, S10 y S11 con el binario compilado y dieron lo esperado (`campo sobrante «color»`; «hay 2 slices o bugs en in_progress (S40, S13)»; «la capacidad C1 ... el archivo no existe»), pero eso no es la observación del humano que pide la regla 2 de canon/method.md.",
+      "proposal": "La misma de R7: registrar en la memoria archivada quién observó la prueba funcional y cuándo, o por qué queda pendiente.",
+      "severity": "major",
+      "feature": "F2"
+    },
+    {
+      "id": "R18",
+      "what": "`work/handoff.json` quedó sin actualizar desde el cierre de S9 y hoy describe un estado falso. F2 corrió en dos sesiones, y los desvíos de S10 a S12 no tienen dónde constar. Reincide R2.",
+      "evidence": "work/handoff.json tiene `date` 2026-11-19T11:10-03:00, dice «S10, S11 y S12 ready» y manda «Empezar S10 ... S9 a in_progress»; el último commit que lo tocó es 2eb0b6a. Los commits fcdfa9a, d899f05 y 2eb0b6a llevan la sesión `session_01NkNRqqKYWQKSW6EBDXyfKW` y los commits de 60155d7 a 70f1324 llevan `session_01NkNRqqKzJ9RWMngP13CUHe`; la regla 14 de canon/method.md pide una sesión por feature. Los pasos del cierre de F2 constan solo en ese archivo (`state.next`, punto 3), y `work/memory.json` no existe desde el commit 980a1ab.",
+      "proposal": "Decidir si el traspaso entre sesiones es un archivo del método, con tipo en `schemas/` y actualización al cerrar cada slice, o si se elimina y su contenido pasa a `work/memory.json`.",
+      "severity": "minor",
+      "feature": "F2"
+    },
+    {
+      "id": "R19",
+      "what": "La prueba `TestRepoFilesDecode` del paquete de herramientas depende de los archivos de planificación de este repo. En una instancia, que recibe `tools/` completo, esa prueba falla.",
+      "evidence": "tools/internal/verify/verify_test.go:380-388 exige `archive/I1.json`, `work/requests/N1.json`, `work/specs/S2.json` y otros diez archivos, y la línea 398 exige al menos 40 specs. El auditor armó una carpeta con `tools/`, `canon/`, `schemas/` y `templates/backlog.json` de HEAD: `aquas verify` dio código 0 y `go test -run TestRepoFilesDecode ./internal/verify` falló con «no se pudo leer archive/I1.json». docs/governance/C2-verify.md:54 presenta esa prueba como la única corrida automática del verificador sobre el repo.",
+      "proposal": "Que la prueba se salte cuando `canon/config.json` no diga `role: pack`, o mover la comprobación del repo real a un paso del CI que corra `aquas verify`.",
+      "severity": "minor",
+      "feature": "F2"
+    },
+    {
+      "id": "R20",
+      "what": "`work/retro.json` tiene forma de una sola feature: un campo `feature` y un `created_at` en la raíz. El auditor de F2 agregó sus candidatos a la misma lista con un campo `feature` propio para no tocar los de F1.",
+      "evidence": "work/retro.json líneas 2 y 3 dicen `\"feature\": \"F1\"` y la fecha del cierre de F1. La regla 12 de canon/method.md dice que N es cuántos candidatos hay en el archivo y no dice qué pasa con los de una feature anterior cuando la retrospectiva aún no corrió. Ningún archivo de `schemas/` describe `work/retro.json`.",
+      "proposal": "Definir el tipo de `work/retro.json` con `feature` y `created_at` por candidato, publicarlo en `schemas/` y decir en la regla 12 si N cuenta los candidatos de todas las features abiertas.",
+      "severity": "minor",
+      "feature": "F2"
     }
   ]
 }
