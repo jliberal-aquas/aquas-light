@@ -104,15 +104,16 @@
       "id": "S11",
       "type": "slice",
       "parent": "F2",
-      "state": "in_progress",
+      "state": "done",
       "priority": 3,
-      "spec": "work/specs/S11.json"
+      "spec": "work/specs/S11.json",
+      "spec_sha256": "7b479e6a0ba01ed0c5ede3f2801292951523537bec67e7b502218ca770d6738f"
     },
     {
       "id": "S12",
       "type": "slice",
       "parent": "F2",
-      "state": "ready",
+      "state": "in_progress",
       "priority": 4,
       "spec": "work/specs/S12.json"
     },

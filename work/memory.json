@@ -1,21 +1,13 @@
 {
-  "slice": "S11",
-  "step": "commit",
-  "done": [
-    "plan",
-    "red",
-    "green",
-    "tester"
-  ],
-  "next": "Ver el CI de los tres sistemas; si está verde, S11 a done con spec_sha256.",
+  "slice": "S12",
+  "step": "plan",
+  "done": [],
+  "next": "Implementador: prueba roja TestInstallRunsVerify, código en install, TestIntegrationVerify, verde.",
   "files": [
-    "tools/internal/verify/capabilities.go",
-    "tools/internal/verify/capabilities_test.go",
-    "tools/internal/verify/verify.go",
-    "tools/internal/verify/backlog.go",
-    "tools/internal/verify/verify_test.go",
-    "tools/internal/verify/backlog_test.go"
+    "tools/internal/install/install.go",
+    "tools/cmd/aquas/main.go",
+    "tools/cmd/aquas/integration_test.go"
   ],
   "blockers": [],
-  "updated_at": "2026-11-20T13:47:00-03:00"
+  "updated_at": "2026-11-20T13:55:00-03:00"
 }
